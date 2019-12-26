@@ -42,6 +42,7 @@ const webpackConfig = {
 	resolve: {
 		extensions: ['.js', '.json'],
 	},
+	devtool: 'sourcemap',
 }
 
 module.exports = webpackConfig

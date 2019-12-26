@@ -50,7 +50,62 @@ class Editor {
 	// move property
 	isMoving = false
 	movingType = null
-	movingTarget = null
+	movingItem = null
+	movingItemIndex = null
+	movingStart = {
+		x: 0,
+		y: 0,
+	}
+	_startAddItem(dom) {
+		this.movingType = 'new-item'
+
+		let shape = dom.getAttribute('data-shape')
+		this.movingItem = this.shapeList[shape]
+		this.movingStart = { x: 0, y: 0 }
+	}
+	_startMoveItem(e) {
+		const { itemList, edgeList } = this
+
+		for (let i = itemList.length - 1; i >= 0; i --) {
+			if (checkInRect(e, itemList[i])) {
+				this.movingItem = itemList[i]
+				this.movingItemIndex = i
+				this.movingStart = e
+				this.movingType = 'move-item'
+				break
+			}
+		}
+
+		this.isMoving = !!this.movingItem
+	}
+	_paintMovingItem(item) {		// paint moving item
+		const { moveCtx: ctx } = this
+		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
+
+		ctx.save()
+		ctx.setLineDash([7, 3])
+		ctx.strokeStyle = COLOR['blue']
+		ctx.fillStyle = COLOR['blue-op']
+
+		const { x, y, w, h } = item
+
+		let sx = x - w/2
+		let sy = y - h/2
+		let ex = x + w/2
+		let ey = y + h/2
+
+		ctx.beginPath()
+		ctx.moveTo(sx, sy)
+		ctx.lineTo(ex, sy)
+		ctx.lineTo(ex, ey)
+		ctx.lineTo(sx, ey)
+		ctx.lineTo(sx, sy)
+		ctx.stroke()
+		ctx.closePath()
+		ctx.fillRect(sx, sy, w, h)
+
+		ctx.restore()
+	}
 
 	// hover property
 	hoverItem = null
@@ -104,6 +159,22 @@ class Editor {
 			this._clearHover()
 		}
 	}
+	_paintHoverItem(item) {			// paint hover item
+		const { moveCtx: ctx } = this
+		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
+
+		const { x, y, w, h, input, output } = item
+		ctx.strokeRect(x - w/2, y - h/2, w, h)
+	}
+	_paintHoverAnchor(x, y, type) {
+		const { moveCtx: ctx } = this
+		ctx.beginPath()
+		ctx.arc(x, y, 4, 0, Math.PI * 2)
+		ctx.fillStyle = type === 'solid' ? COLOR['blue'] : COLOR['white']
+		ctx.fill()
+		ctx.stroke()
+		ctx.closePath()
+	}
 
 	_paintItem(item) {
 		const { ctx } = this
@@ -125,35 +196,12 @@ class Editor {
 		ctx.fillText(text, x, y)
 		// ctx.restore()
 	}
-	_paintMovingItem(item) {		// paint moving item
-		const { moveCtx: ctx } = this
-		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
-		const { x, y, w, h } = item
-		ctx.beginPath()
-		ctx.moveTo(x - w/2, y - h/2)
-		ctx.lineTo(x + w/2, y - h/2)
-		ctx.lineTo(x + w/2, y + h/2)
-		ctx.lineTo(x - w/2, y + h/2)
-		ctx.lineTo(x - w/2, y - h/2)
-		ctx.stroke()
-		ctx.closePath()
-		ctx.fillRect(x - w/2, y - h/2, w, h)
-	}
-	_paintHoverItem(item) {			// paint hover item
-		const { moveCtx: ctx } = this
-		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
-
-		const { x, y, w, h, input, output } = item
-		ctx.strokeRect(x - w/2, y - h/2, w, h)
-	}
-	_paintHoverAnchor(x, y, type) {
-		const { moveCtx: ctx } = this
-		ctx.beginPath()
-		ctx.arc(x, y, 4, 0, Math.PI * 2)
-		ctx.fillStyle = type === 'solid' ? COLOR['blue'] : COLOR['white']
-		ctx.fill()
-		ctx.stroke()
-		ctx.closePath()
+	_repaint() {
+		this._clear()
+		const { itemList, edgeList } = this
+		itemList.forEach(item => {
+			this._paintItem(item)
+		})
 	}
 
 	// item, edge, shape
@@ -207,10 +255,13 @@ class Editor {
 
 			this._startAddItem(oItem)
 		})
-		// 从 canvas 开始的点击, 可能是移动/选择/拖边
-		this.oCanvasContainer.addEventListener('click', e => {
-			console.log('xxx')
+		// 从 canvas 开始的 mousedown, 可能是移动/拖边
+		this.oCanvasContainer.addEventListener('mousedown', e => {
+			let { offsetX: x, offsetY: y } = e
+			this._startMoveItem({ x, y })
 		})
+		// 奖 canvas 的点击事件单独处理, mousedown + up 同时会触发 click
+
 
 		this.oCanvasContainer.addEventListener('mousemove', e => {
 			let { offsetX: x, offsetY: y } = e
@@ -234,42 +285,57 @@ class Editor {
 	}
 
 	// move event
-	_startAddItem(dom) {
-		this.movingType = 'new-item'
 
-		let shape = dom.getAttribute('data-shape')
-		this.movingTarget = this.shapeList[shape]
-
-		const { moveCtx: ctx } = this
-		ctx.setLineDash([7, 3])
-		ctx.strokeStyle = COLOR['blue']
-		ctx.fillStyle = COLOR_RGBA['blue']
-	}
-	_startMoveItem() {
-
-	}
 	_move({ x, y }) {
-		let item = this.movingTarget
-		if (this.movingType === 'new-item') {
-			this._paintMovingItem({ x, y, ...item })
+		let { movingItem, movingStart, movingType } = this
+		switch (movingType) {
+			case 'new-item':
+				this._paintMovingItem({ x, y, ...movingItem })
+				break
+			case 'move-item':
+				let diffX = x - movingStart.x
+				let diffY = y - movingStart.y
+				this._paintMovingItem({
+					...movingItem,
+					x: movingItem.x + diffX,
+					y: movingItem.y + diffY,
+				})
+				break
 		}
 	}
 
 	_endMove(e) {
 		this.isMoving = false
 
-		const { movingType, movingTarget, rect } = this
+		const { movingType, movingItem, rect, itemList, movingItemIndex, movingStart } = this
 		const { offsetX: x, offsetY: y } = e
 
 		if (movingType === 'new-item') {
 			if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
-				let item = { x, y, ...movingTarget }
+				let item = { x, y, ...movingItem }
 				this._paintItem(item)
 				this._addItem(item)
 				this._clearMoving()
 			}
 		}
 
+		if (movingType === 'move-item') {
+			if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
+				movingItem.x += (x - movingStart.x)
+				movingItem.y += (y - movingStart.y)
+				movingItem.z = itemList[itemList.length - 1]['z'] + 1
+				itemList.splice(movingItemIndex, 1)
+				itemList.push(movingItem)
+				this._repaint()
+				this._clearMoving()
+			}
+		}
+
+	}
+
+	_clear() {
+		const { ctx, oCanvas } = this
+		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
 	}
 
 	_clearMoving() {
@@ -277,7 +343,8 @@ class Editor {
 		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
 
 		this.movingType = null
-		this.movingTarget = null
+		this.movingItem = null
+		this.movingItemIndex = null
 
 		ctx.setLineDash([])
 	}
