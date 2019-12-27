@@ -1,4 +1,4 @@
-import { COLOR } from './color'
+import COLOR from './color'
 
 const w = 180
 const h = 40

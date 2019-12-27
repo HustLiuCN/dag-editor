@@ -1,4 +1,4 @@
-export const COLOR = {
+const COLOR = {
 	'white': '#ffffff',
 	'blue': '#2196f3',
 	'font': '#333333',
@@ -8,3 +8,5 @@ export const COLOR = {
 	'grey': '#f3f4f8',
 	'green': '#66bb6a',
 }
+
+export default COLOR
