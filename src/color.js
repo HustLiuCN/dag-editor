@@ -5,7 +5,6 @@ export const COLOR = {
 	'border': '#333333',
 	'shadow': 'rgba(0, 0, 0, 0.1)',
 	'blue-op': 'rgba(33, 150, 243, 0.05)',
-}
-export const COLOR_RGBA = {
-	'blue': 'rgba(33, 150, 243, 0.05)',
+	'grey': '#f3f4f8',
+	'green': '#66bb6a',
 }

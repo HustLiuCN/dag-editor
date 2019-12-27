@@ -1,91 +1,289 @@
 import { COLOR, COLOR_RGBA } from './color'
 import { checkInRect, checkInCircle } from './check-if-in'
+import { getDom, createDom } from './dom'
+// import { bindEvent } from './event'
 
 const R = 1
 
 class Editor {
 	constructor(options) {
 
+		this.options = options
+
 		this._initDom(options)
 
 		this._bindEvent()
 	}
-	_initDom({ container = '#container', toolbar = '#toolbar', canvas = '#editor', panel = '#panel' }) {
-		this.oContainer = document.querySelector('#container')
-		this.oMenu = document.querySelector('#menu')
-		this.oPanel = document.querySelector('#panel')
+	// init dom & canvas
+	_initDom({
+		container = '#container',
+		menu = '#menu',
+		editor = '#editor',
+	}) {
+		// container
+		this.oContainer = getDom(container)
+
+		// item menu
+		this.oMenu = getDom(menu)
 
 		// canvas
-		this.oCanvasContainer = document.querySelector('#editor')
+		this.oCanvasContainer = getDom(editor)
 		const rect = this.oCanvasContainer.getBoundingClientRect()
 		this.rect = rect
+		// main painting canvas
+		const canvas = createDom('canvas')
+		canvas.width = rect.width * R
+		canvas.height = rect.height * R
+		canvas.style.backgroundColor = COLOR['grey']
+		this.oCanvasContainer.appendChild(canvas)
+		this.oCanvas = canvas
+		this.ctx = canvas.getContext('2d')
+		// upper moving painting canvas
+		const cp = canvas.cloneNode()
+		cp.style.pointerEvents = 'none'
+		cp.style.backgroundColor = 'transparent'
+		this.oCanvasContainer.appendChild(cp)
+		this.moveCtx = cp.getContext('2d')
 
-		// paint canvas
-		const oCanvas = document.createElement('canvas')
-		oCanvas.width = rect.width
-		oCanvas.height = rect.height
-		oCanvas.style.backgroundColor = '#F3F4F8'
+		this._initCanvas()
+	}
+	_initCanvas() {
+		const { ctx, moveCtx } = this
 
-		this.oCanvasContainer.appendChild(oCanvas)
-		this.oCanvas = oCanvas
-		this.ctx = oCanvas.getContext('2d')
+		ctx.fillStyle = COLOR['white']
+		ctx.strokeStyle = COLOR['border']
+		ctx.font = `${R > 1 ? 20 : 14}px sans-serif`
+		ctx.textAlign = 'center'
+		ctx.textBaseline = 'middle'
+		ctx.lineJoin = 'round'
 
-		this.ctx.fillStyle = '#fff'
-		this.ctx.font = `${R > 1 ? 20 : 14}px sans-serif`
-		this.ctx.textAlign = 'center'
-		this.ctx.textBaseline = 'middle'
-		this.ctx.strokeStyle = COLOR['border']
+		moveCtx.strokeStyle = COLOR['blue']
+		moveCtx.fillStyle = COLOR['blue-op']
+		moveCtx.lineJoin = 'round'
+	}
+	// bind event
+	eventList = [
+		['oMenu', 'mousedown', '_startAddItem'],				// mousedown in menu: start to add a new item
+		['oCanvasContainer', 'mousedown', '_selectItem'],
+		['oContainer', 'mouseup', '_endMove'],					// mouseup in container: end move
+		['oCanvasContainer', 'mousemove', '_mouseMove'],		// mousemove in canvas: move item or hover
+	]
+	_bindEvent() {
+		const { eventList } = this
+		eventList.forEach(ev => {
+			this[ev[0]].addEventListener(ev[1], e => this[ev[2]](e))
+		})
+	}
+	// item, edge, shape
+	shapeList = {}
+	itemList = []
+	edgeList = []
+	selectedItem = null
+	selectedAnchor = null			// index of item.anchors
+	selectedItemType = null
 
-		const oMoveCanvas = document.createElement('canvas')
-		oMoveCanvas.width = rect.width
-		oMoveCanvas.height = rect.height
-		oMoveCanvas.style.pointerEvents = 'none'
-		oMoveCanvas.style.backgroundColor = 'transparent'
-		this.oCanvasContainer.appendChild(oMoveCanvas)
-		this.moveCtx = oMoveCanvas.getContext('2d')
+	_addItem(item) {		// push to the itemList in 'z-index' ascend order
+		const { itemList } = this
 
-		this.moveCtx.lineJoin = 'round'
+		let n = itemList.length
+		item.id = item.z = n > 0 ? itemList[n - 1]['z'] : 1
+		itemList.push(item)
+	}
+	_replaceItem(item) {
+		const { itemList } = this
+
+		let i = itemList.findIndex(o => o.id === item.id)
+		if (i >= 0) {
+			item.z = itemList[itemList.length - 1]['z'] + 1
+			itemList.splice(i, 1)
+			itemList.push(item)
+		}
 	}
 
-	// move property
-	isMoving = false
-	movingType = null
-	movingItem = null
-	movingItemIndex = null
-	movingStart = {
-		x: 0,
-		y: 0,
+	// event
+	_mouseMove(e) {
+		const { offsetX: x, offsetY: y } = e
+		this.isMoving ? this._moveItem({ x, y }) : this._hoverItem({ x, y })
 	}
-	_startAddItem(dom) {
-		this.movingType = 'new-item'
+	_selectItem(e) {
+		const { moveCtx: ctx } = this
+		this.selectedItem = this.hoverItem
+		this.selectedAnchor = this.hoverAnchor
+		this.selectedItemType = this.hoverAnchor ? 'anchor' : 'item'
 
-		let shape = dom.getAttribute('data-shape')
-		this.movingItem = this.shapeList[shape]
-		this.movingStart = { x: 0, y: 0 }
+		if (this.selectedItem) {
+			this.isMoving = true
+			this.movingType = 'move-item'
+			this.movingItem = this.selectedItem
+			this.movingStart = { x: e.offsetX, y: e.offsetY }
+
+			ctx.save()
+			ctx.setLineDash([7, 3])
+			ctx.strokeStyle = COLOR['blue']
+			ctx.fillStyle = COLOR['blue-op']
+		} else {
+			this.isMoving = false
+			this.movingType = null
+		}
 	}
-	_startMoveItem(e) {
-		const { itemList, edgeList } = this
 
-		for (let i = itemList.length - 1; i >= 0; i --) {
+	// hover
+	hoverItem = null
+	hoverAnchor = null
+	_hoverItem(e) {
+		const { itemList, moveCtx: ctx } = this
+
+		let hoverItem = null
+		for (let i = itemList.length - 1; i >= 0; i --) {		// by z-index ascend order
 			if (checkInRect(e, itemList[i])) {
-				this.movingItem = itemList[i]
-				this.movingItemIndex = i
-				this.movingStart = e
-				this.movingType = 'move-item'
+				hoverItem = itemList[i]
 				break
 			}
 		}
 
-		this.isMoving = !!this.movingItem
-	}
-	_paintMovingItem(item) {		// paint moving item
-		const { moveCtx: ctx } = this
-		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
+		if (!hoverItem && !this.hoverAnchor) {			// mouse not in item-rect & item-anchor
+			this._clearHover()
+			return
+		}
+		if (hoverItem) {		// mouse hover on item
+			this.hoverItem = hoverItem
+		}
 
+		this._paintHoverItem(this.hoverItem)
+
+		let { x, y, w, h, anchors } = this.hoverItem
+		if (anchors.length) {
+			let hoverAnchor = null
+			for (let i = 0; i < anchors.length; i ++) {
+				let anchor = anchors[i]
+				let [ox, oy] = anchor
+
+				ox = x - w/2 + w * ox
+				oy = y - h/2 + h * oy
+
+				if (checkInCircle(e, { ox, oy, r: 8 })) {
+					hoverAnchor = i
+					this._paintHoverAnchor(ox, oy, 'solid')
+				} else {
+					this._paintHoverAnchor(ox, oy, 'empty')
+				}
+			}
+			this.hoverAnchor = hoverAnchor
+		} else {
+			this.hoverAnchor = null
+		}
+	}
+	_clearHover() {
+		const { moveCtx: ctx, oCanvas } = this
+		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
+
+		this.hoverItem = null
+		this.hoverAnchor = null
+	}
+
+	// move info
+	isMoving = false
+	movingType = null
+	movingItem = null
+	movingStart = {}		// { x, y }: move start point, to calculate the diffX, diffY
+	// move start with a new item
+	_startAddItem(e) {
+		const oItem = e.target
+		if (!oItem.classList.contains('menu-item')) {
+			return
+		}
+		const shape = oItem.getAttribute('data-shape')
+		// set new item info
+		this.isMoving = true
+		this.movingType = 'new-item'
+		this.movingItem = this.shapeList[shape]
+		this.movingStart = { x: 0, y: 0 }
+		// set moving-canvas
+		const { moveCtx: ctx } = this
 		ctx.save()
 		ctx.setLineDash([7, 3])
 		ctx.strokeStyle = COLOR['blue']
 		ctx.fillStyle = COLOR['blue-op']
+	}
+	// moving item
+	_moveItem({ x, y }) {
+		const { movingItem, movingStart, movingType } = this
+		switch (movingType) {
+			case 'new-item':
+				this._paintMovingItem({ x, y, ...movingItem })
+				break
+			case 'move-item':
+				let diffX = x - movingStart.x
+				let diffY = y - movingStart.y
+				this._paintMovingItem({
+					...movingItem,
+					x: movingItem.x + diffX,
+					y: movingItem.y + diffY,
+				})
+				break
+		}
+	}
+	// end move
+	_endMove(e) {
+		this.isMoving = false
+
+		const { movingItem, movingType, oCanvas, rect, movingStart } = this
+		const { offsetX: x, offsetY: y } = e
+
+		switch (movingType) {
+			case 'new-item':
+				if (x > 0 && x < oCanvas.width && y > 0 && y < oCanvas.height) {
+					let item = { x, y, ...movingItem }
+					this._paintItem(item)
+					this._addItem(item)
+				}
+				break
+			case 'move-item':
+				if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
+					movingItem.x += (x - movingStart.x)
+					movingItem.y += (y - movingStart.y)
+					this._replaceItem(movingItem)
+					this._repaint()
+					this._clearMoving()
+				}
+				break
+		}
+
+		this._clearMoving()
+	}
+	_clearMoving() {
+		const { moveCtx: ctx, oCanvas } = this
+
+		ctx.restore()
+		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
+
+		this.movingType = null
+		this.movingItem = null
+	}
+	// paint
+	_paintItem(item) {
+		const { ctx } = this
+		const { x, y, w, h, text, z, c } = item
+		let sx = x - w/2
+		let sy = y - h/2
+
+		ctx.save()
+		// rect
+		ctx.fillStyle = COLOR['shadow']
+		ctx.fillRect(sx + 1, sy + 2, w, h)
+		ctx.fillStyle = COLOR['white']
+		ctx.fillRect(sx, sy, w, h)
+		// border
+		ctx.fillStyle = c
+		ctx.fillRect(sx, sy, 6, h + 1)
+		// text
+		ctx.fillStyle = COLOR['font']
+		ctx.fillText(text, x, y)
+		ctx.restore()
+	}
+	_paintMovingItem(item) {		// paint moving item
+		const { moveCtx: ctx } = this
+		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
 
 		const { x, y, w, h } = item
 
@@ -104,66 +302,12 @@ class Editor {
 		ctx.closePath()
 		ctx.fillRect(sx, sy, w, h)
 
-		ctx.restore()
 	}
-
-	// hover property
-	hoverItem = null
-	hoverAnchor = null
-	_hover(e) {
-		const { itemList, edgeList } = this
-
-		let hoverItem = null
-		for (let i = itemList.length - 1; i >= 0; i --) {
-			if (checkInRect(e, itemList[i])) {
-				hoverItem = itemList[i]
-				break
-			}
-		}
-		if (hoverItem) {		// 鼠标实际在 item 范围内
-			this.hoverItem = hoverItem
-		} else if (!this.hoverAnchor) {		// 鼠标虽然不在 item 范围内但还在 item 的 anchor 内
-			this.hoverItem = null
-		}
-
-
-
-		this.moveCtx.strokeStyle = COLOR['blue']
-		// TODO 逻辑合并?
-		if (this.hoverItem) {		// 鼠标在 item 或 item.anchor 内
-			this._paintHoverItem(this.hoverItem)
-
-			let { x, y, w, h, anchors } = this.hoverItem
-
-			if (anchors.length) {		// 这时候再判断鼠标是否在 anchor 内
-				let hoverAnchor = null
-				for (let i = 0; i < anchors.length; i ++) {
-					let anchor = anchors[i]
-					let [ox, oy] = anchor
-
-					ox = x - w/2 + w * ox
-					oy = y - h/2 + h * oy
-
-					if (checkInCircle(e, { ox, oy, r: 8 })) {
-						hoverAnchor = anchor
-						this._paintHoverAnchor(ox, oy, 'solid')
-					} else {
-						this._paintHoverAnchor(ox, oy, 'empty')
-					}
-				}
-				this.hoverAnchor = hoverAnchor
-			} else {
-				this.hoverAnchor = null
-			}
-		} else if (!this.hoverAnchor) {
-			this._clearHover()
-		}
-	}
-	_paintHoverItem(item) {			// paint hover item
+	_paintHoverItem(item) {
 		const { moveCtx: ctx } = this
 		ctx.clearRect(0, 0, this.oCanvas.width, this.oCanvas.height)
 
-		const { x, y, w, h, input, output } = item
+		const { x, y, w, h } = item
 		ctx.strokeRect(x - w/2, y - h/2, w, h)
 	}
 	_paintHoverAnchor(x, y, type) {
@@ -175,27 +319,6 @@ class Editor {
 		ctx.stroke()
 		ctx.closePath()
 	}
-
-	_paintItem(item) {
-		const { ctx } = this
-		const { x, y, w, h, text, z, c } = item
-		let sx = x - w/2
-		let sy = y - h/2
-
-		// rect
-		ctx.fillStyle = COLOR['shadow']
-		ctx.fillRect(sx + 1, sy + 2, w, h)
-		ctx.fillStyle = COLOR['white']
-		ctx.fillRect(sx, sy, w, h)
-		// border
-		ctx.fillStyle = c
-		ctx.fillRect(sx, sy, 6, h + 1)
-
-		// ctx.save()
-		ctx.fillStyle = COLOR['font']
-		ctx.fillText(text, x, y)
-		// ctx.restore()
-	}
 	_repaint() {
 		this._clear()
 		const { itemList, edgeList } = this
@@ -204,161 +327,19 @@ class Editor {
 		})
 	}
 
-	// item, edge, shape
-	itemList = []
-	edgeList = []
-	shapeList = {}
-
-	_addItem(item) {
-		const { itemList } = this
-
-		let n = itemList.length
-		item.z = n > 0 ? itemList[n - 1]['z'] : 1
-		itemList.push(item)
-
-
-		// if (!n) {
-		// 	item.z = 1
-		// 	itemList.push(item)
-		// 	return item
-		// }
-
-		// let maxIndex = Math.max.apply(0, itemList.map(i => i.z))
-		// item.z = maxIndex + 1
-
-		// let p
-		// for (let i = 0; i < n; i ++) {
-		// 	p = i
-		// 	if (itemList[i]['x'] > item.x) {
-		// 		break
-		// 	}
-		// 	if (itemList[i]['x'] === item.x && item[i]['y'] > item.y) {
-		// 		break
-		// 	}
-		// }
-		// itemList.splice(p, 1, item, itemList[p])
-	}
-
-	// event
-	_bindEvent() {
-		// this.oCanvasContainer.addEventListener('mousemove', e => {
-		// 	console.log(e)
-		// })
-
-		// 从 menu 开始的点击, 只能是添加 item 事件
-		this.oMenu.addEventListener('mousedown', e => {
-			const oItem = e.target
-			if (!oItem.classList.contains('menu-item')) {
-				return false
-			}
-			this.isMoving = true
-
-			this._startAddItem(oItem)
-		})
-		// 从 canvas 开始的 mousedown, 可能是移动/拖边
-		this.oCanvasContainer.addEventListener('mousedown', e => {
-			let { offsetX: x, offsetY: y } = e
-			this._startMoveItem({ x, y })
-		})
-		// 奖 canvas 的点击事件单独处理, mousedown + up 同时会触发 click
-
-
-		this.oCanvasContainer.addEventListener('mousemove', e => {
-			let { offsetX: x, offsetY: y } = e
-			if (this.isMoving) {
-				// TODO mousemove 出画布区域
-				// if (x < 2 || x > this.rect.width - 2 || y < 2 || y > this.rect.height - 2) {
-				// 	this.isMoving = false
-				// 	this._clearMoving()
-				// } else {
-					this._move({ x, y })
-				// }
-
-			} else {
-				this._hover({ x, y })
-			}
-		})
-
-		this.oContainer.addEventListener('mouseup', e => {
-			this._endMove(e)
-		})
-	}
-
-	// move event
-
-	_move({ x, y }) {
-		let { movingItem, movingStart, movingType } = this
-		switch (movingType) {
-			case 'new-item':
-				this._paintMovingItem({ x, y, ...movingItem })
-				break
-			case 'move-item':
-				let diffX = x - movingStart.x
-				let diffY = y - movingStart.y
-				this._paintMovingItem({
-					...movingItem,
-					x: movingItem.x + diffX,
-					y: movingItem.y + diffY,
-				})
-				break
-		}
-	}
-
-	_endMove(e) {
-		this.isMoving = false
-
-		const { movingType, movingItem, rect, itemList, movingItemIndex, movingStart } = this
-		const { offsetX: x, offsetY: y } = e
-
-		if (movingType === 'new-item') {
-			if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
-				let item = { x, y, ...movingItem }
-				this._paintItem(item)
-				this._addItem(item)
-				this._clearMoving()
-			}
-		}
-
-		if (movingType === 'move-item') {
-			if (x > 0 && x < rect.width && y > 0 && y < rect.height) {
-				movingItem.x += (x - movingStart.x)
-				movingItem.y += (y - movingStart.y)
-				movingItem.z = itemList[itemList.length - 1]['z'] + 1
-				itemList.splice(movingItemIndex, 1)
-				itemList.push(movingItem)
-				this._repaint()
-				this._clearMoving()
-			}
-		}
-
-	}
 
 	_clear() {
 		const { ctx, oCanvas } = this
 		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
 	}
 
-	_clearMoving() {
-		const { moveCtx: ctx, oCanvas } = this
-		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
-
-		this.movingType = null
-		this.movingItem = null
-		this.movingItemIndex = null
-
-		ctx.setLineDash([])
-	}
-	_clearHover() {
-		const { moveCtx: ctx, oCanvas } = this
-		ctx.clearRect(0, 0, oCanvas.width, oCanvas.height)
-
-		this.hoverItem = null
-		this.hoverAnchor = null
-	}
-
 	// register
 	_register(shape, item) {
 		this.shapeList[shape] = item
+	}
+
+	_log() {
+		console.log(this.selectedItem, this.xx)
 	}
 }
 

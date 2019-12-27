@@ -1,6 +1,8 @@
+import { COLOR } from './color'
+
 const w = 180
 const h = 40
-const c = '#42a5f5'
+const c = COLOR['blue']
 
 const shapes = {
 	'shape-001': {
@@ -10,7 +12,16 @@ const shapes = {
 			[0.5, 0, 'input'],		// [x, y, type]
 			[0.5, 1, 'output'],
 		],
-	}
+	},
+	'Test-Shape-': {
+		w, h, c: COLOR['green'],
+		text: 'Test-Shape-',
+		anchors: [
+			[0.5, 0, 'input'],
+			[0.3, 1, 'output'],
+			[0.7, 1, 'output'],
+		],
+	},
 }
 
 export default shapes

@@ -5,6 +5,5 @@ export function checkInRect({ x, y }, rect) {
 }
 
 export function checkInCircle({ x, y }, { ox, oy, r }) {
-
 	return Math.pow(ox - x, 2) + Math.pow(oy - y, 2) <= Math.pow(r, 2)
 }
