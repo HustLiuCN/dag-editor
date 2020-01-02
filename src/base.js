@@ -191,7 +191,7 @@ class Editor {
 					y: selectedItem.y + diffY,
 				})
 				break
-			case 'move-edge':
+			case 'move-anchor':
 				this._paintMovingLine(movingStart, { x, y })
 				break
 		}
