@@ -5,7 +5,7 @@ const webpackConfig = {
 	mode: 'development',
 	// watch: true,
 	entry: {
-		app: './src/index.js',
+		app: './src/app.js',
 	},
 	output: {
 		filename: '[name].js',

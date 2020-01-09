@@ -1,11 +1,20 @@
 import { getDom, createDom } from './dom'
 import COLOR from './color'
 
+/*
+ *    oContainer
+ *    oMenu
+ *    oCanvasContainer
+ *        ctx
+ *        moveCtx
+ */
+
 function init({
     container = '#container',
     menu = '#menu',
     editor = '#editor',
 }) {
+    // @TODO null dom error
     // container
     this.oContainer = getDom(container)
 
