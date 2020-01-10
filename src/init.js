@@ -1,4 +1,4 @@
-import { getDom, createDom } from './dom'
+import { getDom, createDom } from '../lib/dom'
 import COLOR from './color'
 
 /*

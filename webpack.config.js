@@ -6,6 +6,7 @@ const webpackConfig = {
 	// watch: true,
 	entry: {
 		app: './src/app.js',
+		game: './game/index.js',
 	},
 	output: {
 		filename: '[name].js',
