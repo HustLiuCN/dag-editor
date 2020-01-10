@@ -16,6 +16,8 @@ class GAME {
 
 		this._initData()
 		this._initPaint()
+
+		this._bindEvent()
 	}
 	_initDom() {
 		const oCon = getDom('#game-box')
@@ -33,9 +35,14 @@ class GAME {
 		// animation canvas
 		const ani = bg.cloneNode()
 		this.ani = ani.getContext('2d')
+		this.ani.fillStyle = '#2196f3'
 		// controller canvas
 		const ctl = bg.cloneNode()
 		this.ctl = ctl.getContext('2d')
+
+		bg.className = 'bg-canvas'
+		ani.className = 'ani-canvas'
+		ctl.className = 'ctl-canvas'
 
 		oCon.appendChild(bg)
 		oCon.appendChild(ani)
@@ -51,6 +58,7 @@ class GAME {
 		this.items.forEach(item => {
 			this._paintBoard(item)
 		})
+		this._paintRole(this.role.x, this.role.y)
 	}
 
 	// board
@@ -59,6 +67,25 @@ class GAME {
 		const { bg } = this
 
 		bg.fillRect(x, y, w, h)
+	}
+
+	// role
+	role = {
+		x: 50,
+		y: 190,
+	}
+	_paintRole(x, y) {
+		this.ani.beginPath()
+		this.ani.arc(x, y, 10, 0, Math.PI * 2, false)
+		this.ani.fill()
+	}
+
+	// event
+	_bindEvent() {
+		this.oCon.addEventListener('touchstart', e => {
+			let touch = e.touches[0]
+			console.log(touch)
+		})
 	}
 }
 
