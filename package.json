@@ -23,10 +23,13 @@
     "@babel/plugin-syntax-dynamic-import": "^7.2.0",
     "@babel/preset-env": "^7.5.0",
     "babel-loader": "^8.0.6",
+    "typescript": "^3.9.3",
     "webpack": "^4.35.2"
   },
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "source-map-loader": "^0.2.4",
+    "ts-loader": "^7.0.5",
     "webpack-cli": "^3.3.5"
   }
 }

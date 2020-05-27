@@ -5,8 +5,7 @@ const webpackConfig = {
 	mode: 'development',
 	// watch: true,
 	entry: {
-		app: './src/app.js',
-		game: './game/index.js',
+		mind: './src/mind',
 	},
 	output: {
 		filename: '[name].js',
@@ -16,12 +15,15 @@ const webpackConfig = {
 	module: {
 		rules: [
 			{
+				test: /\.tsx?$/,
+				loader: 'ts-loader',
+			}, {
 				test: /\.js$/,
 				exclude: /node_modules/,
 				use: [
 					'babel-loader',
 				],
-			}
+			},
 		]
 	},
 	optimization: {
@@ -41,7 +43,12 @@ const webpackConfig = {
 		},
 	},
 	resolve: {
-		extensions: ['.js', '.json'],
+		extensions: ['.js', '.json', '.ts'],
+		alias: {
+			'@data': path.resolve(__dirname, './mock-data'),
+			'@style': path.resolve(__dirname, './style'),
+			'@lib': path.resolve(__dirname, './lib'),
+		},
 	},
 	devtool: 'sourcemap',
 }
