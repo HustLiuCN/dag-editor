@@ -3,6 +3,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
+	<link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_hu47ga9737c.css">
 	<link rel="stylesheet" href="../style/common.css">
 	<style>
 		#mind-map-container {
@@ -11,10 +12,36 @@
 			height: 100%;
 			margin: 0 auto;
 		}
+		#toolbar {
+			position: absolute;
+			right: 10px;
+			top: 10px;
+			display: flex;
+			align-items: center;
+			background-color: #fff;
+			padding: 5px;
+			box-shadow: 0 0 10px 0 rgba(0, 0, 0, .15);
+		}
+		#toolbar .iconfont {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 18px;
+			padding: 4px;
+			margin: 0 5px;
+			background-color: #eee;
+			cursor: pointer;
+		}
 	</style>
 </head>
 <body>
-	<div id="mind-map-container"></div>
+	<div id="mind-map-container">
+		<div id="toolbar">
+			<i class="iconfont icon-clear" data-command="reset"></i>
+			<i class="iconfont icon-zoomIn" data-command="zoom-in"></i>
+			<i class="iconfont icon-zoomOut" data-command="zoom-out"></i>
+		</div>
+	</div>
 </body>
 <script src="../dist/mind.js"></script>
 </html>
