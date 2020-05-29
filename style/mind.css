@@ -44,6 +44,10 @@
 }
 
 @media screen and (max-device-width: 760px) {
+    body {
+        user-select:none;
+    }
+
     #mind-map-container {
         margin: 10px;
     }

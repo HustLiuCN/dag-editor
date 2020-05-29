@@ -1,4 +1,4 @@
 node_modules/
 *.map
-dist/
+# dist/
 .git
