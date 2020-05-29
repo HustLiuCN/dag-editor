@@ -6,6 +6,7 @@ const webpackConfig = {
 	// watch: true,
 	entry: {
 		mind: './src/mind',
+		editor: './src/editor',
 	},
 	output: {
 		filename: '[name].js',

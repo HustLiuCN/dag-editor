@@ -3,10 +3,11 @@
  */
 
 import { createDom, getDom } from '@lib/dom'
-import { getLeavesCount, figureNodeLevel } from '@lib/tree'
+import { figureNodeLevel } from '@lib/tree'
 import MockData from '@data/mind-map-data'
 import COLOR from '@lib/color'
 import Toolbar from './toolbar'
+import Event from './event'
 
 class Mind {
     constructor({ container = '#mind-map-container', data = {}, options = {} }) {
@@ -86,7 +87,7 @@ class Mind {
         for (let k in nodeInfo) {
             nodeInfo[k] = nodeInfo[k] * r
         }
-        nodeInfo.fontSize = r > 1 ? 20 : 12
+        nodeInfo.fontSize = Math.max(r * 10, 12)
     }
     // canvas ctx translate info, it's the origin pos relative to canvas(0, 0)
     _initTranslate() {
@@ -261,12 +262,17 @@ class Mind {
      *  event
      */
     _bindEvent() {
-        this.oCanvas.addEventListener('mousedown', this._mouseDown.bind(this))
-        this.oCanvas.addEventListener('mouseup', this._mouseUp.bind(this))
-        // this.oCanvas.addEventListener('mousemove', this._mouseMove.bind(this))
-        this.oCanvas.addEventListener('mousemove', e => {
+        const event = new Event({
+            rect: this.config
+        })
+        const { oCanvas: o } = this
+        event.add(o, 'mousedown', this._mouseDown.bind(this))
+        event.add(o, 'mouseup', this._mouseUp.bind(this))
+        event.add(o, 'mousemove', e => {
             requestAnimationFrame(this._mouseMove.bind(this, e))
         })
+
+        this.event = event
     }
     mouseEvent = {
         isDown: false,
