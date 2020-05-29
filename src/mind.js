@@ -116,8 +116,7 @@ class Mind {
         this._clear()
         this.ctx.save()
         const sc = this.scale / 10
-        this.ctx.scale(sc, sc)
-        this.ctx.transform(1, 0, 0, 1, x, y)
+        this.ctx.transform(sc, 0, 0, sc, x, y)
         this._render()
         this.ctx.restore()
     }
@@ -255,14 +254,14 @@ class Mind {
     _mouseDown(e) {
         const { offsetX: x, offsetY: y } = e
         const { ratio: r } = this.config
-        const sc = 10 / this.scale
+        const sc = this.scale / 10
         this.mouseEvent.isDown = true
         this.mouseEvent.sx = x*r*sc
         this.mouseEvent.sy = y*r*sc
     }
     _mouseMove(e) {
         const { isDown, sx, sy } = this.mouseEvent
-        const sc = 10 / this.scale
+        const sc = this.scale / 10
         if (!isDown) {
             return
         }
@@ -277,7 +276,7 @@ class Mind {
         const { offsetX: x, offsetY: y } = e
         const { sx, sy } = this.mouseEvent
         const { ratio: r } = this.config
-        const sc = 10 / this.scale
+        const sc = this.scale / 10
 
         this.mouseEvent.isDown = false
 
