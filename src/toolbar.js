@@ -21,7 +21,7 @@ class Toolbar {
                 return
             }
             const fn = this.events[command]
-            fn && fn()
+            fn && fn(e)
         })
     }
 }

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_hu47ga9737c.css">
+	<link rel="stylesheet" href="../style/common.css">
+	<style>
+		#mind-map-container {
+			position: relative;
+			width: 400px;
+			height: 400px;
+			margin: 0 auto;
+		}
+
+	</style>
+</head>
+<body>
+	<div id="mind-map-container">
+		<canvas width="400" height="400"></canvas>
+	</div>
+</body>
+<script>
+    const canvas = document.getElementsByTagName('canvas')[0]
+    const ctx = canvas.getContext('2d')
+
+    const a = [50, 200]
+    const b = [200, 50]
+    const c = [200, 200]
+    const d = [200, 300]
+    const list = [a, b, c, d]
+    const edge = [b, c, d]
+
+
+    list.forEach(l => {
+        ctx.beginPath()
+        ctx.arc(l[0], l[1], 2, 0, Math.PI * 2, false)
+        ctx.fill()
+        ctx.closePath()
+    })
+
+    edge.forEach(e => {
+        _edge(a, e)
+    })
+
+    function _edge(s, e) {
+        ctx.beginPath()
+        ctx.moveTo(s[0], s[1])
+        const cp1 = [ (s[0] + e[0]) / 2, s[1] ]
+        const cp2 = [ s[0], e[1] ]
+        ctx.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], e[0], e[1])
+        ctx.stroke()
+        ctx.closePath()
+    }
+
+
+</script>
+</html>

@@ -3,14 +3,17 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Document</title>
-	<link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_hu47ga9737c.css">
+	<link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_dlod123nn7.css">
 	<link rel="stylesheet" href="../style/common.css">
 	<style>
+		#code-container {
+			position: relative;
+			flex: 0 0 300px;
+		}
 		#mind-map-container {
 			position: relative;
-			width: 80%;
-			height: 100%;
-			margin: 0 auto;
+			flex: 1;
+			margin: 50px;
 		}
 		#toolbar {
 			position: absolute;
@@ -20,7 +23,7 @@
 			align-items: center;
 			background-color: #fff;
 			padding: 5px;
-			box-shadow: 0 0 10px 0 rgba(0, 0, 0, .15);
+			border-radius: 2px;
 		}
 		#toolbar .iconfont {
 			display: flex;
@@ -29,19 +32,39 @@
 			font-size: 18px;
 			padding: 4px;
 			margin: 0 5px;
-			background-color: #eee;
 			cursor: pointer;
+			transition: color .3s ease;
+		}
+		#toolbar .iconfont:hover {
+			color: #2196f3;
+		}
+
+		.legends-container {
+			display: flex;
+			position: absolute;
+			left: 10px;
+			top: 10px;
+			color: #3e3e3e;
+		}
+		.legends-container .legend-item {
+			padding: 2px 4px;
+			margin: 0 4px;
 		}
 	</style>
 </head>
 <body>
-	<div id="mind-map-container">
-		<div id="toolbar">
-			<i class="iconfont icon-clear" data-command="reset"></i>
-			<i class="iconfont icon-zoomIn" data-command="zoom-in"></i>
-			<i class="iconfont icon-zoomOut" data-command="zoom-out"></i>
+	<main>
+		<!-- <div id="code-container"></div> -->
+		<div id="mind-map-container" class="bxs">
+			<div id="toolbar" class="bxs">
+				<i class="iconfont icon-curve-line" data-command="switch-line" title="切换连线方式"></i>
+				<!-- <i class="iconfont icon-line" data-command="switch-line"></i> -->
+				<i class="iconfont icon-clear" data-command="reset" title="重置"></i>
+				<i class="iconfont icon-zoomIn" data-command="zoom-in" title="放大"></i>
+				<i class="iconfont icon-zoomOut" data-command="zoom-out" title="缩小"></i>
+			</div>
 		</div>
-	</div>
+	</main>
 </body>
 <script src="../dist/mind.js"></script>
 </html>
