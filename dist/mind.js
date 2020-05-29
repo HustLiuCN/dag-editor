@@ -394,6 +394,14 @@ var EventHandler = /*#__PURE__*/function () {
     var UA = window && window.navigator.userAgent || '';
     this.isMobile = !!UA.toLowerCase().match(/iphone|mobile|andriod/);
     this.baseRect = rect;
+
+    if (this.isMobile) {
+      document.body.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+      }, {
+        passive: false
+      });
+    }
   }
 
   _createClass(EventHandler, [{

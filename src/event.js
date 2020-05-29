@@ -4,6 +4,12 @@ class EventHandler {
 
         this.isMobile = !!UA.toLowerCase().match(/iphone|mobile|andriod/)
         this.baseRect = rect
+
+        if (this.isMobile) {
+            document.body.addEventListener('touchmove', e => {
+                e.preventDefault()
+            }, { passive: false })
+        }
     }
     mobileEvent = {
         'mousedown': 'touchstart',
