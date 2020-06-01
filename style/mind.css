@@ -41,6 +41,7 @@
 .legends-container .legend-item {
     padding: 2px 4px;
     margin: 0 4px;
+    opacity: 0.8;
 }
 
 @media screen and (max-device-width: 760px) {
