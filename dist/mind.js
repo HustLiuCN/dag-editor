@@ -110,7 +110,7 @@ var COLOR = {
 /*!********************!*\
   !*** ./lib/dom.js ***!
   \********************/
-/*! exports provided: getDom, getDomList, createDom */
+/*! exports provided: getDom, getDomList, createDom, getAttr */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -118,6 +118,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDom", function() { return getDom; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getDomList", function() { return getDomList; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "createDom", function() { return createDom; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAttr", function() { return getAttr; });
 function getDom(selector) {
   return document.querySelector(selector);
 }
@@ -132,6 +133,9 @@ function createDom() {
   className && (o.className = className);
   id && (o.id = id);
   return o;
+}
+function getAttr(dom, attr) {
+  return dom.getAttribute(attr);
 }
 
 /***/ }),

@@ -4,49 +4,14 @@
 	<meta charset="UTF-8">
     <title>DAG Editor</title>
     <link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_dlod123nn7.css">
-	<link rel="stylesheet" href="../style/common.css">
-	<style>
-		#container {
-			height: 100%;
-			/*background-color: #eee;*/
-			display: flex;
-		}
-		#menu {
-			flex: 0 0 200px;
-			background-color: #fff;
-			box-shadow: 1px 0 6px 0 rgba(0, 0, 0, 0.05);
-			padding: 10px;
-		}
-		.menu-item {
-			border: 1px solid #ddd;
-			padding: 5px 10px;
-			margin-bottom: 10px;
-			cursor: move;
-		}
-		#panel {
-			flex: 0 0 300px;
-			background-color: #fff;
-			box-shadow: -1px 0 6px 0 rgba(0, 0, 0, 0.05);
-		}
-		#editor {
-			position: relative;
-			flex: 1;
-		}
-		#editor > canvas {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			left: 0;
-			top: 0;
-			cursor: default;
-		}
-	</style>
+    <link rel="stylesheet" href="../style/common.css">
+    <link rel="stylesheet" href="../style/editor.css">
 </head>
 <body>
 	<div id="container">
-		<div id="menu">
-			<div class="menu-item" data-shape="shape-001">Shape 001</div>
-			<div class="menu-item" data-shape="Test-Shape-">Shape 002</div>
+		<div id="itempanel">
+			<div class="itempanel-item" data-shape="shape-001">Shape 001</div>
+			<div class="itempanel-item" data-shape="Test-Shape-">Shape 002</div>
 		</div>
 		<div id="editor"></div>
 		<div id="panel"></div>
