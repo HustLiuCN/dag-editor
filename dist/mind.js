@@ -86,26 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./lib/color.js":
-/*!**********************!*\
-  !*** ./lib/color.js ***!
-  \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-var COLOR = {
-  blue: '#b3e5fc',
-  font: '#333333',
-  line: '#c1c1c1',
-  green: '#c5e1a5',
-  red: '#ffcdd2'
-};
-/* harmony default export */ __webpack_exports__["default"] = (COLOR);
-
-/***/ }),
-
 /***/ "./lib/dom.js":
 /*!********************!*\
   !*** ./lib/dom.js ***!
@@ -366,6 +346,28 @@ var DATA = {
 
 /***/ }),
 
+/***/ "./src/color.js":
+/*!**********************!*\
+  !*** ./src/color.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var COLOR = {
+  blue: '#b3e5fc',
+  font: '#333333',
+  line: '#c1c1c1',
+  green: '#c5e1a5',
+  red: '#ffcdd2',
+  lingthBlue: '#e3f2fd',
+  white: '#ffffff'
+};
+/* harmony default export */ __webpack_exports__["default"] = (COLOR);
+
+/***/ }),
+
 /***/ "./src/event.js":
 /*!**********************!*\
   !*** ./src/event.js ***!
@@ -446,7 +448,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @lib/dom */ "./lib/dom.js");
 /* harmony import */ var _lib_tree__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @lib/tree */ "./lib/tree.js");
 /* harmony import */ var _data_mind_map_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @data/mind-map-data */ "./mock-data/mind-map-data.js");
-/* harmony import */ var _lib_color__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @lib/color */ "./lib/color.js");
+/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./color */ "./src/color.js");
 /* harmony import */ var _toolbar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./toolbar */ "./src/toolbar.js");
 /* harmony import */ var _event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./event */ "./src/event.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
@@ -484,9 +486,9 @@ var Mind = /*#__PURE__*/function () {
 
     _defineProperty(this, "options", {
       style: {
-        fill: _lib_color__WEBPACK_IMPORTED_MODULE_3__["default"].blue,
-        line: _lib_color__WEBPACK_IMPORTED_MODULE_3__["default"].line,
-        font: _lib_color__WEBPACK_IMPORTED_MODULE_3__["default"].font
+        fill: _color__WEBPACK_IMPORTED_MODULE_3__["default"].blue,
+        line: _color__WEBPACK_IMPORTED_MODULE_3__["default"].line,
+        font: _color__WEBPACK_IMPORTED_MODULE_3__["default"].font
       },
       lineType: 'polygon',
       legends: null
@@ -970,15 +972,15 @@ new Mind({
       // type: { name, color }
       'default': {
         name: '业务场景',
-        color: _lib_color__WEBPACK_IMPORTED_MODULE_3__["default"].blue
+        color: _color__WEBPACK_IMPORTED_MODULE_3__["default"].blue
       },
       'tech': {
         name: '技术应用',
-        color: _lib_color__WEBPACK_IMPORTED_MODULE_3__["default"].green
+        color: _color__WEBPACK_IMPORTED_MODULE_3__["default"].green
       },
       'todo': {
         name: 'TODO',
-        color: _lib_color__WEBPACK_IMPORTED_MODULE_3__["default"].red
+        color: _color__WEBPACK_IMPORTED_MODULE_3__["default"].red
       }
     },
     lineType: 'curve' // curve, polygon

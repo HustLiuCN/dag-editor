@@ -7,6 +7,7 @@ import { getDom, createDom, getAttr } from '@lib/dom'
 import Event from './event'
 import Canvas from './canvas'
 import shapes from '@data/dag-shapes'
+import COLOR from './color'
 
 class Editor {
     constructor({
@@ -47,7 +48,10 @@ class Editor {
         oDynamicCanvas.style.backgroundColor = 'transparent'
 
         this.mainCanvas = new Canvas(oCanvas)
-        this.dynamicCanvas = new Canvas(oDynamicCanvas)
+        this.dynamicCanvas = new Canvas(oDynamicCanvas, {
+            fillStyle: COLOR.lingthBlue,
+            strokeStyle: COLOR.blue,
+        })
 
         this.oPage.appendChild(oCanvas)
         this.oPage.appendChild(oDynamicCanvas)
@@ -82,16 +86,21 @@ class Editor {
     /*
      *  events
      */
+    eventList = [
+        ['oItemPanel', 'mousedown', '_beginAddNode'],
+        ['oItemPanel', 'mouseup', '_mouseUp'],
+        ['oPage', 'mousemove', '_mouseMove'],
+        ['oPage', 'mouseleave', '_mouseLeave'],
+        ['oPage', 'mouseup', '_mouseUpOnPage'],
+    ]
     _bindEvents() {
         const event = new Event({
             rect: this.config
         })
 
-        event.add(this.oItemPanel, 'mousedown', this._beginAddNode.bind(this))
-        event.add(this.oPage, 'mousemove', this._mouseMove.bind(this))
-
-        // event.add(this.oContainer, 'mouseup', this._mouseUp.bind(this))
-        event.add(this.oPage, 'mouseleave', this._mouseLeave.bind(this))
+        for (let ev of this.eventList) {
+            event.add(this[ev[0]], ev[1], this[ev[2]].bind(this))
+        }
 
         this.event = event
     }
@@ -110,7 +119,6 @@ class Editor {
         this.mouseDownType = 'add-node'
 
         this.selectedShape = this.shapes[shape]
-        console.log(this.selectedShape)
     }
     // mouse move
     _mouseMove(e) {
@@ -118,7 +126,7 @@ class Editor {
         if (this.isMouseDown) {
             switch(this.mouseDownType) {
                 case 'add-node':
-                    this.dynamicCanvas._paint({ ...this.selectedShape, x, y })
+                    this.dynamicCanvas._paintNode({ ...this.selectedShape, x, y })
                     break
                 case 'move-node':
                     console.log('moving node')
@@ -128,10 +136,26 @@ class Editor {
     }
 
     _mouseLeave() {
-        this.isMouseDown = false
+        this._mouseUp()
+        // this.dynamicCanvas._clear()
     }
-    _mouseUp(e) {
+
+    _mouseUpOnPage(e) {
+        const { offsetX: x, offsetY: y } = e
+        if (!this.isMouseDown) {
+            return
+        }
+        switch(this.mouseDownType) {
+            case 'add-node':
+                this.mainCanvas._paintNode({ ...this.selectedShape, x, y })
+                this._mouseUp()
+        }
+    }
+    _mouseUp() {
         this.isMouseDown = false
+        this.mouseDownType = null
+        this.selectedShape = null
+        this.dynamicCanvas._clear()
     }
 }
 

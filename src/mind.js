@@ -5,7 +5,7 @@
 import { createDom, getDom } from '@lib/dom'
 import { figureNodeLevel } from '@lib/tree'
 import MockData from '@data/mind-map-data'
-import COLOR from '@lib/color'
+import COLOR from './color'
 import Toolbar from './toolbar'
 import Event from './event'
 

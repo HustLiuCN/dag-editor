@@ -86,26 +86,6 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./lib/color.js":
-/*!**********************!*\
-  !*** ./lib/color.js ***!
-  \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-var COLOR = {
-  blue: '#b3e5fc',
-  font: '#333333',
-  line: '#c1c1c1',
-  green: '#c5e1a5',
-  red: '#ffcdd2'
-};
-/* harmony default export */ __webpack_exports__["default"] = (COLOR);
-
-/***/ }),
-
 /***/ "./lib/dom.js":
 /*!********************!*\
   !*** ./lib/dom.js ***!
@@ -149,11 +129,11 @@ function getAttr(dom, attr) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _lib_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @lib/color */ "./lib/color.js");
+/* harmony import */ var _src_color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @src/color */ "./src/color.js");
 
 var w = 180;
 var h = 40;
-var c = _lib_color__WEBPACK_IMPORTED_MODULE_0__["default"]['blue'];
+var c = _src_color__WEBPACK_IMPORTED_MODULE_0__["default"]['blue'];
 var shapes = {
   'shape-001': {
     w: w,
@@ -166,7 +146,7 @@ var shapes = {
   'Test-Shape-': {
     w: w,
     h: h,
-    c: _lib_color__WEBPACK_IMPORTED_MODULE_0__["default"]['green'],
+    c: _src_color__WEBPACK_IMPORTED_MODULE_0__["default"]['green'],
     text: 'Test-Shape-',
     anchors: [[0.5, 0, 'input'], [0.3, 1, 'output'], [0.7, 1, 'output']]
   }
@@ -184,24 +164,44 @@ var shapes = {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./color */ "./src/color.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+
+
 var Canvas = /*#__PURE__*/function () {
-  function Canvas(canvas, options) {
+  function Canvas(canvas) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
     _classCallCheck(this, Canvas);
 
     this.canvas = canvas;
     var ctx = canvas.getContext('2d');
+    ctx.fillStyle = options.fillStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
+    ctx.strokeStyle = options.strokeStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].line;
+    this.ctx = ctx;
   }
 
   _createClass(Canvas, [{
-    key: "_paint",
-    value: function _paint(node) {
-      console.log(node);
+    key: "_paintNode",
+    value: function _paintNode(node) {
+      this._clear();
+
+      var x = node.x,
+          y = node.y,
+          w = node.w,
+          h = node.h;
+      this.ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+      this.ctx.fillRect(x - w / 2, y - h / 2, w, h);
+    }
+  }, {
+    key: "_clear",
+    value: function _clear() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
   }]);
 
@@ -209,6 +209,28 @@ var Canvas = /*#__PURE__*/function () {
 }();
 
 /* harmony default export */ __webpack_exports__["default"] = (Canvas);
+
+/***/ }),
+
+/***/ "./src/color.js":
+/*!**********************!*\
+  !*** ./src/color.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var COLOR = {
+  blue: '#b3e5fc',
+  font: '#333333',
+  line: '#c1c1c1',
+  green: '#c5e1a5',
+  red: '#ffcdd2',
+  lingthBlue: '#e3f2fd',
+  white: '#ffffff'
+};
+/* harmony default export */ __webpack_exports__["default"] = (COLOR);
 
 /***/ }),
 
@@ -225,9 +247,16 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./event */ "./src/event.js");
 /* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
 /* harmony import */ var _data_dag_shapes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.js");
+/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./color */ "./src/color.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -241,6 +270,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *  dag-editor
  *  author: liupeidong@gmail.com
  */
+
 
 
 
@@ -261,6 +291,8 @@ var Editor = /*#__PURE__*/function () {
     _defineProperty(this, "nodes", []);
 
     _defineProperty(this, "edges", []);
+
+    _defineProperty(this, "eventList", [['oItemPanel', 'mousedown', '_beginAddNode'], ['oItemPanel', 'mouseup', '_mouseUp'], ['oPage', 'mousemove', '_mouseMove'], ['oPage', 'mouseleave', '_mouseLeave'], ['oPage', 'mouseup', '_mouseUpOnPage']]);
 
     _defineProperty(this, "isMouseDown", false);
 
@@ -302,7 +334,10 @@ var Editor = /*#__PURE__*/function () {
       oDynamicCanvas.style.pointerEvents = 'none';
       oDynamicCanvas.style.backgroundColor = 'transparent';
       this.mainCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_2__["default"](oCanvas);
-      this.dynamicCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_2__["default"](oDynamicCanvas);
+      this.dynamicCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_2__["default"](oDynamicCanvas, {
+        fillStyle: _color__WEBPACK_IMPORTED_MODULE_4__["default"].lingthBlue,
+        strokeStyle: _color__WEBPACK_IMPORTED_MODULE_4__["default"].blue
+      });
       this.oPage.appendChild(oCanvas);
       this.oPage.appendChild(oDynamicCanvas);
     }
@@ -344,10 +379,21 @@ var Editor = /*#__PURE__*/function () {
       var event = new _event__WEBPACK_IMPORTED_MODULE_1__["default"]({
         rect: this.config
       });
-      event.add(this.oItemPanel, 'mousedown', this._beginAddNode.bind(this));
-      event.add(this.oPage, 'mousemove', this._mouseMove.bind(this)); // event.add(this.oContainer, 'mouseup', this._mouseUp.bind(this))
 
-      event.add(this.oPage, 'mouseleave', this._mouseLeave.bind(this));
+      var _iterator = _createForOfIteratorHelper(this.eventList),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var ev = _step.value;
+          event.add(this[ev[0]], ev[1], this[ev[2]].bind(this));
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
       this.event = event;
     }
   }, {
@@ -363,7 +409,6 @@ var Editor = /*#__PURE__*/function () {
       this.isMouseDown = true;
       this.mouseDownType = 'add-node';
       this.selectedShape = this.shapes[shape];
-      console.log(this.selectedShape);
     } // mouse move
 
   }, {
@@ -375,7 +420,7 @@ var Editor = /*#__PURE__*/function () {
       if (this.isMouseDown) {
         switch (this.mouseDownType) {
           case 'add-node':
-            this.dynamicCanvas._paint(_objectSpread({}, this.selectedShape, {
+            this.dynamicCanvas._paintNode(_objectSpread({}, this.selectedShape, {
               x: x,
               y: y
             }));
@@ -391,12 +436,38 @@ var Editor = /*#__PURE__*/function () {
   }, {
     key: "_mouseLeave",
     value: function _mouseLeave() {
-      this.isMouseDown = false;
+      this._mouseUp(); // this.dynamicCanvas._clear()
+
+    }
+  }, {
+    key: "_mouseUpOnPage",
+    value: function _mouseUpOnPage(e) {
+      var x = e.offsetX,
+          y = e.offsetY;
+
+      if (!this.isMouseDown) {
+        return;
+      }
+
+      switch (this.mouseDownType) {
+        case 'add-node':
+          this.mainCanvas._paintNode(_objectSpread({}, this.selectedShape, {
+            x: x,
+            y: y
+          }));
+
+          this._mouseUp();
+
+      }
     }
   }, {
     key: "_mouseUp",
-    value: function _mouseUp(e) {
+    value: function _mouseUp() {
       this.isMouseDown = false;
+      this.mouseDownType = null;
+      this.selectedShape = null;
+
+      this.dynamicCanvas._clear();
     }
   }]);
 

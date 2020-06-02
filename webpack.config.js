@@ -49,6 +49,7 @@ const webpackConfig = {
 			'@data': path.resolve(__dirname, './mock-data'),
 			'@style': path.resolve(__dirname, './style'),
 			'@lib': path.resolve(__dirname, './lib'),
+			'@src': path.resolve(__dirname, './src'),
 		},
 	},
 	devtool: 'sourcemap',

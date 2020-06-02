@@ -1,4 +1,4 @@
-import COLOR from '@lib/color'
+import COLOR from '@src/color'
 
 const w = 180
 const h = 40
