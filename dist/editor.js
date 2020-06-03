@@ -120,6 +120,45 @@ function getAttr(dom, attr) {
 
 /***/ }),
 
+/***/ "./lib/utils.js":
+/*!**********************!*\
+  !*** ./lib/utils.js ***!
+  \**********************/
+/*! exports provided: randomID, checkInNode, getAnchorPos */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "randomID", function() { return randomID; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "checkInNode", function() { return checkInNode; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "getAnchorPos", function() { return getAnchorPos; });
+function randomID() {
+  return Date.now().toString(16);
+}
+function checkInNode(_ref, _ref2) {
+  var x = _ref.x,
+      y = _ref.y;
+  var nx = _ref2.x,
+      ny = _ref2.y,
+      w = _ref2.w,
+      h = _ref2.h;
+  return Math.abs(x - nx) <= w / 2 && Math.abs(y - ny) <= h / 2;
+}
+function getAnchorPos(node, anchor) {
+  var x = node.x,
+      y = node.y,
+      w = node.w,
+      h = node.h;
+  var x0 = x - w / 2;
+  var y0 = y - h / 2;
+  return {
+    x: x0 + anchor[0] * w,
+    y: y0 + anchor[1] * h
+  };
+}
+
+/***/ }),
+
 /***/ "./mock-data/dag-shapes.js":
 /*!*********************************!*\
   !*** ./mock-data/dag-shapes.js ***!
@@ -165,11 +204,13 @@ var shapes = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./color */ "./src/color.js");
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @lib/utils */ "./lib/utils.js");
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 
 
 
@@ -181,6 +222,7 @@ var Canvas = /*#__PURE__*/function () {
 
     this.canvas = canvas;
     var ctx = canvas.getContext('2d');
+    this.ratio = options.ratio || 1;
     ctx.fillStyle = options.fillStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
     ctx.strokeStyle = options.strokeStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].line;
     this.ctx = ctx;
@@ -188,15 +230,53 @@ var Canvas = /*#__PURE__*/function () {
 
   _createClass(Canvas, [{
     key: "_paintNode",
-    value: function _paintNode(node) {
-      this._clear();
+    value: function _paintNode(node, isSelected) {
+      var _this = this;
 
+      var r = this.ratio,
+          ctx = this.ctx;
       var x = node.x,
           y = node.y,
           w = node.w,
           h = node.h;
-      this.ctx.strokeRect(x - w / 2, y - h / 2, w, h);
-      this.ctx.fillRect(x - w / 2, y - h / 2, w, h);
+      x *= r;
+      y *= r;
+      w *= r;
+      h *= r;
+      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+
+      if (isSelected) {
+        ctx.save();
+        ctx.strokeStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].blue;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x - w / 2, y - h / 2, w, h); // anchor
+
+        if (node.anchors) {
+          node.anchors.forEach(function (anchor) {
+            var pos = Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["getAnchorPos"])(node, anchor);
+
+            _this._paintAnchor(pos);
+          });
+        }
+
+        ctx.restore();
+      } else {
+        ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+      }
+    }
+  }, {
+    key: "_paintAnchor",
+    value: function _paintAnchor(_ref) {
+      var x = _ref.x,
+          y = _ref.y;
+      var ctx = this.ctx,
+          r = this.ratio;
+      x *= r;
+      y *= r;
+      ctx.beginPath();
+      ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.stroke();
     }
   }, {
     key: "_clear",
@@ -244,19 +324,20 @@ var COLOR = {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _lib_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @lib/dom */ "./lib/dom.js");
-/* harmony import */ var _event__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./event */ "./src/event.js");
-/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
-/* harmony import */ var _data_dag_shapes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.js");
-/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./color */ "./src/color.js");
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @lib/utils */ "./lib/utils.js");
+/* harmony import */ var _event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./event */ "./src/event.js");
+/* harmony import */ var _canvas__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./canvas */ "./src/canvas.js");
+/* harmony import */ var _data_dag_shapes__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.js");
+/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./color */ "./src/color.js");
 function _createForOfIteratorHelper(o) { if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (o = _unsupportedIterableToArray(o))) { var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var it, normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -270,6 +351,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  *  dag-editor
  *  author: liupeidong@gmail.com
  */
+
 
 
 
@@ -292,13 +374,22 @@ var Editor = /*#__PURE__*/function () {
 
     _defineProperty(this, "edges", []);
 
-    _defineProperty(this, "eventList", [['oItemPanel', 'mousedown', '_beginAddNode'], ['oItemPanel', 'mouseup', '_mouseUp'], ['oPage', 'mousemove', '_mouseMove'], ['oPage', 'mouseleave', '_mouseLeave'], ['oPage', 'mouseup', '_mouseUpOnPage']]);
+    _defineProperty(this, "eventList", [['oItemPanel', 'mousedown', '_beginAddNode'], ['oItemPanel', 'mouseup', '_mouseUp'], ['oPage', 'mousedown', '_mouseDownOnPage'], ['oPage', 'mousemove', '_mouseMove'], ['oPage', 'mouseleave', '_mouseLeave'], ['oPage', 'mouseup', '_mouseUpOnPage'], ['oPage', 'contextmenu', '_contextMenu']]);
 
     _defineProperty(this, "isMouseDown", false);
 
     _defineProperty(this, "mouseDownType", null);
 
     _defineProperty(this, "selectedShape", null);
+
+    _defineProperty(this, "__selectedNode", null);
+
+    _defineProperty(this, "hoverNode", null);
+
+    _defineProperty(this, "mouseEventStart", {
+      x: 0,
+      y: 0
+    });
 
     console.log('xxx');
     this.oContainer = Object(_lib_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])(container);
@@ -333,10 +424,13 @@ var Editor = /*#__PURE__*/function () {
       var oDynamicCanvas = oCanvas.cloneNode();
       oDynamicCanvas.style.pointerEvents = 'none';
       oDynamicCanvas.style.backgroundColor = 'transparent';
-      this.mainCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_2__["default"](oCanvas);
-      this.dynamicCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_2__["default"](oDynamicCanvas, {
-        fillStyle: _color__WEBPACK_IMPORTED_MODULE_4__["default"].lingthBlue,
-        strokeStyle: _color__WEBPACK_IMPORTED_MODULE_4__["default"].blue
+      this.mainCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_3__["default"](oCanvas, {
+        ratio: ratio
+      });
+      this.dynamicCanvas = new _canvas__WEBPACK_IMPORTED_MODULE_3__["default"](oDynamicCanvas, {
+        ratio: ratio,
+        fillStyle: _color__WEBPACK_IMPORTED_MODULE_5__["default"].lingthBlue,
+        strokeStyle: _color__WEBPACK_IMPORTED_MODULE_5__["default"].blue
       });
       this.oPage.appendChild(oCanvas);
       this.oPage.appendChild(oDynamicCanvas);
@@ -361,13 +455,70 @@ var Editor = /*#__PURE__*/function () {
      */
 
   }, {
-    key: "_paint",
+    key: "_addNode",
+    value: function _addNode(node) {
+      this.nodes.push(_objectSpread({}, node, {
+        id: Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["randomID"])()
+      }));
+      this.selectedNode = this.nodes[this.nodes.length - 1];
 
+      this._render();
+    }
+  }, {
+    key: "_updateNode",
+    value: function _updateNode(node, _ref2) {
+      var dx = _ref2.dx,
+          dy = _ref2.dy;
+      var i = this.nodes.findIndex(function (n) {
+        return n.id === node.id;
+      });
+
+      if (i < 0) {
+        return;
+      }
+
+      node.x += dx;
+      node.y += dy;
+      this.nodes.splice(i, 1);
+      this.nodes.push(node);
+
+      this._render();
+    }
+  }, {
+    key: "_getSelected",
+    value: function _getSelected(_ref3) {
+      var x = _ref3.x,
+          y = _ref3.y;
+      var nodes = this.nodes;
+
+      for (var i = nodes.length; i > 0; i--) {
+        var node = nodes[i - 1];
+
+        if (Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["checkInNode"])({
+          x: x,
+          y: y
+        }, node)) {
+          return node;
+        }
+      }
+
+      return null;
+    }
     /*
      *  paint
+     *      render: render all nodes & edges on main canvas, clear first
      */
-    value: function _paint(node) {
-      this.mainCanvas._paint(node);
+
+  }, {
+    key: "_render",
+    value: function _render() {
+      var _this = this;
+
+      this.mainCanvas._clear();
+
+      this.nodes.forEach(function (node) {
+        _this.mainCanvas._paintNode(node, _this.selectedNode && _this.selectedNode.id === node.id);
+      });
     }
     /*
      *  events
@@ -376,7 +527,7 @@ var Editor = /*#__PURE__*/function () {
   }, {
     key: "_bindEvents",
     value: function _bindEvents() {
-      var event = new _event__WEBPACK_IMPORTED_MODULE_1__["default"]({
+      var event = new _event__WEBPACK_IMPORTED_MODULE_2__["default"]({
         rect: this.config
       });
 
@@ -398,6 +549,7 @@ var Editor = /*#__PURE__*/function () {
     }
   }, {
     key: "_beginAddNode",
+    // mouse down on itempanel
     value: function _beginAddNode(e) {
       var o = e.target;
       var shape = Object(_lib_dom__WEBPACK_IMPORTED_MODULE_0__["getAttr"])(o, 'data-shape');
@@ -409,15 +561,38 @@ var Editor = /*#__PURE__*/function () {
       this.isMouseDown = true;
       this.mouseDownType = 'add-node';
       this.selectedShape = this.shapes[shape];
+    } // mouse down on page
+
+  }, {
+    key: "_mouseDownOnPage",
+    value: function _mouseDownOnPage(e) {
+      this.isMouseDown = true;
+      var x = e.offsetX,
+          y = e.offsetY;
+      this.mouseEventStart = {
+        x: x,
+        y: y
+      };
+
+      if (this.hoverNode) {
+        this.mouseDownType = 'move-node';
+        this.selectedNode = this.hoverNode;
+      } else {
+        this.selectedNode = null;
+        return;
+      }
     } // mouse move
 
   }, {
     key: "_mouseMove",
     value: function _mouseMove(e) {
+      this.dynamicCanvas._clear();
+
       var x = e.offsetX,
           y = e.offsetY;
 
       if (this.isMouseDown) {
+        // move
         switch (this.mouseDownType) {
           case 'add-node':
             this.dynamicCanvas._paintNode(_objectSpread({}, this.selectedShape, {
@@ -428,9 +603,25 @@ var Editor = /*#__PURE__*/function () {
             break;
 
           case 'move-node':
-            console.log('moving node');
+            var dx = x - this.mouseEventStart.x;
+            var dy = y - this.mouseEventStart.y;
+
+            this.dynamicCanvas._paintNode(_objectSpread({}, this.selectedNode, {
+              x: this.selectedNode.x + dx,
+              y: this.selectedNode.y + dy
+            }));
+
             break;
         }
+      } else {
+        // hover
+        var hoverNode = this._getSelected({
+          x: x,
+          y: y
+        });
+
+        hoverNode && this.dynamicCanvas._paintNode(hoverNode, true);
+        this.hoverNode = hoverNode;
       }
     }
   }, {
@@ -451,13 +642,31 @@ var Editor = /*#__PURE__*/function () {
 
       switch (this.mouseDownType) {
         case 'add-node':
-          this.mainCanvas._paintNode(_objectSpread({}, this.selectedShape, {
+          this._addNode(_objectSpread({}, this.selectedShape, {
             x: x,
             y: y
           }));
 
           this._mouseUp();
 
+          break;
+
+        case 'move-node':
+          this._updateNode(this.selectedNode, {
+            dx: x - this.mouseEventStart.x,
+            dy: y - this.mouseEventStart.y
+          });
+
+          this._mouseUp();
+
+          break;
+
+        default:
+          this._render();
+
+          this._mouseUp();
+
+          break;
       }
     }
   }, {
@@ -468,6 +677,22 @@ var Editor = /*#__PURE__*/function () {
       this.selectedShape = null;
 
       this.dynamicCanvas._clear();
+    }
+  }, {
+    key: "_contextMenu",
+    value: function _contextMenu(e) {
+      e.preventDefault();
+      console.log('===');
+    }
+  }, {
+    key: "selectedNode",
+    set: function set(node) {
+      // TODO
+      this.__selectedNode = node;
+      this.hoverNode = null;
+    },
+    get: function get() {
+      return this.__selectedNode;
     }
   }]);
 
@@ -480,8 +705,8 @@ var editor = new Editor({
   itempanel: '#itempanel'
 });
 
-for (var shape in _data_dag_shapes__WEBPACK_IMPORTED_MODULE_3__["default"]) {
-  editor.registerShape(shape, _data_dag_shapes__WEBPACK_IMPORTED_MODULE_3__["default"][shape]);
+for (var shape in _data_dag_shapes__WEBPACK_IMPORTED_MODULE_4__["default"]) {
+  editor.registerShape(shape, _data_dag_shapes__WEBPACK_IMPORTED_MODULE_4__["default"][shape]);
 }
 
 /***/ }),

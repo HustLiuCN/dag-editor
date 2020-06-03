@@ -4,6 +4,7 @@
  */
 
 import { getDom, createDom, getAttr } from '@lib/dom'
+import { randomID, checkInNode } from '@lib/utils'
 import Event from './event'
 import Canvas from './canvas'
 import shapes from '@data/dag-shapes'
@@ -47,8 +48,9 @@ class Editor {
         oDynamicCanvas.style.pointerEvents = 'none'
         oDynamicCanvas.style.backgroundColor = 'transparent'
 
-        this.mainCanvas = new Canvas(oCanvas)
+        this.mainCanvas = new Canvas(oCanvas, { ratio, })
         this.dynamicCanvas = new Canvas(oDynamicCanvas, {
+            ratio,
             fillStyle: COLOR.lingthBlue,
             strokeStyle: COLOR.blue,
         })
@@ -75,12 +77,43 @@ class Editor {
     shapes = {}
     nodes = []
     edges = []
+    _addNode(node) {
+        this.nodes.push({ ...node, id: randomID() })
+        this.selectedNode = this.nodes[this.nodes.length - 1]
+        this._render()
+    }
+    _updateNode(node, { dx, dy }) {
+        let i = this.nodes.findIndex(n => n.id === node.id)
+        if (i < 0) {
+            return
+        }
+        node.x += dx
+        node.y += dy
+        this.nodes.splice(i, 1)
+        this.nodes.push(node)
+        this._render()
+    }
+
+    _getSelected({ x, y }) {
+        const { nodes } = this
+        for (let i = nodes.length; i > 0; i --) {
+            let node = nodes[i - 1]
+            if (checkInNode({ x, y }, node)) {
+                return node
+            }
+        }
+        return null
+    }
 
     /*
      *  paint
+     *      render: render all nodes & edges on main canvas, clear first
      */
-    _paint(node) {
-        this.mainCanvas._paint(node)
+    _render() {
+        this.mainCanvas._clear()
+        this.nodes.forEach(node => {
+            this.mainCanvas._paintNode(node, this.selectedNode && this.selectedNode.id === node.id)
+        })
     }
 
     /*
@@ -89,9 +122,11 @@ class Editor {
     eventList = [
         ['oItemPanel', 'mousedown', '_beginAddNode'],
         ['oItemPanel', 'mouseup', '_mouseUp'],
+        ['oPage', 'mousedown', '_mouseDownOnPage'],
         ['oPage', 'mousemove', '_mouseMove'],
         ['oPage', 'mouseleave', '_mouseLeave'],
         ['oPage', 'mouseup', '_mouseUpOnPage'],
+        ['oPage', 'contextmenu', '_contextMenu'],
     ]
     _bindEvents() {
         const event = new Event({
@@ -108,6 +143,18 @@ class Editor {
     isMouseDown = false
     mouseDownType = null
     selectedShape = null
+    // selectedNode
+    __selectedNode = null
+    set selectedNode(node) {
+        // TODO
+        this.__selectedNode = node
+        this.hoverNode = null
+    }
+    get selectedNode() {
+        return this.__selectedNode
+    }
+    hoverNode = null
+    // mouse down on itempanel
     _beginAddNode(e) {
         const o = e.target
         const shape = getAttr(o, 'data-shape')
@@ -120,18 +167,47 @@ class Editor {
 
         this.selectedShape = this.shapes[shape]
     }
+    // mouse down on page
+    mouseEventStart = {
+        x: 0,
+        y: 0,
+    }
+    _mouseDownOnPage(e) {
+        this.isMouseDown = true
+        const { offsetX: x, offsetY: y } = e
+        this.mouseEventStart = { x, y }
+
+        if (this.hoverNode) {
+            this.mouseDownType = 'move-node'
+            this.selectedNode = this.hoverNode
+        } else {
+            this.selectedNode = null
+            return
+        }
+    }
     // mouse move
     _mouseMove(e) {
+        this.dynamicCanvas._clear()
         const { offsetX: x, offsetY: y } = e
-        if (this.isMouseDown) {
+        if (this.isMouseDown) {     // move
             switch(this.mouseDownType) {
                 case 'add-node':
                     this.dynamicCanvas._paintNode({ ...this.selectedShape, x, y })
                     break
                 case 'move-node':
-                    console.log('moving node')
+                    let dx = x - this.mouseEventStart.x
+                    let dy = y - this.mouseEventStart.y
+                    this.dynamicCanvas._paintNode({
+                        ...this.selectedNode,
+                        x: this.selectedNode.x + dx,
+                        y: this.selectedNode.y + dy
+                    })
                     break
             }
+        } else {        // hover
+            const hoverNode = this._getSelected({ x, y })
+            hoverNode && this.dynamicCanvas._paintNode(hoverNode, true)
+            this.hoverNode = hoverNode
         }
     }
 
@@ -141,14 +217,24 @@ class Editor {
     }
 
     _mouseUpOnPage(e) {
-        const { offsetX: x, offsetY: y } = e
+        let { offsetX: x, offsetY: y } = e
+
         if (!this.isMouseDown) {
             return
         }
         switch(this.mouseDownType) {
             case 'add-node':
-                this.mainCanvas._paintNode({ ...this.selectedShape, x, y })
+                this._addNode({ ...this.selectedShape, x, y })
                 this._mouseUp()
+                break
+            case 'move-node':
+                this._updateNode(this.selectedNode, { dx: x - this.mouseEventStart.x, dy: y - this.mouseEventStart.y })
+                this._mouseUp()
+                break
+            default:
+                this._render()
+                this._mouseUp()
+                break
         }
     }
     _mouseUp() {
@@ -156,6 +242,11 @@ class Editor {
         this.mouseDownType = null
         this.selectedShape = null
         this.dynamicCanvas._clear()
+    }
+
+    _contextMenu(e) {
+        e.preventDefault()
+        console.log('===')
     }
 }
 
