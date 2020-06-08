@@ -10,6 +10,9 @@ class Canvas {
 
         ctx.fillStyle = options.fillStyle || COLOR.white
         ctx.strokeStyle = options.strokeStyle || COLOR.line
+        ctx.font = `${Math.max(this.ratio * 10, 12)}px Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,sans-serif`
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
 
         this.ctx = ctx
     }
@@ -39,15 +42,67 @@ class Canvas {
         } else {
             ctx.strokeRect(x - w/2, y - h/2, w, h)
         }
+        ctx.save()
+        ctx.fillStyle = COLOR.font
+        ctx.fillText(node.name || node.shape, x, y)
+        ctx.restore()
     }
     _paintAnchor({ x, y }) {
         const { ctx, ratio: r } = this
         x *= r
         y *= r
+        ctx.save()
+        ctx.fillStyle = COLOR.white
         ctx.beginPath()
         ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false)
         ctx.fill()
+        ctx.restore()
         ctx.stroke()
+    }
+    _paintActiveAnchors(node) {
+        const { anchors } = node
+        anchors.forEach(anchor => {
+            if (anchor[2] === 'input') {
+                let pos = getAnchorPos(node, anchor)
+                this._paintActiveAnchor(pos)
+            }
+        })
+    }
+    _paintActiveAnchor({ x, y }) {
+        const { ctx, ratio: r } = this
+        x *= r
+        y *= r
+        ctx.beginPath()
+        ctx.arc(x, y, 12 * r, 0, Math.PI * 2, false)
+        ctx.fill()
+        ctx.closePath()
+        ctx.beginPath()
+        ctx.save()
+        ctx.fillStyle = COLOR.white
+        ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false)
+        ctx.fill()
+        ctx.stroke()
+        ctx.restore()
+
+    }
+    _paintEdge({ x: sx, y: sy }, { x: ex, y: ey }) {
+        const { ctx, ratio: r } = this
+        sx *= r
+        sy *= r
+        ex *= r
+        ey *= r
+        ctx.save()
+        ctx.strokeStyle = COLOR.line
+        ctx.beginPath()
+        ctx.moveTo(sx, sy)
+        let diffY = Math.abs(ey - sy)
+        const cp1 = [ sx, sy + diffY / 2 ]
+        const cp2 = [ ex, ey - diffY / 2 ]
+        ctx.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
+        // ctx.lineTo(ex, ey)
+        ctx.stroke()
+        ctx.closePath()
+        ctx.restore()
     }
 
     _clear() {

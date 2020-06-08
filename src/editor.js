@@ -4,7 +4,7 @@
  */
 
 import { getDom, createDom, getAttr } from '@lib/dom'
-import { randomID, checkInNode } from '@lib/utils'
+import { randomID, checkInNode, checkInNodeAnchor, getAnchorPos, checkInCircle } from '@lib/utils'
 import Event from './event'
 import Canvas from './canvas'
 import shapes from '@data/dag-shapes'
@@ -80,18 +80,31 @@ class Editor {
     _addNode(node) {
         this.nodes.push({ ...node, id: randomID() })
         this.selectedNode = this.nodes[this.nodes.length - 1]
-        this._render()
+        // this._render()
     }
-    _updateNode(node, { dx, dy }) {
+    _updateNode(node) {
         let i = this.nodes.findIndex(n => n.id === node.id)
         if (i < 0) {
             return
         }
-        node.x += dx
-        node.y += dy
+        // node.x += dx
+        // node.y += dy
         this.nodes.splice(i, 1)
         this.nodes.push(node)
-        this._render()
+        // this._render()
+    }
+    _addEdge([ source, sourceAnchor ], [ target, targetAnchor ]) {
+        let edge = {
+            source: source.id,
+            sourceAnchor,
+            target: target.id,
+            targetAnchor
+        }
+        let i = this.edges.findIndex(e => e.source === source.id && e.sourceAnchor === sourceAnchor && e.target === target.id && e.targetAnchor === targetAnchor)
+        if (i < 0) {
+            this.edges.push(edge)
+        }
+        console.log(this.edges)
     }
 
     _getSelected({ x, y }) {
@@ -114,6 +127,14 @@ class Editor {
         this.nodes.forEach(node => {
             this.mainCanvas._paintNode(node, this.selectedNode && this.selectedNode.id === node.id)
         })
+        this.edges.forEach(({ source, sourceAnchor, target, targetAnchor }) => {
+            let start = this.nodes.find(n => n.id === source)
+            let end = this.nodes.find(n => n.id === target)
+            this.mainCanvas._paintEdge(
+                getAnchorPos(start, start.anchors[sourceAnchor]),
+                getAnchorPos(end, end.anchors[targetAnchor])
+            )
+        })
     }
 
     /*
@@ -128,6 +149,9 @@ class Editor {
         ['oPage', 'mouseup', '_mouseUpOnPage'],
         ['oPage', 'contextmenu', '_contextMenu'],
     ]
+    callbackList = [
+        'selectedNodeChange',
+    ]
     _bindEvents() {
         const event = new Event({
             rect: this.config
@@ -139,6 +163,11 @@ class Editor {
 
         this.event = event
     }
+    on(ev, cb) {
+        if (this.callbackList.indexOf(ev) > -1) {
+            this[ev] = cb
+        }
+    }
 
     isMouseDown = false
     mouseDownType = null
@@ -149,11 +178,27 @@ class Editor {
         // TODO
         this.__selectedNode = node
         this.hoverNode = null
+        this.selectedNodeChange && this.selectedNodeChange(node)
     }
     get selectedNode() {
         return this.__selectedNode
     }
+    __selectedAnchor = null
+    anchorStartPos = {}
+    set selectedAnchor(anchor) {
+        this.__selectedAnchor = anchor
+        if (!anchor) {
+            this.anchorStartPos = {}
+        } else {
+            let [ node, i ] = anchor
+            this.anchorStartPos = getAnchorPos(node, node.anchors[i])
+        }
+    }
+    get selectedAnchor() {
+        return this.__selectedAnchor
+    }
     hoverNode = null
+    hoverAnchor = null
     // mouse down on itempanel
     _beginAddNode(e) {
         const o = e.target
@@ -178,8 +223,14 @@ class Editor {
         this.mouseEventStart = { x, y }
 
         if (this.hoverNode) {
-            this.mouseDownType = 'move-node'
             this.selectedNode = this.hoverNode
+            if (this.hoverAnchor) {
+                this.mouseDownType = 'move-edge'
+                this.selectedAnchor = this.hoverAnchor
+            } else {
+                this.mouseDownType = 'move-node'
+                this.selectedAnchor = null
+            }
         } else {
             this.selectedNode = null
             return
@@ -203,11 +254,28 @@ class Editor {
                         y: this.selectedNode.y + dy
                     })
                     break
+                case 'move-edge':
+                    this.nodes.forEach(node => {
+                        if (node.id !== this.selectedNode.id && node.anchors) {
+                            this.dynamicCanvas._paintActiveAnchors(node)
+                        }
+                    })
+                    this.dynamicCanvas._paintEdge(this.anchorStartPos, { x, y })
+                    break
             }
         } else {        // hover
             const hoverNode = this._getSelected({ x, y })
-            hoverNode && this.dynamicCanvas._paintNode(hoverNode, true)
-            this.hoverNode = hoverNode
+            if (this.hoverNode) {
+                let hoverAnchor = checkInNodeAnchor({ x, y }, this.hoverNode)
+                this.hoverAnchor = hoverAnchor
+                if (!hoverAnchor) {
+                    this.hoverNode = hoverNode
+                }
+            } else {
+                this.hoverAnchor = null
+                this.hoverNode = hoverNode
+            }
+            this.hoverNode && this.dynamicCanvas._paintNode(this.hoverNode, true)
         }
     }
 
@@ -225,17 +293,38 @@ class Editor {
         switch(this.mouseDownType) {
             case 'add-node':
                 this._addNode({ ...this.selectedShape, x, y })
-                this._mouseUp()
+                // this._mouseUp()
                 break
             case 'move-node':
-                this._updateNode(this.selectedNode, { dx: x - this.mouseEventStart.x, dy: y - this.mouseEventStart.y })
-                this._mouseUp()
+                this._updateNode({
+                    ...this.selectedNode,
+                    x: this.selectedNode.x + x - this.mouseEventStart.x,
+                    y: this.selectedNode.y + y - this.mouseEventStart.y
+                })
+                // this._mouseUp()
+                break
+            case 'move-edge':
+                this.nodes.forEach(node => {
+                    if (node.id !== this.selectedNode.id && node.anchors) {
+                        node.anchors.forEach((anchor, i) => {
+                            if (anchor[2] === 'input') {
+                                let pos = getAnchorPos(node, anchor)
+                                if (checkInCircle({ x, y }, pos, 12)) {
+                                    this._addEdge(this.selectedAnchor, [ node, i ])
+                                }
+                            }
+                        })
+                    }
+                })
                 break
             default:
-                this._render()
-                this._mouseUp()
+                // this._render()
+                // this._mouseUp()
                 break
         }
+
+        this._render()
+        this._mouseUp()
     }
     _mouseUp() {
         this.isMouseDown = false
@@ -250,10 +339,42 @@ class Editor {
     }
 }
 
+
+// example
 const editor = new Editor({
     container: '#container',
     page: '#editor',
     itempanel: '#itempanel',
+})
+
+const tpl = `<h4>TODO List</h4>
+            <ul>
+                <li>1. delete node & edge</li>
+                <li>2. edge check</li>
+				<li>3. zoom-in & zoom-out</li>
+				<li>4. more callback</li>
+            </ul>`
+editor.on('selectedNodeChange', node => {
+    const oPanel = getDom('#panel')
+    if (node) {
+        oPanel.innerHTML = ``
+        const oTitle = createDom('h4')
+        oTitle.innerHTML = '节点名称'
+        const oInput = createDom('input')
+        oPanel.appendChild(oTitle)
+        oPanel.appendChild(oInput)
+        oInput.addEventListener('change', e => {
+            let val = e.target.value
+            let newNode = {
+                ...node,
+                name: val,
+            }
+            editor._updateNode(newNode)
+            editor._render()
+        })
+    } else {
+        oPanel.innerHTML = tpl
+    }
 })
 
 for (let shape in shapes) {
