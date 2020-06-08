@@ -223,203 +223,11 @@ var shapes = {
 
 /***/ }),
 
-/***/ "./src/canvas.js":
-/*!***********************!*\
-  !*** ./src/canvas.js ***!
-  \***********************/
+/***/ "./src/base.js":
+/*!*********************!*\
+  !*** ./src/base.js ***!
+  \*********************/
 /*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./color */ "./src/color.js");
-/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @lib/utils */ "./lib/utils.js");
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-
-
-
-var Canvas = /*#__PURE__*/function () {
-  function Canvas(canvas) {
-    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-    _classCallCheck(this, Canvas);
-
-    this.canvas = canvas;
-    var ctx = canvas.getContext('2d');
-    this.ratio = options.ratio || 1;
-    ctx.fillStyle = options.fillStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
-    ctx.strokeStyle = options.strokeStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].line;
-    ctx.font = "".concat(Math.max(this.ratio * 10, 12), "px Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,sans-serif");
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    this.ctx = ctx;
-  }
-
-  _createClass(Canvas, [{
-    key: "_paintNode",
-    value: function _paintNode(node, isSelected) {
-      var _this = this;
-
-      var r = this.ratio,
-          ctx = this.ctx;
-      var x = node.x,
-          y = node.y,
-          w = node.w,
-          h = node.h;
-      x *= r;
-      y *= r;
-      w *= r;
-      h *= r;
-      ctx.fillRect(x - w / 2, y - h / 2, w, h);
-
-      if (isSelected) {
-        ctx.save();
-        ctx.strokeStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].blue;
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x - w / 2, y - h / 2, w, h); // anchor
-
-        if (node.anchors) {
-          node.anchors.forEach(function (anchor) {
-            var pos = Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["getAnchorPos"])(node, anchor);
-
-            _this._paintAnchor(pos);
-          });
-        }
-
-        ctx.restore();
-      } else {
-        ctx.strokeRect(x - w / 2, y - h / 2, w, h);
-      }
-
-      ctx.save();
-      ctx.fillStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].font;
-      ctx.fillText(node.name || node.shape, x, y);
-      ctx.restore();
-    }
-  }, {
-    key: "_paintAnchor",
-    value: function _paintAnchor(_ref) {
-      var x = _ref.x,
-          y = _ref.y;
-      var ctx = this.ctx,
-          r = this.ratio;
-      x *= r;
-      y *= r;
-      ctx.save();
-      ctx.fillStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
-      ctx.beginPath();
-      ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
-      ctx.fill();
-      ctx.restore();
-      ctx.stroke();
-    }
-  }, {
-    key: "_paintActiveAnchors",
-    value: function _paintActiveAnchors(node) {
-      var _this2 = this;
-
-      var anchors = node.anchors;
-      anchors.forEach(function (anchor) {
-        if (anchor[2] === 'input') {
-          var pos = Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["getAnchorPos"])(node, anchor);
-
-          _this2._paintActiveAnchor(pos);
-        }
-      });
-    }
-  }, {
-    key: "_paintActiveAnchor",
-    value: function _paintActiveAnchor(_ref2) {
-      var x = _ref2.x,
-          y = _ref2.y;
-      var ctx = this.ctx,
-          r = this.ratio;
-      x *= r;
-      y *= r;
-      ctx.beginPath();
-      ctx.arc(x, y, 12 * r, 0, Math.PI * 2, false);
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.save();
-      ctx.fillStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
-      ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
-      ctx.fill();
-      ctx.stroke();
-      ctx.restore();
-    }
-  }, {
-    key: "_paintEdge",
-    value: function _paintEdge(_ref3, _ref4) {
-      var sx = _ref3.x,
-          sy = _ref3.y;
-      var ex = _ref4.x,
-          ey = _ref4.y;
-      var ctx = this.ctx,
-          r = this.ratio;
-      sx *= r;
-      sy *= r;
-      ex *= r;
-      ey *= r;
-      ctx.save();
-      ctx.strokeStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].line;
-      ctx.beginPath();
-      ctx.moveTo(sx, sy);
-      var diffY = Math.abs(ey - sy);
-      var cp1 = [sx, sy + diffY / 2];
-      var cp2 = [ex, ey - diffY / 2];
-      ctx.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey); // ctx.lineTo(ex, ey)
-
-      ctx.stroke();
-      ctx.closePath();
-      ctx.restore();
-    }
-  }, {
-    key: "_clear",
-    value: function _clear() {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    }
-  }]);
-
-  return Canvas;
-}();
-
-/* harmony default export */ __webpack_exports__["default"] = (Canvas);
-
-/***/ }),
-
-/***/ "./src/color.js":
-/*!**********************!*\
-  !*** ./src/color.js ***!
-  \**********************/
-/*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-var COLOR = {
-  blue: '#b3e5fc',
-  font: '#333333',
-  line: '#c1c1c1',
-  green: '#c5e1a5',
-  red: '#ffcdd2',
-  lingthBlue: '#e3f2fd',
-  white: '#ffffff'
-};
-/* harmony default export */ __webpack_exports__["default"] = (COLOR);
-
-/***/ }),
-
-/***/ "./src/editor.js":
-/*!***********************!*\
-  !*** ./src/editor.js ***!
-  \***********************/
-/*! no exports provided */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -935,10 +743,231 @@ var Editor = /*#__PURE__*/function () {
   }]);
 
   return Editor;
-}(); // example
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (Editor);
+
+/***/ }),
+
+/***/ "./src/canvas.js":
+/*!***********************!*\
+  !*** ./src/canvas.js ***!
+  \***********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./color */ "./src/color.js");
+/* harmony import */ var _lib_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @lib/utils */ "./lib/utils.js");
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-var editor = new Editor({
+
+
+var Canvas = /*#__PURE__*/function () {
+  function Canvas(canvas) {
+    var options = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+    _classCallCheck(this, Canvas);
+
+    this.canvas = canvas;
+    var ctx = canvas.getContext('2d');
+    this.ratio = options.ratio || 1;
+    ctx.fillStyle = options.fillStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
+    ctx.strokeStyle = options.strokeStyle || _color__WEBPACK_IMPORTED_MODULE_0__["default"].line;
+    ctx.font = "".concat(Math.max(this.ratio * 10, 12), "px Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,sans-serif");
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    this.ctx = ctx;
+  }
+
+  _createClass(Canvas, [{
+    key: "_paintNode",
+    value: function _paintNode(node, isSelected) {
+      var _this = this;
+
+      var r = this.ratio,
+          ctx = this.ctx;
+      var x = node.x,
+          y = node.y,
+          w = node.w,
+          h = node.h;
+      x *= r;
+      y *= r;
+      w *= r;
+      h *= r;
+      ctx.fillRect(x - w / 2, y - h / 2, w, h);
+
+      if (isSelected) {
+        ctx.save();
+        ctx.strokeStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].blue;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x - w / 2, y - h / 2, w, h); // anchor
+
+        if (node.anchors) {
+          node.anchors.forEach(function (anchor) {
+            var pos = Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["getAnchorPos"])(node, anchor);
+
+            _this._paintAnchor(pos);
+          });
+        }
+
+        ctx.restore();
+      } else {
+        ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+      }
+
+      ctx.save();
+      ctx.fillStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].font;
+      ctx.fillText(node.name || node.shape, x, y);
+      ctx.restore();
+    }
+  }, {
+    key: "_paintAnchor",
+    value: function _paintAnchor(_ref) {
+      var x = _ref.x,
+          y = _ref.y;
+      var ctx = this.ctx,
+          r = this.ratio;
+      x *= r;
+      y *= r;
+      ctx.save();
+      ctx.fillStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
+      ctx.beginPath();
+      ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.restore();
+      ctx.stroke();
+    }
+  }, {
+    key: "_paintActiveAnchors",
+    value: function _paintActiveAnchors(node) {
+      var _this2 = this;
+
+      var anchors = node.anchors;
+      anchors.forEach(function (anchor) {
+        if (anchor[2] === 'input') {
+          var pos = Object(_lib_utils__WEBPACK_IMPORTED_MODULE_1__["getAnchorPos"])(node, anchor);
+
+          _this2._paintActiveAnchor(pos);
+        }
+      });
+    }
+  }, {
+    key: "_paintActiveAnchor",
+    value: function _paintActiveAnchor(_ref2) {
+      var x = _ref2.x,
+          y = _ref2.y;
+      var ctx = this.ctx,
+          r = this.ratio;
+      x *= r;
+      y *= r;
+      ctx.beginPath();
+      ctx.arc(x, y, 12 * r, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.save();
+      ctx.fillStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].white;
+      ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+  }, {
+    key: "_paintEdge",
+    value: function _paintEdge(_ref3, _ref4) {
+      var sx = _ref3.x,
+          sy = _ref3.y;
+      var ex = _ref4.x,
+          ey = _ref4.y;
+      var ctx = this.ctx,
+          r = this.ratio;
+      sx *= r;
+      sy *= r;
+      ex *= r;
+      ey *= r;
+      ctx.save();
+      ctx.strokeStyle = _color__WEBPACK_IMPORTED_MODULE_0__["default"].line;
+      ctx.beginPath();
+      ctx.moveTo(sx, sy);
+      var diffY = Math.abs(ey - sy);
+      var cp1 = [sx, sy + diffY / 2];
+      var cp2 = [ex, ey - diffY / 2];
+      ctx.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey); // ctx.lineTo(ex, ey)
+
+      ctx.stroke();
+      ctx.closePath();
+      ctx.restore();
+    }
+  }, {
+    key: "_clear",
+    value: function _clear() {
+      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+  }]);
+
+  return Canvas;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (Canvas);
+
+/***/ }),
+
+/***/ "./src/color.js":
+/*!**********************!*\
+  !*** ./src/color.js ***!
+  \**********************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+var COLOR = {
+  blue: '#b3e5fc',
+  font: '#333333',
+  line: '#c1c1c1',
+  green: '#c5e1a5',
+  red: '#ffcdd2',
+  lingthBlue: '#e3f2fd',
+  white: '#ffffff'
+};
+/* harmony default export */ __webpack_exports__["default"] = (COLOR);
+
+/***/ }),
+
+/***/ "./src/editor.js":
+/*!***********************!*\
+  !*** ./src/editor.js ***!
+  \***********************/
+/*! no exports provided */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _lib_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @lib/dom */ "./lib/dom.js");
+/* harmony import */ var _data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.js");
+/* harmony import */ var _base__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./base */ "./src/base.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+/*
+ *  dag-editor
+ *  author: liupeidong@gmail.com
+ */
+
+
+ // example
+
+var editor = new _base__WEBPACK_IMPORTED_MODULE_2__["default"]({
   container: '#container',
   page: '#editor',
   itempanel: '#itempanel'
@@ -970,8 +999,8 @@ editor.on('selectedNodeChange', function (node) {
   }
 });
 
-for (var shape in _data_dag_shapes__WEBPACK_IMPORTED_MODULE_4__["default"]) {
-  editor.registerShape(shape, _data_dag_shapes__WEBPACK_IMPORTED_MODULE_4__["default"][shape]);
+for (var shape in _data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__["default"]) {
+  editor.registerShape(shape, _data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__["default"][shape]);
 }
 
 /***/ }),
