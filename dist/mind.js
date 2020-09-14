@@ -987,6 +987,16 @@ new Mind({
 
   }
 });
+var oCodeBtn = document.getElementById('code-btn');
+var oBg = document.querySelector('.popup-bg');
+oCodeBtn.addEventListener('click', function () {
+  var o = document.querySelector('.popup');
+  o && o.classList.add('show');
+});
+oBg.addEventListener('click', function () {
+  var o = document.querySelector('.popup');
+  o && o.classList.remove('show');
+});
 
 /***/ }),
 

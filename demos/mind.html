@@ -4,7 +4,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 	<title>Document</title>
-	<link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_dlod123nn7.css">
+	<link rel="stylesheet" href="https://at.alicdn.com/t/font_927789_39hoc36k4u1.css">
 	<link rel="stylesheet" href="../style/common.css">
 	<link rel="stylesheet" href="../style/mind.css">
 </head>
@@ -18,9 +18,72 @@
 				<i class="iconfont icon-clear" data-command="reset" title="重置"></i>
 				<i class="iconfont icon-zoomIn" data-command="zoom-in" title="放大"></i>
 				<i class="iconfont icon-zoomOut" data-command="zoom-out" title="缩小"></i>
+				<i class="iconfont icon-code" title="查看源数据" id="code-btn"></i>
+				<a href="https://github.com/HustLiuCN/dag-editor" target="_blank">
+					<i class="iconfont icon-githubcolor"></i>
+				</a>
 			</div>
 		</div>
 	</main>
+	<div class="popup">
+		<div class="popup-box bxs">
+<pre id="code-preview">
+import Mind from 'mind'
+var data = {
+	text: 'Platform',
+	children: [
+		// 实验相关
+		{
+			text: '实验',
+			children: [
+				{
+					text: 'DAG图',
+					children: [
+						{
+							text: '@antV/g6-editor', type: 'tech',
+						}, {
+							text: '定制化UI',
+							children: [
+								{
+									text: '原始API延伸', type: 'tech',
+								}, {
+									text: '上层canvas自定义', type: 'tech',
+								},
+							],
+						}, {
+							text: '更多框架接入/拓展', type: 'todo',
+						},
+					],
+				},
+				{
+					text: '参数配置',
+					children: [
+						{
+							text: '算子参数',
+						}, {
+							text: '实验参数',
+						},
+					],
+				},
+			],
+		},
+		// 调度
+		{
+			text: '任务调度',
+			children: [
+				{
+					text: '调度管理',
+					children: [],
+				}
+			],
+		},
+	],
+}
+new Mind({ data })
+</pre>
+		</div>
+		<div class="popup-bg"></div>
+	</div>
 </body>
 <script src="../dist/mind.js"></script>
 </html>

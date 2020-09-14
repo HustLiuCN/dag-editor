@@ -364,7 +364,6 @@ class Mind {
     }
 }
 
-
 new Mind({
     data: MockData,
     options: {
@@ -377,4 +376,17 @@ new Mind({
         },
         lineType: 'curve',      // curve, polygon
     },
+})
+
+const oCodeBtn = document.getElementById('code-btn')
+const oBg = document.querySelector('.popup-bg')
+
+oCodeBtn.addEventListener('click', () => {
+    const o = document.querySelector('.popup')
+    o && o.classList.add('show')
+})
+
+oBg.addEventListener('click', () => {
+    const o = document.querySelector('.popup')
+    o && o.classList.remove('show')
 })
