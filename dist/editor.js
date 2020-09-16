@@ -626,6 +626,7 @@ class Editor {
             return;
         }
         let cur = this.nodes.splice(i, 1)[0];
+        console.log(cur, node);
         cur = Object.assign({}, node);
         this.nodes.push(cur);
         this.selectedNode = cur;
@@ -785,7 +786,13 @@ class Editor {
                 // this._render()
                 break;
             case 'move-node':
-                this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + x - this.mouseEventStartPos.x, y: this.selectedNode.y + y - this.mouseEventStartPos.y }));
+                let diffX = x - this.mouseEventStartPos.x;
+                let diffY = y - this.mouseEventStartPos.y;
+                if (diffX < 5 || diffY < 5) {
+                    break;
+                }
+                console.log('move');
+                this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + diffX, y: this.selectedNode.y + diffY }));
                 break;
             case 'add-edge':
                 // TODO deduplicate
