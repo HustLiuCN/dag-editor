@@ -10,12 +10,35 @@
 <body>
 	<div id="container">
 		<div id="itempanel">
-			<div class="itempanel-item" data-shape="shape-001">节点ABC</div>
-			<div class="itempanel-item" data-shape="shape-002">节点XYZ</div>
+			<div class="itempanel-item" data-shape="shape-001">Node-ABC</div>
+			<div class="itempanel-item" data-shape="shape-002">Node-XYZ</div>
 		</div>
 		<div id="editor"></div>
 		<div id="panel">
 			<!-- custom detail panel here -->
+			<div id="node-panel" class="panel">
+				<h3>Current Selected Node</h3>
+				<div class="panel-row">
+					<h4>Node Name:</h4>
+					<div class="panel-item">
+						<input type="text" id="node-name">
+					</div>
+				</div>
+				<div class="panel-row">
+					<p class="sub-ft">
+						we provide some callback handlers, such as `onSelectedNodeChange`, `onNodeDeleted` and so on.
+					</p>
+					<p class="sub-ft">
+						u can define any custom properties on node,
+						and then u can use any methods such ad Vue, React, to bind the node-property and
+						the view (like all mvvm frame did),
+						in order to use the data that created by the Editor for anything.
+					</p>
+				</div>
+			</div>
+			<div id="canvas-panel" class="panel show">
+				<h3>Nothing Selected</h3>
+			</div>
 		</div>
 	</div>
 </body>

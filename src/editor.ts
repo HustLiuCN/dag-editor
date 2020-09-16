@@ -1,7 +1,7 @@
 /*
- *  dag-editor
- *  author: liupeidong@gmail.com
- */
+*  dag-editor
+*  author: liupeidong@gmail.com
+*/
 
 import { getDom, createDom } from '@lib/dom'
 import shapes from '@data/dag-shapes'
@@ -10,35 +10,35 @@ import { Editor } from './core'
 
 // example
 const editor = new Editor({
-    container: '#container',
-    page: '#editor',
-    itempanel: '#itempanel',
+  container: '#container',
+  page: '#editor',
+  itempanel: '#itempanel',
 })
 
 editor.on('selectedNodeChange', (node: Editor.INode) => {
-    console.log('selected node changed', node)
-//     const oPanel = getDom('#panel')
-//     if (node) {
-//         oPanel.innerHTML = ``
-//         const oTitle = createDom('h4')
-//         oTitle.innerHTML = '节点名称'
-//         const oInput = createDom('input')
-//         oPanel.appendChild(oTitle)
-//         oPanel.appendChild(oInput)
-//         oInput.addEventListener('change', e => {
-//             let val = e.target.value
-//             let newNode = {
-//                 ...node,
-//                 name: val,
-//             }
-//             editor._updateNode(newNode)
-//             editor._render()
-//         })
-//     } else {
-//         oPanel.innerHTML = ''
-//     }
+  console.log('selected node changed', node)
+  const oNodePanel = getDom('#node-panel')
+  const oCanvasPanel = getDom('#canvas-panel')
+  if (node) {
+    oNodePanel.classList.add('show')
+    oCanvasPanel.classList.remove('show')
+
+    const oInput = getDom('#node-name') as HTMLInputElement
+    oInput.value = node.name
+    oInput.addEventListener('change', () => {
+      let val = oInput.value.trim()
+      let newNode = {
+          ...node,
+          name: val,
+      }
+      editor._updateNode(newNode)
+    })
+  } else {
+    oNodePanel.classList.remove('show')
+    oCanvasPanel.classList.add('show')
+  }
 })
 
 for (let shape of shapes) {
-    editor.registerShape(shape.shape, shape)
+  editor.registerShape(shape.shape, shape)
 }

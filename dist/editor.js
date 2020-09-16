@@ -193,7 +193,7 @@ const shapes = [
     {
         shape: 'shape-001',
         w, h, color: c,
-        name: '节点ABC',
+        name: 'Node-ABC',
         anchors: [
             [0.5, 0, 'input'],
             [0.5, 1, 'output'],
@@ -202,7 +202,7 @@ const shapes = [
     {
         shape: 'shape-002',
         w, h, color: color_1.default['green'],
-        name: '节点XYZ',
+        name: 'Node-XYZ',
         anchors: [
             [0.5, 0, 'input'],
             [0.3, 1, 'output'],
@@ -881,10 +881,11 @@ exports.Editor = Editor;
 "use strict";
 
 /*
- *  dag-editor
- *  author: liupeidong@gmail.com
- */
+*  dag-editor
+*  author: liupeidong@gmail.com
+*/
 Object.defineProperty(exports, "__esModule", { value: true });
+const dom_1 = __webpack_require__(/*! @lib/dom */ "./lib/dom.ts");
 const dag_shapes_1 = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.ts");
 // import Editor from './base'
 const core_1 = __webpack_require__(/*! ./core */ "./src/core.ts");
@@ -896,26 +897,23 @@ const editor = new core_1.Editor({
 });
 editor.on('selectedNodeChange', (node) => {
     console.log('selected node changed', node);
-    //     const oPanel = getDom('#panel')
-    //     if (node) {
-    //         oPanel.innerHTML = ``
-    //         const oTitle = createDom('h4')
-    //         oTitle.innerHTML = '节点名称'
-    //         const oInput = createDom('input')
-    //         oPanel.appendChild(oTitle)
-    //         oPanel.appendChild(oInput)
-    //         oInput.addEventListener('change', e => {
-    //             let val = e.target.value
-    //             let newNode = {
-    //                 ...node,
-    //                 name: val,
-    //             }
-    //             editor._updateNode(newNode)
-    //             editor._render()
-    //         })
-    //     } else {
-    //         oPanel.innerHTML = ''
-    //     }
+    const oNodePanel = dom_1.getDom('#node-panel');
+    const oCanvasPanel = dom_1.getDom('#canvas-panel');
+    if (node) {
+        oNodePanel.classList.add('show');
+        oCanvasPanel.classList.remove('show');
+        const oInput = dom_1.getDom('#node-name');
+        oInput.value = node.name;
+        oInput.addEventListener('change', () => {
+            let val = oInput.value.trim();
+            let newNode = Object.assign(Object.assign({}, node), { name: val });
+            editor._updateNode(newNode);
+        });
+    }
+    else {
+        oNodePanel.classList.remove('show');
+        oCanvasPanel.classList.add('show');
+    }
 });
 for (let shape of dag_shapes_1.default) {
     editor.registerShape(shape.shape, shape);

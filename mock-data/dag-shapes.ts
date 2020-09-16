@@ -9,7 +9,7 @@ const shapes: Editor.IShape[] = [
 	{
 		shape: 'shape-001',
 		w, h, color: c,
-		name: '节点ABC',
+		name: 'Node-ABC',
 		anchors: [
 			[0.5, 0, 'input'],		// [x, y, type]
 			[0.5, 1, 'output'],
@@ -18,7 +18,7 @@ const shapes: Editor.IShape[] = [
 	{
 		shape: 'shape-002',
 		w, h, color: COLOR['green'],
-		name: '节点XYZ',
+		name: 'Node-XYZ',
 		anchors: [
 			[0.5, 0, 'input'],
 			[0.3, 1, 'output'],

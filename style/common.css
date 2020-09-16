@@ -30,6 +30,13 @@ canvas {
 	height: 100%;
 }
 
+.red {
+	color: #f44336;
+}
+.sub-ft {
+	color: #9e9e9e;
+}
+
 .shadow::before,
 .shadow::after {
 	content: '';
