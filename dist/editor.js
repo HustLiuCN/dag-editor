@@ -690,10 +690,24 @@ class Editor {
             event.add(this[ev[0]], ev[1], this[ev[2]].bind(this));
         }
     }
+    /*
+     *	public
+     */
     on(ev, cb) {
         if (this.callbackList.indexOf(ev) > -1) {
             this[ev] = cb;
         }
+    }
+    update(type) {
+    }
+    repaint() {
+        this._render();
+    }
+    getData() {
+        return {
+            nodes: this.nodes,
+            edges: this.edges,
+        };
     }
     // mousedown on itempanel
     _beginAddNode(e) {
@@ -894,14 +908,16 @@ exports.Editor = Editor;
 Object.defineProperty(exports, "__esModule", { value: true });
 const dom_1 = __webpack_require__(/*! @lib/dom */ "./lib/dom.ts");
 const dag_shapes_1 = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.ts");
-// import Editor from './base'
 const core_1 = __webpack_require__(/*! ./core */ "./src/core.ts");
+const store_1 = __webpack_require__(/*! ./store */ "./src/store.ts");
 // example
 const editor = new core_1.Editor({
     container: '#container',
     page: '#editor',
     itempanel: '#itempanel',
 });
+// example data store
+const store = new store_1.Store({ editor });
 editor.on('selectedNodeChange', (node) => {
     console.log('selected node changed', node);
     const oNodePanel = dom_1.getDom('#node-panel');
@@ -909,13 +925,7 @@ editor.on('selectedNodeChange', (node) => {
     if (node) {
         oNodePanel.classList.add('show');
         oCanvasPanel.classList.remove('show');
-        const oInput = dom_1.getDom('#node-name');
-        oInput.value = node.name;
-        oInput.addEventListener('change', () => {
-            let val = oInput.value.trim();
-            let newNode = Object.assign(Object.assign({}, node), { name: val });
-            editor._updateNode(newNode);
-        });
+        store.currentNode = node;
     }
     else {
         oNodePanel.classList.remove('show');
@@ -925,6 +935,10 @@ editor.on('selectedNodeChange', (node) => {
 for (let shape of dag_shapes_1.default) {
     editor.registerShape(shape.shape, shape);
 }
+// check source data
+dom_1.getDom('#source-btn').addEventListener('click', () => {
+    dom_1.getDom('#code').innerHTML = JSON.stringify(editor.getData());
+});
 
 
 /***/ }),
@@ -972,6 +986,50 @@ class Event {
     }
 }
 exports.Event = Event;
+
+
+/***/ }),
+
+/***/ "./src/store.ts":
+/*!**********************!*\
+  !*** ./src/store.ts ***!
+  \**********************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Store = void 0;
+const dom_1 = __webpack_require__(/*! @lib/dom */ "./lib/dom.ts");
+// example to show Editor callback and data binding
+class Store {
+    constructor({ editor }) {
+        this.editor = editor;
+        this.oName = dom_1.getDom('#node-name');
+        this.oW = dom_1.getDom('#node-width');
+        this._bind();
+    }
+    _bind() {
+        this.oName.addEventListener('change', () => {
+            this.currentNode.name = this.oName.value.trim();
+            this.editor.repaint();
+        });
+        this.oW.addEventListener('change', () => {
+            this.currentNode.w = Number(this.oW.value.trim());
+            this.editor.repaint();
+        });
+    }
+    get currentNode() {
+        return this.__node;
+    }
+    set currentNode(node) {
+        this.__node = node;
+        this.oName.value = node.name;
+        this.oW.value = node.w.toString();
+    }
+}
+exports.Store = Store;
 
 
 /***/ })

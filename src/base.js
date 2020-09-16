@@ -10,7 +10,7 @@ import Canvas from './canvas'
 import shapes from '@data/dag-shapes'
 import COLOR from './color'
 
-class Editor {
+class OldEditor {
     constructor({
         container,
         toolbar,
@@ -339,4 +339,4 @@ class Editor {
     }
 }
 
-export default Editor
+export default OldEditor

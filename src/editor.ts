@@ -5,8 +5,8 @@
 
 import { getDom, createDom } from '@lib/dom'
 import shapes from '@data/dag-shapes'
-// import Editor from './base'
 import { Editor } from './core'
+import { Store } from './store'
 
 // example
 const editor = new Editor({
@@ -14,6 +14,9 @@ const editor = new Editor({
   page: '#editor',
   itempanel: '#itempanel',
 })
+
+// example data store
+const store = new Store({ editor })
 
 editor.on('selectedNodeChange', (node: Editor.INode) => {
   console.log('selected node changed', node)
@@ -23,16 +26,7 @@ editor.on('selectedNodeChange', (node: Editor.INode) => {
     oNodePanel.classList.add('show')
     oCanvasPanel.classList.remove('show')
 
-    const oInput = getDom('#node-name') as HTMLInputElement
-    oInput.value = node.name
-    oInput.addEventListener('change', () => {
-      let val = oInput.value.trim()
-      let newNode = {
-          ...node,
-          name: val,
-      }
-      editor._updateNode(newNode)
-    })
+    store.currentNode = node
   } else {
     oNodePanel.classList.remove('show')
     oCanvasPanel.classList.add('show')
@@ -42,3 +36,8 @@ editor.on('selectedNodeChange', (node: Editor.INode) => {
 for (let shape of shapes) {
   editor.registerShape(shape.shape, shape)
 }
+
+// check source data
+getDom('#source-btn').addEventListener('click', () => {
+  getDom('#code').innerHTML = JSON.stringify(editor.getData())
+})

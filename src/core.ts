@@ -36,7 +36,7 @@ export class Editor {
 	private oItemPanel: HTMLElement
 	private oPage: HTMLElement
 	// init canvas
-	_initCanvas() {
+	private _initCanvas() {
 		const rect = this.oPage.getBoundingClientRect()
 		// const { width, height, left, top } = rect
 		const ratio = window.devicePixelRatio || 1
@@ -106,11 +106,11 @@ export class Editor {
 		this.__hoverNode = node
 		this._render()
 	}
-	_addNode(node: Editor.INode) {
+	private _addNode(node: Editor.INode) {
 		this.nodes.push({ ...node, id: randomID() })
 		this.selectedNode = this.nodes[this.nodes.length - 1]
 	}
-	_updateNode(node: Editor.INode) {
+	private _updateNode(node: Editor.INode) {
 		let i = this.nodes.findIndex(n => n.id === node.id)
 		if (i < 0) {
 			return
@@ -121,7 +121,7 @@ export class Editor {
 		this.nodes.push(cur)
 		this.selectedNode = cur
 	}
-	_delNode(nid: string) {
+	private _delNode(nid: string) {
 		let i = this.nodes.findIndex(n => n.id === nid)
 		if (i > -1) {
 			this.nodes.splice(i, 1)
@@ -140,7 +140,7 @@ export class Editor {
 	// private selectedAnchor: [Editor.INode, number]
 	anchorStartPos = { x: 0, y: 0 }
 
-	_addEdge([source, sourceAnchorIndex]: [Editor.INode, number], [target, targetAnchorIndex]: [Editor.INode, number]) {
+	private _addEdge([source, sourceAnchorIndex]: [Editor.INode, number], [target, targetAnchorIndex]: [Editor.INode, number]) {
 		let edge = {
 			source: source.id,
 			sourceAnchorIndex,
@@ -154,20 +154,20 @@ export class Editor {
 		}
 		console.log(this.edges)
 	}
-	_delEdge(eid: string) {
+	private _delEdge(eid: string) {
 		let i = this.edges.findIndex(e => e.id === eid)
 		if (i > -1) {
 			this.edges.splice(i, 1)
 		}
 	}
 	// clear
-	_clear() {
+	private _clear() {
 		this.nodes = []
 		this.edges = []
 		this._render()
 	}
 	// render
-	_render() {
+	private _render() {
 		this.mainCvs.clear()
 		this.nodes.forEach(node => {
 			// TODO
@@ -201,7 +201,7 @@ export class Editor {
 	callbackList = [
 		'selectedNodeChange',
 	]
-	_bindEvents() {
+	private _bindEvents() {
 		const event = new Event({
 			rect: this.pageConfig,
 		})
@@ -210,9 +210,24 @@ export class Editor {
 			event.add(this[ev[0]], ev[1], this[ev[2]].bind(this))
 		}
 	}
+	/*
+	 *	public
+	 */
 	on(ev: string, cb: Function) {
 		if (this.callbackList.indexOf(ev) > -1) {
 			this[ev] = cb
+		}
+	}
+	update(type: 'node' | 'edge') {
+
+	}
+	repaint() {		
+		this._render()
+	}
+	getData(): { nodes: Editor.INode[], edges: Editor.IEdge[] } {
+		return {
+			nodes: this.nodes,
+			edges: this.edges,
 		}
 	}
 	/*
@@ -233,7 +248,7 @@ export class Editor {
 		y: 0,
 	}
 	// mousedown on itempanel
-	_beginAddNode(e: MouseEvent) {
+	private _beginAddNode(e: MouseEvent) {
 		const o = e.target as HTMLElement
 		const shape = getAttr(o, 'data-shape')
 		if (!shape) {
@@ -245,7 +260,7 @@ export class Editor {
 		this.selectedShape = this.shapes[shape]
 	}
 	// mousedown on page
-	_mouseDownOnPage(e: MouseEvent) {
+	private _mouseDownOnPage(e: MouseEvent) {
 		this.isMouseDown = true
 		const { offsetX: x, offsetY: y } = e
 		this.mouseEventStartPos = { x, y }
@@ -271,7 +286,7 @@ export class Editor {
 		this._triggerMenu(e.button === 2, e)
 	}
 	// mousemove
-	_mouseMove(e: MouseEvent) {
+	private _mouseMove(e: MouseEvent) {
 		this.dynamicCvs.clear()
 		const { offsetX: x, offsetY: y } = e
 		if (this.isMouseDown) {		// move
@@ -313,11 +328,11 @@ export class Editor {
 		// this._render()
 	}
 	// mouseleave
-	_mouseLeavePage() {
+	private _mouseLeavePage() {
 		this._mouseUp()
 	}
 	// mouseup
-	_mouseUpPage(e: MouseEvent) {
+	private _mouseUpPage(e: MouseEvent) {
 		if (!this.isMouseDown) {
 			return
 		}
@@ -359,7 +374,7 @@ export class Editor {
 
 		this._mouseUp()
 	}
-	_mouseUp() {
+	private _mouseUp() {
 		this.isMouseDown = false
 		this.mouseDownType = null
 		this.dynamicCvs.clear()
@@ -373,7 +388,7 @@ export class Editor {
 		['del:node', '_delNodeCommand'],
 		['clear', '_clear'],
 	]
-	_initCommand() {
+	private _initCommand() {
 		const command = new Command({ app: this })
 		const { commands } = this
 		commands.forEach(cm => {
@@ -387,7 +402,7 @@ export class Editor {
 			container: this.oContainer
 		})
 	}
-	_triggerMenu(show: boolean, e?: MouseEvent) {
+	private _triggerMenu(show: boolean, e?: MouseEvent) {
 		if (show) {
 			let options = {
 				type: null,
@@ -400,16 +415,16 @@ export class Editor {
 			this.contextmenu.detach()
 		}
 	}
-	_preventDefaultMenu(e: MouseEvent) {
+	private _preventDefaultMenu(e: MouseEvent) {
 		e.preventDefault()
 	}
-	_delNodeCommand() {
+	private _delNodeCommand() {
 		this._delNode(this.selectedNode.id)
 	}
 	/*
 	 * methods
 	 */
-	_getSelected({ x, y }): Editor.INode {
+	private _getSelected({ x, y }): Editor.INode {
 		const { nodes } = this
 		for (let i = nodes.length; i > 0; i --) {
 			let node = nodes[i - 1]
@@ -419,7 +434,7 @@ export class Editor {
 		}
 		return null
 	}
-	_getRelatedEdge(nid: string): Editor.IEdge[] {
+	private _getRelatedEdge(nid: string): Editor.IEdge[] {
 		let tmps = []
 		this.edges.forEach(e => {
 			if (e.source === nid || e.target === nid) {
