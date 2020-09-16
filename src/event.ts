@@ -1,5 +1,5 @@
-class EventHandler {
-    constructor({ rect }) {
+export class Event {
+    constructor({ rect }: { rect: DOMRect }) {
         const UA = window && window.navigator.userAgent || ''
 
         this.isMobile = !!UA.toLowerCase().match(/iphone|mobile|andriod/)
@@ -11,12 +11,15 @@ class EventHandler {
             }, { passive: false })
         }
     }
+    protected isMobile: boolean
+    private baseRect: DOMRect
+
     mobileEvent = {
         'mousedown': 'touchstart',
         'mouseup': 'touchend',
         'mousemove': 'touchmove',
     }
-    add(dom, ev, fn) {
+    add(dom: HTMLElement, ev: string, fn: Function) {
         ev = this.isMobile ? (this.mobileEvent[ev] || ev) : ev
         dom.addEventListener(ev, e => {
             if (this.isMobile) {
@@ -30,5 +33,3 @@ class EventHandler {
         })
     }
 }
-
-export default EventHandler

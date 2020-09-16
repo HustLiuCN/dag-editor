@@ -14,6 +14,7 @@
     padding: 5px 10px;
     margin-bottom: 10px;
     cursor: move;
+    user-select: none;
 }
 #panel {
     flex: 0 0 300px;
@@ -32,4 +33,28 @@
     left: 0;
     top: 0;
     cursor: default;
+}
+
+/* contextmenu */
+.editor-contextmenu {
+    display: none;
+    position: fixed;
+    width: 100px;
+    padding: 5px 0;
+    background-color: #fff;
+    z-index: 9;
+    flex-direction: column;
+    border-radius: 2px;
+    overflow: hidden;
+}
+.editor-contextmenu.show {
+    display: flex;
+}
+.editor-contextmenu-item {
+    padding: 5px 10px;
+    cursor: default;
+    transition: color .2s ease;
+}
+.editor-contextmenu-item:hover {
+    color: #03a9f4;
 }
