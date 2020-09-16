@@ -1,4 +1,5 @@
 a simple dag editor tool for web
+[Demo 地址](https://stillbold.com/demos/dag-editor/demos/editor.html)
 
 # usage
 
@@ -16,6 +17,8 @@ const editor = new Editor({
 
 ## register shape
 
+`` editor.registerShape(shapeName, shape) ``
+
 ```javascript
 interface IShape {
   shape: string,  // shape name
@@ -30,8 +33,6 @@ interface IAnchor extends Array<number | string> {
   [1]: number,  // relative y position to node-item
   [2]: 'input' | 'output',  // type of anchor
 }
-
-editor.registerShape(shapeName, shape)
 ```
 
 ## callback
