@@ -221,7 +221,7 @@ export class Editor {
 	update(type: 'node' | 'edge') {
 
 	}
-	repaint() {		
+	repaint() {
 		this._render()
 	}
 	getData(): { nodes: Editor.INode[], edges: Editor.IEdge[] } {
@@ -345,7 +345,7 @@ export class Editor {
 			case 'move-node':
 				let diffX = x - this.mouseEventStartPos.x
 				let diffY = y - this.mouseEventStartPos.y
-				if (diffX < 5 || diffY < 5) {
+				if (diffX < 5 && diffY < 5) {
 					break
 				}
 				console.log('move')

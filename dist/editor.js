@@ -802,7 +802,7 @@ class Editor {
             case 'move-node':
                 let diffX = x - this.mouseEventStartPos.x;
                 let diffY = y - this.mouseEventStartPos.y;
-                if (diffX < 5 || diffY < 5) {
+                if (diffX < 5 && diffY < 5) {
                     break;
                 }
                 console.log('move');
