@@ -18,6 +18,11 @@ const editor = new Editor({
 // example data store
 const store = new Store({ editor })
 
+// new node added
+editor.on('nodeAdded', (node: Editor.INode) => {
+  console.log('node added', node)
+})
+// selected node change
 editor.on('selectedNodeChange', (node: Editor.INode) => {
   console.log('selected node changed', node)
   const oNodePanel = getDom('#node-panel')
@@ -31,6 +36,10 @@ editor.on('selectedNodeChange', (node: Editor.INode) => {
     oNodePanel.classList.remove('show')
     oCanvasPanel.classList.add('show')
   }
+})
+// node deleted
+editor.on('nodeDeleted', (nodeId: string) => {
+  console.log(`node deleted: node-id: ${nodeId}`)
 })
 
 for (let shape of shapes) {

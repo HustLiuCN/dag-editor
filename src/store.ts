@@ -8,7 +8,7 @@ export class Store {
 
     this.oName = getDom('#node-name') as HTMLInputElement
     this.oW = getDom('#node-width') as HTMLInputElement
-    
+
     this._bind()
   }
 
@@ -26,7 +26,7 @@ export class Store {
   editor: Editor
   oName: HTMLInputElement
   oW: HTMLInputElement
-  
+
   __node: Editor.INode
   get currentNode() {
     return this.__node

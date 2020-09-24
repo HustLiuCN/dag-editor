@@ -527,9 +527,12 @@ class Editor {
             ['oPage', 'mouseup', '_mouseUpPage'],
             ['oContainer', 'contextmenu', '_preventDefaultMenu'],
         ];
-        this.callbackList = [
-            'selectedNodeChange',
-        ];
+        this.callback = {
+            selectedNodeChange: null,
+            nodeAdded: null,
+            nodeDeleted: null,
+            edgeAdded: null,
+        };
         /*
          *	add-node
          *	- mousedown_on_itempanel: begin-add-node
@@ -547,10 +550,10 @@ class Editor {
             x: 0,
             y: 0,
         };
-        this.commands = [
-            ['del:node', '_delNodeCommand'],
-            ['clear', '_clear'],
-        ];
+        this.commands = {
+            'del:node': '_delNodeCommand',
+            'clear': '_clear',
+        };
         console.log('dag-editor created');
         // dom container
         this.oContainer = dom_1.getDom(container);
@@ -603,7 +606,7 @@ class Editor {
         // selected node change trigger render on main canvas
         this._render();
         // callback
-        this['selectedNodeChange'] && this['selectedNodeChange'](node);
+        this.callback.selectedNodeChange && this.callback.selectedNodeChange(node);
     }
     get hoverNode() {
         return this.__hoverNode;
@@ -618,7 +621,9 @@ class Editor {
     }
     _addNode(node) {
         this.nodes.push(Object.assign(Object.assign({}, node), { id: utils_1.randomID() }));
-        this.selectedNode = this.nodes[this.nodes.length - 1];
+        let cur = this.nodes[this.nodes.length - 1];
+        this.callback.nodeAdded && this.callback.nodeAdded(cur);
+        this.selectedNode = cur;
     }
     _updateNode(node) {
         let i = this.nodes.findIndex(n => n.id === node.id);
@@ -626,7 +631,6 @@ class Editor {
             return;
         }
         let cur = this.nodes.splice(i, 1)[0];
-        console.log(cur, node);
         cur = Object.assign({}, node);
         this.nodes.push(cur);
         this.selectedNode = cur;
@@ -640,6 +644,7 @@ class Editor {
                 edges.forEach(e => { this._delEdge(e.id); });
             }
             this.selectedNode = null;
+            this.callback.nodeDeleted && this.callback.nodeDeleted(nid);
         }
     }
     _addEdge([source, sourceAnchorIndex], [target, targetAnchorIndex]) {
@@ -694,8 +699,8 @@ class Editor {
      *	public
      */
     on(ev, cb) {
-        if (this.callbackList.indexOf(ev) > -1) {
-            this[ev] = cb;
+        if (this.callback.hasOwnProperty(ev)) {
+            this.callback[ev] = cb;
         }
     }
     update(type) {
@@ -834,9 +839,9 @@ class Editor {
     _initCommand() {
         const command = new command_1.Command({ app: this });
         const { commands } = this;
-        commands.forEach(cm => {
-            command.register(cm[0], this[cm[1]]);
-        });
+        for (let cmd in commands) {
+            command.register(cmd, this[commands[cmd]]);
+        }
         this.command = command;
         this.contextmenu = new contextmenu_1.ContextMenu({
             app: this,
@@ -918,6 +923,11 @@ const editor = new core_1.Editor({
 });
 // example data store
 const store = new store_1.Store({ editor });
+// new node added
+editor.on('nodeAdded', (node) => {
+    console.log('node added', node);
+});
+// selected node change
 editor.on('selectedNodeChange', (node) => {
     console.log('selected node changed', node);
     const oNodePanel = dom_1.getDom('#node-panel');
@@ -931,6 +941,10 @@ editor.on('selectedNodeChange', (node) => {
         oNodePanel.classList.remove('show');
         oCanvasPanel.classList.add('show');
     }
+});
+// node deleted
+editor.on('nodeDeleted', (nodeId) => {
+    console.log(`node deleted: node-id: ${nodeId}`);
 });
 for (let shape of dag_shapes_1.default) {
     editor.registerShape(shape.shape, shape);

@@ -63,12 +63,12 @@ export class Editor {
 		this.oPage.appendChild(oc)
 		this.oPage.appendChild(odc)
 	}
-	pageConfig: Editor.IPageConfig
-	mainCvs: Canvas
-	dynamicCvs: Canvas
+	private pageConfig: Editor.IPageConfig
+	private mainCvs: Canvas
+	private dynamicCvs: Canvas
 	// register shape
-	shapes: Editor.IShapes
-	selectedShape: Editor.IShape
+	private shapes: Editor.IShapes
+	private selectedShape: Editor.IShape
 	registerShape(name: string, shape: Editor.IShape) {
 		this.shapes[name] = shape
 	}
@@ -78,10 +78,10 @@ export class Editor {
 	protected nodes: Editor.INode[]
 	// selected node
 	private __selectedNode: Editor.INode
-	get selectedNode() {
+	private get selectedNode() {
 		return this.__selectedNode
 	}
-	set selectedNode(node: Editor.INode) {
+	private set selectedNode(node: Editor.INode) {
 		if (node === this.__selectedNode) {
 			console.log('no change')
 			return
@@ -91,14 +91,14 @@ export class Editor {
 		// selected node change trigger render on main canvas
 		this._render()
 		// callback
-		this['selectedNodeChange'] && this['selectedNodeChange'](node)
+		this.callback.selectedNodeChange && this.callback.selectedNodeChange(node)
 	}
 	// hover node
 	private __hoverNode: Editor.INode
-	get hoverNode() {
+	private get hoverNode() {
 		return this.__hoverNode
 	}
-	set hoverNode(node: Editor.INode) {
+	private set hoverNode(node: Editor.INode) {
 		if (node === this.__hoverNode) {
 			return
 		}
@@ -108,7 +108,9 @@ export class Editor {
 	}
 	private _addNode(node: Editor.INode) {
 		this.nodes.push({ ...node, id: randomID() })
-		this.selectedNode = this.nodes[this.nodes.length - 1]
+		let cur = this.nodes[this.nodes.length - 1]
+		this.callback.nodeAdded && this.callback.nodeAdded(cur)
+		this.selectedNode = cur
 	}
 	private _updateNode(node: Editor.INode) {
 		let i = this.nodes.findIndex(n => n.id === node.id)
@@ -116,7 +118,6 @@ export class Editor {
 			return
 		}
 		let cur = this.nodes.splice(i, 1)[0]
-		console.log(cur, node)
 		cur = { ...node }
 		this.nodes.push(cur)
 		this.selectedNode = cur
@@ -130,6 +131,8 @@ export class Editor {
 				edges.forEach(e => { this._delEdge(e.id) })
 			}
 			this.selectedNode = null
+
+			this.callback.nodeDeleted && this.callback.nodeDeleted(nid)
 		}
 	}
 	/*
@@ -138,7 +141,7 @@ export class Editor {
 	private edges: Editor.IEdge[]
 	private hoverAnchor: [Editor.INode, number]
 	// private selectedAnchor: [Editor.INode, number]
-	anchorStartPos = { x: 0, y: 0 }
+	private anchorStartPos = { x: 0, y: 0 }
 
 	private _addEdge([source, sourceAnchorIndex]: [Editor.INode, number], [target, targetAnchorIndex]: [Editor.INode, number]) {
 		let edge = {
@@ -186,10 +189,10 @@ export class Editor {
 	/*
 	 *	events
 	 */
-	isMouseDown = false
-	mouseDownType: 'add-node' | 'move-node' | 'add-edge'
+	private isMouseDown = false
+	private mouseDownType: 'add-node' | 'move-node' | 'add-edge'
 
-	eventList = [
+	private eventList = [
 		['oItemPanel', 'mousedown', '_beginAddNode'],
 		['oItemPanel', 'mouseup', '_mouseUp'],
 		['oPage', 'mousedown', '_mouseDownOnPage'],
@@ -198,9 +201,12 @@ export class Editor {
 		['oPage', 'mouseup', '_mouseUpPage'],
 		['oContainer', 'contextmenu', '_preventDefaultMenu'],
 	]
-	callbackList = [
-		'selectedNodeChange',
-	]
+	private callback = {
+		selectedNodeChange: null,
+		nodeAdded: null,
+		nodeDeleted: null,
+		edgeAdded: null,
+	}
 	private _bindEvents() {
 		const event = new Event({
 			rect: this.pageConfig,
@@ -214,8 +220,8 @@ export class Editor {
 	 *	public
 	 */
 	on(ev: string, cb: Function) {
-		if (this.callbackList.indexOf(ev) > -1) {
-			this[ev] = cb
+		if (this.callback.hasOwnProperty(ev)) {
+			this.callback[ev] = cb
 		}
 	}
 	update(type: 'node' | 'edge') {
@@ -243,7 +249,7 @@ export class Editor {
 	 *	- mousemove_on_page
 	 *	- mouseup_page: end
 	 */
-	mouseEventStartPos = {
+	private mouseEventStartPos = {
 		x: 0,
 		y: 0,
 	}
@@ -382,18 +388,18 @@ export class Editor {
 	/*
 	 *	contextmenu
 	 */
-	contextmenu: ContextMenu
-	command: Command
-	commands = [
-		['del:node', '_delNodeCommand'],
-		['clear', '_clear'],
-	]
+	private contextmenu: ContextMenu
+	private command: Command
+	readonly commands = {
+		'del:node': '_delNodeCommand',
+		'clear': '_clear',
+	}
 	private _initCommand() {
 		const command = new Command({ app: this })
 		const { commands } = this
-		commands.forEach(cm => {
-			command.register(cm[0], this[cm[1]])
-		})
+		for (let cmd in commands) {
+			command.register(cmd, this[commands[cmd]])
+		}
 
 		this.command = command
 		this.contextmenu = new ContextMenu({

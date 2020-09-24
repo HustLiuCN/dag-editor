@@ -505,7 +505,7 @@ var Mind = /*#__PURE__*/function () {
     }
 
     this.oCon = Object(_lib_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])(container);
-    this.options = _objectSpread(_objectSpread({}, this.options), options);
+    this.options = _objectSpread({}, this.options, {}, options);
 
     this._init();
 
@@ -1021,7 +1021,7 @@ var Toolbar = /*#__PURE__*/function () {
   _createClass(Toolbar, [{
     key: "registerCommands",
     value: function registerCommands(events) {
-      this.events = _objectSpread(_objectSpread({}, this.events), events);
+      this.events = _objectSpread({}, this.events, {}, events);
     }
   }, {
     key: "_bind",
