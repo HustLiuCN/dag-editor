@@ -181,10 +181,8 @@ export class Editor {
 	// render
 	private renderTask: number
 	private _renderTask(msg?: string) {
-		this.renderTask && clearTimeout(this.renderTask)
-		this.renderTask = window.setTimeout(() => {
-			this._render(msg)
-		}, 0)
+		this.renderTask && cancelAnimationFrame(this.renderTask)
+		this.renderTask = window.requestAnimationFrame(() => { this._render(msg) })
 	}
 	private _render(msg?: string) {
 		console.log(`===render by: ${msg}===`)

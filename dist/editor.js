@@ -732,10 +732,8 @@ class Editor {
         this._renderTask('clear');
     }
     _renderTask(msg) {
-        this.renderTask && clearTimeout(this.renderTask);
-        this.renderTask = window.setTimeout(() => {
-            this._render(msg);
-        }, 0);
+        this.renderTask && cancelAnimationFrame(this.renderTask);
+        this.renderTask = window.requestAnimationFrame(() => { this._render(msg); });
     }
     _render(msg) {
         console.log(`===render by: ${msg}===`);
