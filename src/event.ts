@@ -14,12 +14,12 @@ export class Event {
     protected isMobile: boolean
     private baseRect: DOMRect
 
-    mobileEvent = {
+    private mobileEvent = {
         'mousedown': 'touchstart',
         'mouseup': 'touchend',
         'mousemove': 'touchmove',
     }
-    add(dom: HTMLElement, ev: string, fn: Function) {
+    add(dom: HTMLElement, ev: string, fn: (e: globalThis.Event) => void) {
         ev = this.isMobile ? (this.mobileEvent[ev] || ev) : ev
         dom.addEventListener(ev, e => {
             if (this.isMobile) {

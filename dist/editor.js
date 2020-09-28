@@ -229,7 +229,7 @@ exports.Canvas = void 0;
 const color_1 = __webpack_require__(/*! ./color */ "./src/color.ts");
 const utils_1 = __webpack_require__(/*! @lib/utils */ "./lib/utils.ts");
 class Canvas {
-    constructor(cvs, { ratio = 1, fillStyle = color_1.default.white, strokeStyle = color_1.default.line, }) {
+    constructor(cvs, { ratio = 1, fillStyle = color_1.default.white, strokeStyle = color_1.default.line, hasStore, }) {
         this.canvas = cvs;
         this.ratio = ratio;
         const ctx = cvs.getContext('2d');
@@ -239,6 +239,11 @@ class Canvas {
         ctx.textBaseline = 'middle';
         ctx.font = `${Math.max(ratio * 10, 12)}px Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,sans-serif`;
         this.ctx = ctx;
+        this.hasStore = hasStore;
+        this.paths = {
+            nodes: {},
+            edges: {},
+        };
     }
     // paint node
     paintNode(node, status) {
@@ -255,7 +260,12 @@ class Canvas {
             ctx.save();
             ctx.strokeStyle = color_1.default.blue;
             ctx.lineWidth = 2;
-            ctx.strokeRect(x - w / 2, y - h / 2, w, h);
+            const path = new Path2D();
+            path.rect(x - w / 2, y - h / 2, w, h);
+            ctx.stroke(path);
+            if (node.id && this.hasStore) {
+                this.paths.nodes[node.id] = path;
+            }
             if (node.anchors) {
                 node.anchors.forEach(anchor => {
                     let pos = utils_1.getAnchorPos(node, anchor);
@@ -273,6 +283,14 @@ class Canvas {
         ctx.fillStyle = color_1.default.font;
         ctx.fillText(node.name || node.shape, x, y);
         ctx.restore();
+    }
+    checkInNode(nid, pos) {
+        const r = this.ratio;
+        const path = this.paths.nodes[nid];
+        let { x, y } = pos;
+        x *= r;
+        y *= r;
+        return path && this.ctx.isPointInPath(path, x, y);
     }
     // paint anchor
     _paintAnchor({ x, y }) {
@@ -311,21 +329,48 @@ class Canvas {
         ctx.closePath();
     }
     // paint edge
-    paintEdge({ x: sx, y: sy }, { x: ex, y: ey }) {
+    paintEdge({ x: sx, y: sy }, // start
+    { x: ex, y: ey }, // end
+    opts // options
+    ) {
         const { ctx, ratio: r } = this;
         sx *= r;
         sy *= r;
         ex *= r;
         ey *= r;
+        const path = new Path2D();
         ctx.beginPath();
-        ctx.moveTo(sx, sy);
+        path.moveTo(sx, sy);
         let diffY = Math.abs(ey - sy);
         const cp1 = [sx, sy + diffY / 4];
         const cp2 = [ex, ey - diffY / 2];
-        ctx.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey);
-        ctx.stroke();
+        path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey);
+        if (opts && opts.selected) {
+            ctx.save();
+            ctx.lineWidth = 2 * r;
+            ctx.stroke(path);
+            ctx.restore();
+        }
+        else {
+            ctx.stroke(path);
+        }
+        if (opts && opts.id && this.hasStore) {
+            this.paths.edges[opts.id] = path;
+        }
         ctx.closePath();
         this._paintArrow({ x: ex, y: ey });
+    }
+    checkOnEdge(eid, pos) {
+        const { ratio: r, ctx } = this;
+        const path = this.paths.edges[eid];
+        let { x, y } = pos;
+        x *= r;
+        y *= r;
+        ctx.save();
+        ctx.lineWidth = 6 * r;
+        let on = path && ctx.isPointInStroke(path, x, y);
+        ctx.restore();
+        return on;
     }
     _paintArrow({ x, y }) {
         const { ctx, ratio: r } = this;
@@ -444,6 +489,7 @@ class ContextMenu {
     }
     // attach
     attach(e, { type }) {
+        this.detach();
         this.body.classList.add('show');
         this.body.style.left = `${e.clientX}px`;
         this.body.style.top = `${e.clientY}px`;
@@ -515,6 +561,15 @@ class Editor {
         // private selectedAnchor: [Editor.INode, number]
         this.anchorStartPos = { x: 0, y: 0 };
         /*
+         *	public
+         */
+        this.callback = {
+            selectedNodeChange: null,
+            nodeAdded: null,
+            nodeDeleted: null,
+            edgeAdded: null,
+        };
+        /*
          *	events
          */
         this.isMouseDown = false;
@@ -527,12 +582,6 @@ class Editor {
             ['oPage', 'mouseup', '_mouseUpPage'],
             ['oContainer', 'contextmenu', '_preventDefaultMenu'],
         ];
-        this.callback = {
-            selectedNodeChange: null,
-            nodeAdded: null,
-            nodeDeleted: null,
-            edgeAdded: null,
-        };
         /*
          *	add-node
          *	- mousedown_on_itempanel: begin-add-node
@@ -546,6 +595,7 @@ class Editor {
          *	- mousemove_on_page
          *	- mouseup_page: end
          */
+        // mouse event start pos (x, y)
         this.mouseEventStartPos = {
             x: 0,
             y: 0,
@@ -583,7 +633,7 @@ class Editor {
         odc.style.backgroundColor = 'transparent';
         // define canvas object
         // main canvas paint all nodes & edges that exist in this.nodes & this.edges
-        this.mainCvs = new canvas_1.Canvas(oc, { ratio });
+        this.mainCvs = new canvas_1.Canvas(oc, { ratio, hasStore: true });
         // dynamic canvas paint nodes & edges which is being added or moved
         this.dynamicCvs = new canvas_1.Canvas(odc, { ratio });
         // append to page container
@@ -601,10 +651,9 @@ class Editor {
             console.log('no change');
             return;
         }
-        // TODO del
         this.__selectedNode = node;
         // selected node change trigger render on main canvas
-        this._render();
+        this._renderTask('selected node change');
         // callback
         this.callback.selectedNodeChange && this.callback.selectedNodeChange(node);
     }
@@ -617,7 +666,7 @@ class Editor {
         }
         // hover node change trigger render on main canvas
         this.__hoverNode = node;
-        this._render();
+        this._renderTask('hover node change');
     }
     _addNode(node) {
         this.nodes.push(Object.assign(Object.assign({}, node), { id: utils_1.randomID() }));
@@ -647,6 +696,16 @@ class Editor {
             this.callback.nodeDeleted && this.callback.nodeDeleted(nid);
         }
     }
+    get selectedEdge() {
+        return this.__selectedEdge;
+    }
+    set selectedEdge(edge) {
+        if (edge === this.__selectedEdge) {
+            return;
+        }
+        this.__selectedEdge = edge;
+        this._renderTask('selected edge change');
+    }
     _addEdge([source, sourceAnchorIndex], [target, targetAnchorIndex]) {
         let edge = {
             source: source.id,
@@ -655,11 +714,10 @@ class Editor {
             targetAnchorIndex,
         };
         let exist = this.edges.find(e => utils_1.compareEdge(edge, e));
-        // TODO deduplicate
         if (!exist) {
             this.edges.push(Object.assign(Object.assign({}, edge), { id: utils_1.randomID() }));
+            this.callback.edgeAdded && this.callback.edgeAdded(edge);
         }
-        console.log(this.edges);
     }
     _delEdge(eid) {
         let i = this.edges.findIndex(e => e.id === eid);
@@ -671,33 +729,27 @@ class Editor {
     _clear() {
         this.nodes = [];
         this.edges = [];
-        this._render();
+        this._renderTask('clear');
     }
-    // render
-    _render() {
+    _renderTask(msg) {
+        this.renderTask && clearTimeout(this.renderTask);
+        this.renderTask = window.setTimeout(() => {
+            this._render(msg);
+        }, 0);
+    }
+    _render(msg) {
+        console.log(`===render by: ${msg}===`);
         this.mainCvs.clear();
         this.nodes.forEach(node => {
-            // TODO
             let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null);
             this.mainCvs.paintNode(node, status);
         });
-        this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex }) => {
+        this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex, id }) => {
             const start = this.nodes.find(n => n.id === source);
             const end = this.nodes.find(n => n.id === target);
-            this.mainCvs.paintEdge(utils_1.getAnchorPos(start, start.anchors[sourceAnchorIndex]), utils_1.getAnchorPos(end, end.anchors[targetAnchorIndex]));
+            this.mainCvs.paintEdge(utils_1.getAnchorPos(start, start.anchors[sourceAnchorIndex]), utils_1.getAnchorPos(end, end.anchors[targetAnchorIndex]), { id, selected: this.selectedEdge && this.selectedEdge.id === id });
         });
     }
-    _bindEvents() {
-        const event = new event_1.Event({
-            rect: this.pageConfig,
-        });
-        for (let ev of this.eventList) {
-            event.add(this[ev[0]], ev[1], this[ev[2]].bind(this));
-        }
-    }
-    /*
-     *	public
-     */
     on(ev, cb) {
         if (this.callback.hasOwnProperty(ev)) {
             this.callback[ev] = cb;
@@ -706,13 +758,21 @@ class Editor {
     update(type) {
     }
     repaint() {
-        this._render();
+        this._renderTask('repaint');
     }
     getData() {
         return {
             nodes: this.nodes,
             edges: this.edges,
         };
+    }
+    _bindEvents() {
+        const event = new event_1.Event({
+            rect: this.pageConfig,
+        });
+        for (let ev of this.eventList) {
+            event.add(this[ev[0]], ev[1], this[ev[2]].bind(this));
+        }
     }
     // mousedown on itempanel
     _beginAddNode(e) {
@@ -731,8 +791,8 @@ class Editor {
         const { offsetX: x, offsetY: y } = e;
         this.mouseEventStartPos = { x, y };
         if (this.hoverNode) {
-            // TODO dobule trigger bug
             this.selectedNode = this.hoverNode;
+            this.selectedEdge = null;
             // this.selectedNode = this.selectedNode
             if (this.hoverAnchor) {
                 // u can't drag an edge from input anchor
@@ -745,6 +805,7 @@ class Editor {
         }
         else {
             this.selectedNode = null;
+            this.selectedEdge = this._getSelectedEdge({ x, y });
             // TODO start drag canvas
         }
         // TODO contextmenu
@@ -763,7 +824,6 @@ class Editor {
                     this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + x - this.mouseEventStartPos.x, y: this.selectedNode.y + y - this.mouseEventStartPos.y }));
                     break;
                 case 'add-edge':
-                    // TODO
                     this.nodes.forEach(node => {
                         if (node.id !== this.selectedNode.id && node.anchors) {
                             this.dynamicCvs.paintActiveAnchors(node);
@@ -774,7 +834,7 @@ class Editor {
             }
         }
         else { // hover
-            const hoverNode = this._getSelected({ x, y });
+            const hoverNode = this._getSelectedNode({ x, y });
             if (this.hoverNode) {
                 let hoverAnchor = utils_1.checkInNodeAnchor({ x, y }, this.hoverNode);
                 this.hoverAnchor = hoverAnchor;
@@ -787,7 +847,6 @@ class Editor {
                 this.hoverNode = hoverNode;
             }
         }
-        // this._render()
     }
     // mouseleave
     _mouseLeavePage() {
@@ -802,7 +861,6 @@ class Editor {
         switch (this.mouseDownType) {
             case 'add-node':
                 this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x, y }));
-                // this._render()
                 break;
             case 'move-node':
                 let diffX = x - this.mouseEventStartPos.x;
@@ -814,7 +872,6 @@ class Editor {
                 this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + diffX, y: this.selectedNode.y + diffY }));
                 break;
             case 'add-edge':
-                // TODO deduplicate
                 this.nodes.forEach(node => {
                     if (node.id !== this.selectedNode.id && node.anchors) {
                         node.anchors.forEach((anchor, i) => {
@@ -872,12 +929,21 @@ class Editor {
     /*
      * methods
      */
-    _getSelected({ x, y }) {
+    _getSelectedNode({ x, y }) {
         const { nodes } = this;
         for (let i = nodes.length; i > 0; i--) {
             let node = nodes[i - 1];
-            if (utils_1.checkInNode({ x, y }, node)) {
+            if (this.mainCvs.checkInNode(node.id, { x, y })) {
                 return node;
+            }
+        }
+        return null;
+    }
+    _getSelectedEdge({ x, y }) {
+        const { edges } = this;
+        for (let edge of edges) {
+            if (this.mainCvs.checkOnEdge(edge.id, { x, y })) {
+                return edge;
             }
         }
         return null;
@@ -945,6 +1011,10 @@ editor.on('selectedNodeChange', (node) => {
 // node deleted
 editor.on('nodeDeleted', (nodeId) => {
     console.log(`node deleted: node-id: ${nodeId}`);
+});
+// new edge added
+editor.on('edgeAdded', (edge) => {
+    console.log('edge added', edge);
 });
 for (let shape of dag_shapes_1.default) {
     editor.registerShape(shape.shape, shape);

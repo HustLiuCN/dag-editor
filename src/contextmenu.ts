@@ -37,6 +37,7 @@ export class ContextMenu {
   }
   // attach
   attach(e: MouseEvent, { type }: IMenuOption) {
+    this.detach()
     this.body.classList.add('show')
     this.body.style.left = `${e.clientX}px`
     this.body.style.top = `${e.clientY}px`

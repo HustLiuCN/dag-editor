@@ -41,6 +41,10 @@ editor.on('selectedNodeChange', (node: Editor.INode) => {
 editor.on('nodeDeleted', (nodeId: string) => {
   console.log(`node deleted: node-id: ${nodeId}`)
 })
+// new edge added
+editor.on('edgeAdded', (edge: Editor.IEdge) => {
+  console.log('edge added', edge)
+})
 
 for (let shape of shapes) {
   editor.registerShape(shape.shape, shape)

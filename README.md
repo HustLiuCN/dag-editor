@@ -23,7 +23,7 @@ const editor = new Editor({
 interface IShape {
   shape: string,  // shape name
   w: number,  // width
-  h: number,  // height  
+  h: number,  // height
   name: string, // node-item shown text
   anchors: IAnchor[],
   [customProp: string]: any,  // any custom define property
@@ -49,6 +49,7 @@ interface INode extends IShape {
 `` editor.on('selectedNodeChange', (node: Inode): void) ``
 
 ### TODO
-- `nodeDeleted`
-- `nodeAdded`
-- ...
+- ~~`nodeDeleted`~~
+- ~~`nodeAdded`~~
+- **select edge**
+- **drag canvas**

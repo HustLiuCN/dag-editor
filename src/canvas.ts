@@ -7,10 +7,12 @@ export class Canvas {
 		ratio = 1,
 		fillStyle = COLOR.white,
 		strokeStyle = COLOR.line,
+		hasStore,
 	}: {
 		ratio: number,
 		fillStyle?: string,
-		strokeStyle?: string
+		strokeStyle?: string,
+		hasStore?: boolean
 	}) {
 		this.canvas = cvs
 		this.ratio = ratio
@@ -23,10 +25,20 @@ export class Canvas {
 		ctx.font = `${Math.max(ratio * 10, 12)}px Helvetica Neue,Helvetica,PingFang SC,Microsoft YaHei,sans-serif`
 
 		this.ctx = ctx
+		this.hasStore = hasStore
+		this.paths = {
+			nodes: {},
+			edges: {},
+		}
 	}
 	canvas: HTMLCanvasElement
 	ratio: number
 	ctx: CanvasRenderingContext2D
+	hasStore: boolean
+	paths: {		// store the paths for node & edge
+		nodes: { [id: string]: Path2D },
+		edges: { [id: string]: Path2D },
+	}
 	// paint node
 	paintNode(node: Editor.INode, status?: string) {
 		const { ctx, ratio: r } = this
@@ -42,7 +54,12 @@ export class Canvas {
 			ctx.save()
 			ctx.strokeStyle = COLOR.blue
 			ctx.lineWidth = 2
-			ctx.strokeRect(x - w/2, y - h/2, w, h)
+			const path = new Path2D()
+			path.rect(x - w/2, y - h/2, w, h)
+			ctx.stroke(path)
+			if (node.id && this.hasStore) {
+				this.paths.nodes[node.id] = path
+			}
 			if (node.anchors) {
 				node.anchors.forEach(anchor => {
 					let pos = getAnchorPos(node, anchor)
@@ -59,6 +76,14 @@ export class Canvas {
 		ctx.fillStyle = COLOR.font
 		ctx.fillText(node.name || node.shape, x, y)
 		ctx.restore()
+	}
+	checkInNode(nid: string, pos: Editor.IPos) {
+		const r = this.ratio
+		const path = this.paths.nodes[nid]
+		let { x, y } = pos
+		x *= r
+		y *= r
+		return path && this.ctx.isPointInPath(path, x, y)
 	}
 	// paint anchor
 	private _paintAnchor({ x, y }: { x: number, y: number }) {
@@ -97,21 +122,48 @@ export class Canvas {
 		ctx.closePath()
 	}
 	// paint edge
-	paintEdge({ x: sx, y: sy }: Editor.IPos, { x: ex, y: ey }: Editor.IPos) {
+	paintEdge(
+		{ x: sx, y: sy }: Editor.IPos,	// start
+		{ x: ex, y: ey }: Editor.IPos,	// end
+		opts?: { id?: string, selected?: boolean }		// options
+	) {
 		const { ctx, ratio: r } = this
 		sx *= r
 		sy *= r
 		ex *= r
 		ey *= r
+		const path = new Path2D()
 		ctx.beginPath()
-		ctx.moveTo(sx, sy)
+		path.moveTo(sx, sy)
 		let diffY = Math.abs(ey - sy)
 		const cp1 = [sx, sy + diffY / 4]
 		const cp2 = [ex, ey - diffY / 2]
-		ctx.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
-		ctx.stroke()
+		path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
+		if (opts && opts.selected) {
+			ctx.save()
+			ctx.lineWidth = 2 * r
+			ctx.stroke(path)
+			ctx.restore()
+		} else {
+			ctx.stroke(path)
+		}
+		if (opts && opts.id && this.hasStore) {
+			this.paths.edges[opts.id] = path
+		}
 		ctx.closePath()
 		this._paintArrow({ x: ex, y: ey })
+	}
+	checkOnEdge(eid: string, pos: Editor.IPos) {
+		const { ratio: r, ctx } = this
+		const path = this.paths.edges[eid]
+		let { x, y } = pos
+		x *= r
+		y *= r
+		ctx.save()
+		ctx.lineWidth = 6 * r
+		let on = path && ctx.isPointInStroke(path, x, y)
+		ctx.restore()
+		return on
 	}
 	private _paintArrow({ x, y}: Editor.IPos) {
 		const { ctx, ratio: r } = this
