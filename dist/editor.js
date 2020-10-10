@@ -497,6 +497,9 @@ class ContextMenu {
             case 'node':
                 this.body.appendChild(this._createDelItem());
                 break;
+            case 'edge':
+                this.body.appendChild(this._createDelEdge());
+                break;
             default:
                 this.body.appendChild(this._createClearItem());
                 break;
@@ -517,6 +520,12 @@ class ContextMenu {
         const item = dom_1.createDom('div', 'editor-contextmenu-item');
         item.setAttribute('data-command', 'del:node');
         item.innerText = '删除节点';
+        return item;
+    }
+    _createDelEdge() {
+        const item = dom_1.createDom('div', 'editor-contextmenu-item');
+        item.setAttribute('data-command', 'del:edge');
+        item.innerText = '删除边';
         return item;
     }
     _createClearItem() {
@@ -568,6 +577,7 @@ class Editor {
             nodeAdded: null,
             nodeDeleted: null,
             edgeAdded: null,
+            edgeDeleted: null,
         };
         /*
          *	events
@@ -602,6 +612,7 @@ class Editor {
         };
         this.commands = {
             'del:node': '_delNodeCommand',
+            'del:edge': '_delEdgeCommand',
             'clear': '_clear',
         };
         console.log('dag-editor created');
@@ -722,7 +733,8 @@ class Editor {
     _delEdge(eid) {
         let i = this.edges.findIndex(e => e.id === eid);
         if (i > -1) {
-            this.edges.splice(i, 1);
+            let [edge] = this.edges.splice(i, 1);
+            this.callback.edgeDeleted && this.callback.edgeDeleted(edge);
         }
     }
     // clear
@@ -912,6 +924,9 @@ class Editor {
             if (this.selectedNode) {
                 options.type = 'node';
             }
+            else if (this.selectedEdge) {
+                options.type = 'edge';
+            }
             this.contextmenu.attach(e, options);
         }
         else {
@@ -923,6 +938,10 @@ class Editor {
     }
     _delNodeCommand() {
         this._delNode(this.selectedNode.id);
+    }
+    _delEdgeCommand() {
+        this._delEdge(this.selectedEdge.id);
+        this.selectedEdge = null;
     }
     /*
      * methods
@@ -1013,6 +1032,10 @@ editor.on('nodeDeleted', (nodeId) => {
 // new edge added
 editor.on('edgeAdded', (edge) => {
     console.log('edge added', edge);
+});
+// edge deleted
+editor.on('edgeDeleted', (edge) => {
+    console.log('edge deleted', edge);
 });
 for (let shape of dag_shapes_1.default) {
     editor.registerShape(shape.shape, shape);

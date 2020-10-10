@@ -45,6 +45,10 @@ editor.on('nodeDeleted', (nodeId: string) => {
 editor.on('edgeAdded', (edge: Editor.IEdge) => {
   console.log('edge added', edge)
 })
+// edge deleted
+editor.on('edgeDeleted', (edge: Editor.IEdge) => {
+  console.log('edge deleted', edge)
+})
 
 for (let shape of shapes) {
   editor.registerShape(shape.shape, shape)

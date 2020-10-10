@@ -51,5 +51,8 @@ interface INode extends IShape {
 ### TODO
 - ~~`nodeDeleted`~~
 - ~~`nodeAdded`~~
-- **select edge**
+- ~~**select edge**~~
+- ~~**delete edge**~~
+- ~~`edgeAdded` & `edgeDeleted` callback~~
 - **drag canvas**
+- **scale**

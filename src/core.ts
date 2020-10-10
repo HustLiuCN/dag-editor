@@ -169,7 +169,8 @@ export class Editor {
 	private _delEdge(eid: string) {
 		let i = this.edges.findIndex(e => e.id === eid)
 		if (i > -1) {
-			this.edges.splice(i, 1)
+			let [ edge ] = this.edges.splice(i, 1)
+			this.callback.edgeDeleted && this.callback.edgeDeleted(edge)
 		}
 	}
 	// clear
@@ -209,6 +210,7 @@ export class Editor {
 		nodeAdded: null,
 		nodeDeleted: null,
 		edgeAdded: null,
+		edgeDeleted: null,
 	}
 	on(ev: string, cb: Function) {
 		if (this.callback.hasOwnProperty(ev)) {
@@ -405,6 +407,7 @@ export class Editor {
 	private command: Command
 	readonly commands = {
 		'del:node': '_delNodeCommand',
+		'del:edge': '_delEdgeCommand',
 		'clear': '_clear',
 	}
 	private _initCommand() {
@@ -428,6 +431,8 @@ export class Editor {
 			}
 			if (this.selectedNode) {
 				options.type = 'node'
+			} else if (this.selectedEdge) {
+				options.type = 'edge'
 			}
 			this.contextmenu.attach(e, options)
 		} else {
@@ -439,6 +444,10 @@ export class Editor {
 	}
 	private _delNodeCommand() {
 		this._delNode(this.selectedNode.id)
+	}
+	private _delEdgeCommand() {
+		this._delEdge(this.selectedEdge.id)
+		this.selectedEdge = null
 	}
 	/*
 	 * methods

@@ -46,6 +46,9 @@ export class ContextMenu {
       case 'node':
         this.body.appendChild(this._createDelItem())
         break
+      case 'edge':
+        this.body.appendChild(this._createDelEdge())
+        break
       default:
         this.body.appendChild(this._createClearItem())
         break
@@ -66,6 +69,12 @@ export class ContextMenu {
     const item = createDom('div', 'editor-contextmenu-item')
     item.setAttribute('data-command', 'del:node')
     item.innerText = '删除节点'
+    return item
+  }
+  private _createDelEdge() {
+    const item = createDom('div', 'editor-contextmenu-item')
+    item.setAttribute('data-command', 'del:edge')
+    item.innerText = '删除边'
     return item
   }
   private _createClearItem() {
