@@ -42,11 +42,27 @@ interface INode extends IShape {
   x: number,  // canvas position
   y: number,  // canvas postion
 }
+
+interface IEdge {
+  id: string,
+  source: string,   // source node id
+  sourceAnchorIndex: number,
+  target: string,   // target node id
+  targetAnchorIndex: number,
+}
 ```
 
-### selectedNodeChange
+```javascript
+interface callback {
+  selectedNodeChange: (node: INode) => void,
+  nodeAdded: (node: INode) => void,
+  nodeDeleted: (nodeId: string) => void,
+  edgeAdded: (edge: IEdge) => void,
+  edgeDeleted: (edge: IEdge) => void,
+}
+```
 
-`` editor.on('selectedNodeChange', (node: Inode): void) ``
+**`` editor.on(`${callbackEventName}`, callback) ``**
 
 ### TODO
 - ~~`nodeDeleted`~~
