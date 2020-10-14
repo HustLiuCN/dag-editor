@@ -370,53 +370,6 @@ exports.default = COLOR;
 
 /***/ }),
 
-/***/ "./src/event.ts":
-/*!**********************!*\
-  !*** ./src/event.ts ***!
-  \**********************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Event = void 0;
-class Event {
-    constructor({ rect }) {
-        this.mobileEvent = {
-            'mousedown': 'touchstart',
-            'mouseup': 'touchend',
-            'mousemove': 'touchmove',
-        };
-        const UA = window && window.navigator.userAgent || '';
-        this.isMobile = !!UA.toLowerCase().match(/iphone|mobile|andriod/);
-        this.baseRect = rect;
-        if (this.isMobile) {
-            document.body.addEventListener('touchmove', e => {
-                e.preventDefault();
-            }, { passive: false });
-        }
-    }
-    add(dom, ev, fn) {
-        ev = this.isMobile ? (this.mobileEvent[ev] || ev) : ev;
-        dom.addEventListener(ev, e => {
-            if (this.isMobile) {
-                let t = ev === 'touchend' ? e['changedTouches'][0] : e['touches'][0];
-                t.offsetX = t.clientX - this.baseRect.left;
-                t.offsetY = t.clientY - this.baseRect.top;
-                fn(t);
-            }
-            else {
-                fn(e);
-            }
-        });
-    }
-}
-exports.Event = Event;
-
-
-/***/ }),
-
 /***/ "./src/mind.js":
 /*!*********************!*\
   !*** ./src/mind.js ***!
@@ -433,8 +386,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./color */ "./src/color.ts");
 /* harmony import */ var _color__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_color__WEBPACK_IMPORTED_MODULE_3__);
 /* harmony import */ var _toolbar__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./toolbar */ "./src/toolbar.js");
-/* harmony import */ var _event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./event */ "./src/event.ts");
-/* harmony import */ var _event__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_event__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _old_event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./old-event */ "./src/old-event.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -825,7 +777,7 @@ var Mind = /*#__PURE__*/function () {
     value: function _bindEvent() {
       var _this2 = this;
 
-      var event = new _event__WEBPACK_IMPORTED_MODULE_5___default.a({
+      var event = new _old_event__WEBPACK_IMPORTED_MODULE_5__["default"]({
         rect: this.config
       });
       var o = this.oCanvas;
@@ -981,6 +933,74 @@ oBg.addEventListener('click', function () {
   var o = document.querySelector('.popup');
   o && o.classList.remove('show');
 });
+
+/***/ }),
+
+/***/ "./src/old-event.js":
+/*!**************************!*\
+  !*** ./src/old-event.js ***!
+  \**************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var EventHandler = /*#__PURE__*/function () {
+  function EventHandler(_ref) {
+    var rect = _ref.rect;
+
+    _classCallCheck(this, EventHandler);
+
+    _defineProperty(this, "mobileEvent", {
+      'mousedown': 'touchstart',
+      'mouseup': 'touchend',
+      'mousemove': 'touchmove'
+    });
+
+    var UA = window && window.navigator.userAgent || '';
+    this.isMobile = !!UA.toLowerCase().match(/iphone|mobile|andriod/);
+    this.baseRect = rect;
+
+    if (this.isMobile) {
+      document.body.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+      }, {
+        passive: false
+      });
+    }
+  }
+
+  _createClass(EventHandler, [{
+    key: "add",
+    value: function add(dom, ev, fn) {
+      var _this = this;
+
+      ev = this.isMobile ? this.mobileEvent[ev] || ev : ev;
+      dom.addEventListener(ev, function (e) {
+        if (_this.isMobile) {
+          var t = ev === 'touchend' ? e['changedTouches'][0] : e['touches'][0];
+          t.offsetX = t.clientX - _this.baseRect.left;
+          t.offsetY = t.clientY - _this.baseRect.top;
+          fn(t);
+        } else {
+          fn(e);
+        }
+      });
+    }
+  }]);
+
+  return EventHandler;
+}();
+
+/* harmony default export */ __webpack_exports__["default"] = (EventHandler);
 
 /***/ }),
 

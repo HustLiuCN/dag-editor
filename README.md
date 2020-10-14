@@ -70,5 +70,5 @@ interface callback {
 - ~~**select edge**~~
 - ~~**delete edge**~~
 - ~~`edgeAdded` & `edgeDeleted` callback~~
-- **drag canvas**
+- ~~**drag canvas**~~
 - **scale**

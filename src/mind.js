@@ -7,7 +7,7 @@ import { figureNodeLevel } from '@lib/tree'
 import MockData from '@data/mind-map-data'
 import COLOR from './color'
 import Toolbar from './toolbar'
-import Event from './event'
+import Event from './old-event'
 
 class Mind {
     constructor({ container = '#mind-map-container', data = {}, options = {} }) {

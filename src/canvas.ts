@@ -30,6 +30,11 @@ export class Canvas {
 			nodes: {},
 			edges: {},
 		}
+		// translate
+		this.translateInfo = {
+			x: 0,
+			y: 0,
+		}
 	}
 	canvas: HTMLCanvasElement
 	ratio: number
@@ -38,6 +43,26 @@ export class Canvas {
 	paths: {		// store the paths for node & edge
 		nodes: { [id: string]: Path2D },
 		edges: { [id: string]: Path2D },
+	}
+	translateInfo: { x: number, y: number }
+	translate(dx: number, dy: number) {
+		const { ratio: r, ctx } = this
+		dx *= r
+		dy *= r
+		ctx.translate(dx, dy)
+		this.translateInfo.x += dx
+		this.translateInfo.y += dy
+	}
+	transform(dx: number, dy: number) {
+		const { ctx, ratio: r } = this
+		ctx.save()
+		ctx.transform(1, 0, 0, 1, dx*r, dy*r)
+		// ctx.setTransform(1, 0, 0, 1, dx * r, dy * r)
+		// console.log(ctx.getTransform())
+	}
+	restore() {
+		this.ctx.restore()
+		// this.translate(-this.translateInfo.x, -this.translateInfo.y)
 	}
 	// paint node
 	paintNode(node: Editor.INode, status?: string) {
@@ -180,7 +205,8 @@ export class Canvas {
 	}
 	// clear canvas
 	clear() {
-		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
+		const { x, y } = this.translateInfo
+		this.ctx.clearRect(-x, -y, this.canvas.width, this.canvas.height)
 	}
 }
 

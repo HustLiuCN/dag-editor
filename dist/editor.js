@@ -244,6 +244,30 @@ class Canvas {
             nodes: {},
             edges: {},
         };
+        // translate
+        this.translateInfo = {
+            x: 0,
+            y: 0,
+        };
+    }
+    translate(dx, dy) {
+        const { ratio: r, ctx } = this;
+        dx *= r;
+        dy *= r;
+        ctx.translate(dx, dy);
+        this.translateInfo.x += dx;
+        this.translateInfo.y += dy;
+    }
+    transform(dx, dy) {
+        const { ctx, ratio: r } = this;
+        ctx.save();
+        ctx.transform(1, 0, 0, 1, dx * r, dy * r);
+        // ctx.setTransform(1, 0, 0, 1, dx * r, dy * r)
+        // console.log(ctx.getTransform())
+    }
+    restore() {
+        this.ctx.restore();
+        // this.translate(-this.translateInfo.x, -this.translateInfo.y)
     }
     // paint node
     paintNode(node, status) {
@@ -387,7 +411,8 @@ class Canvas {
     }
     // clear canvas
     clear() {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        const { x, y } = this.translateInfo;
+        this.ctx.clearRect(-x, -y, this.canvas.width, this.canvas.height);
     }
 }
 exports.Canvas = Canvas;
@@ -748,7 +773,7 @@ class Editor {
         this.renderTask = window.requestAnimationFrame(() => { this._render(msg); });
     }
     _render(msg) {
-        console.log(`===render by: ${msg}===`);
+        msg && console.log(`===render by: ${msg}===`);
         this.mainCvs.clear();
         this.nodes.forEach(node => {
             let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null);
@@ -817,21 +842,24 @@ class Editor {
             this.selectedNode = null;
             this.selectedEdge = this._getSelectedEdge({ x, y });
             // TODO start drag canvas
+            this.mouseDownType = 'drag-canvas';
         }
-        // TODO contextmenu
+        // trigger contextmenu
         this._triggerMenu(e.button === 2, e);
     }
     // mousemove
     _mouseMove(e) {
         this.dynamicCvs.clear();
         const { offsetX: x, offsetY: y } = e;
+        const dx = x - this.mouseEventStartPos.x;
+        const dy = y - this.mouseEventStartPos.y;
         if (this.isMouseDown) { // move
             switch (this.mouseDownType) {
                 case 'add-node':
                     this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedShape), { x, y }));
                     break;
                 case 'move-node':
-                    this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + x - this.mouseEventStartPos.x, y: this.selectedNode.y + y - this.mouseEventStartPos.y }));
+                    this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
                     break;
                 case 'add-edge':
                     this.nodes.forEach(node => {
@@ -840,6 +868,15 @@ class Editor {
                         }
                     });
                     this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y });
+                    break;
+                // TODO
+                case 'drag-canvas':
+                    this.mainCvs.clear();
+                    this.mainCvs.transform(dx, dy);
+                    this.dynamicCvs.transform(dx, dy);
+                    this._render();
+                    this.mainCvs.restore();
+                    this.dynamicCvs.restore();
                     break;
             }
         }
@@ -868,18 +905,18 @@ class Editor {
             return;
         }
         const { offsetX: x, offsetY: y } = e;
+        const dx = x - this.mouseEventStartPos.x;
+        const dy = y - this.mouseEventStartPos.y;
         switch (this.mouseDownType) {
             case 'add-node':
                 this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x, y }));
                 break;
             case 'move-node':
-                let diffX = x - this.mouseEventStartPos.x;
-                let diffY = y - this.mouseEventStartPos.y;
-                if (diffX < 5 && diffY < 5) {
+                if (dx < 5 && dy < 5) {
                     break;
                 }
                 console.log('move');
-                this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + diffX, y: this.selectedNode.y + diffY }));
+                this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
                 break;
             case 'add-edge':
                 this.nodes.forEach(node => {
@@ -894,6 +931,11 @@ class Editor {
                         });
                     }
                 });
+                break;
+            case 'drag-canvas':
+                // this.mainCvs.reset()
+                this.mainCvs.translate(dx, dy);
+                this.dynamicCvs.translate(dx, dy);
                 break;
         }
         this._mouseUp();

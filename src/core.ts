@@ -186,7 +186,7 @@ export class Editor {
 		this.renderTask = window.requestAnimationFrame(() => { this._render(msg) })
 	}
 	private _render(msg?: string) {
-		console.log(`===render by: ${msg}===`)
+		msg && console.log(`===render by: ${msg}===`)
 		this.mainCvs.clear()
 		this.nodes.forEach(node => {
 			let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null)
@@ -233,7 +233,7 @@ export class Editor {
 	 *	events
 	 */
 	private isMouseDown = false
-	private mouseDownType: 'add-node' | 'move-node' | 'add-edge'
+	private mouseDownType: 'add-node' | 'move-node' | 'add-edge' | 'drag-canvas'
 
 	private eventList = [
 		['oItemPanel', 'mousedown', '_beginAddNode'],
@@ -300,20 +300,21 @@ export class Editor {
 			} else {
 				this.mouseDownType = 'move-node'
 			}
-
 		} else {
 			this.selectedNode = null
 			this.selectedEdge = this._getSelectedEdge({ x, y })
 			// TODO start drag canvas
+			this.mouseDownType = 'drag-canvas'
 		}
-
-		// TODO contextmenu
+		// trigger contextmenu
 		this._triggerMenu(e.button === 2, e)
 	}
 	// mousemove
 	private _mouseMove(e: MouseEvent) {
 		this.dynamicCvs.clear()
 		const { offsetX: x, offsetY: y } = e
+		const dx = x - this.mouseEventStartPos.x
+		const dy = y - this.mouseEventStartPos.y
 		if (this.isMouseDown) {		// move
 			switch(this.mouseDownType) {
 				case 'add-node':
@@ -322,8 +323,8 @@ export class Editor {
 				case 'move-node':
 					this.dynamicCvs.paintNode({
 						...this.selectedNode,
-						x: this.selectedNode.x + x - this.mouseEventStartPos.x,
-						y: this.selectedNode.y + y - this.mouseEventStartPos.y,
+						x: this.selectedNode.x + dx,
+						y: this.selectedNode.y + dy,
 					})
 					break
 				case 'add-edge':
@@ -333,6 +334,15 @@ export class Editor {
 						}
 					})
 					this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y })
+					break
+				// TODO
+				case 'drag-canvas':
+					this.mainCvs.clear()
+					this.mainCvs.transform(dx, dy)
+					this.dynamicCvs.transform(dx, dy)
+					this._render()
+					this.mainCvs.restore()
+					this.dynamicCvs.restore()
 					break
 			}
 		} else {		// hover
@@ -360,21 +370,21 @@ export class Editor {
 			return
 		}
 		const { offsetX: x, offsetY: y } = e
+		const dx = x - this.mouseEventStartPos.x
+		const dy = y - this.mouseEventStartPos.y
 		switch(this.mouseDownType) {
 			case 'add-node':
 				this._addNode({ ...this.selectedShape, x, y })
 				break
 			case 'move-node':
-				let diffX = x - this.mouseEventStartPos.x
-				let diffY = y - this.mouseEventStartPos.y
-				if (diffX < 5 && diffY < 5) {
+				if (dx < 5 && dy < 5) {
 					break
 				}
 				console.log('move')
 				this._updateNode({
 					...this.selectedNode,
-					x: this.selectedNode.x + diffX,
-					y: this.selectedNode.y + diffY,
+					x: this.selectedNode.x + dx,
+					y: this.selectedNode.y + dy,
 				})
 				break
 			case 'add-edge':
@@ -390,6 +400,11 @@ export class Editor {
 						})
 					}
 				})
+				break
+			case 'drag-canvas':
+				// this.mainCvs.reset()
+				this.mainCvs.translate(dx, dy)
+				this.dynamicCvs.translate(dx, dy)
 				break
 		}
 
