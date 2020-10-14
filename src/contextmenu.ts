@@ -1,5 +1,5 @@
 import { Command } from './command'
-import { createDom, getAttr } from '@lib/dom'
+import { createDom, getAttr } from './dom'
 import { Editor } from './core'
 
 export class ContextMenu {

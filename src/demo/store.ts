@@ -1,5 +1,5 @@
-import { getDom } from "@lib/dom";
-import { Editor } from "./core";
+import { getDom } from "../dom";
+import { Editor } from "../core";
 
 // example to show Editor callback and data binding
 export class Store {

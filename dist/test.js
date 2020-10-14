@@ -57,7 +57,7 @@
 /******/ 	// undefined = chunk not loaded, null = chunk preloaded/prefetched
 /******/ 	// Promise = chunk loading, 0 = chunk loaded
 /******/ 	var installedChunks = {
-/******/ 		"editor": 0
+/******/ 		"test": 0
 /******/ 	};
 /******/
 /******/ 	var deferredModules = [];
@@ -148,165 +148,29 @@
 /******/
 /******/
 /******/ 	// add entry module to deferred list
-/******/ 	deferredModules.push(["./src/demo/editor.ts","common"]);
+/******/ 	deferredModules.push(["./src/test.ts","common"]);
 /******/ 	// run deferred modules when ready
 /******/ 	return checkDeferredModules();
 /******/ })
 /************************************************************************/
 /******/ ({
 
-/***/ "./mock-data/dag-shapes.ts":
-/*!*********************************!*\
-  !*** ./mock-data/dag-shapes.ts ***!
-  \*********************************/
+/***/ "./src/test.ts":
+/*!*********************!*\
+  !*** ./src/test.ts ***!
+  \*********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const color_1 = __webpack_require__(/*! @src/color */ "./src/color.ts");
-const w = 160;
-const h = 36;
-const c = color_1.default['blue'];
-const shapes = [
-    {
-        shape: 'shape-001',
-        w, h, color: c,
-        name: 'Node-ABC',
-        anchors: [
-            [0.5, 0, 'input'],
-            [0.5, 1, 'output'],
-        ],
-    },
-    {
-        shape: 'shape-002',
-        w, h, color: color_1.default['green'],
-        name: 'Node-XYZ',
-        anchors: [
-            [0.5, 0, 'input'],
-            [0.3, 1, 'output'],
-            [0.7, 1, 'output'],
-        ],
-    },
-];
-exports.default = shapes;
-
-
-/***/ }),
-
-/***/ "./src/demo/editor.ts":
-/*!****************************!*\
-  !*** ./src/demo/editor.ts ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-/*
-*  dag-editor
-*  author: liupeidong@gmail.com
-*/
-console.log('demo editor');
-const dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
-const dag_shapes_1 = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.ts");
-const index_1 = __webpack_require__(/*! ../index */ "./src/index.ts");
-const store_1 = __webpack_require__(/*! ./store */ "./src/demo/store.ts");
-// example
-const editor = new index_1.Editor({
-    container: '#container',
-    page: '#editor',
-    itempanel: '#itempanel',
-});
-// example data store
-const store = new store_1.Store({ editor });
-// new node added
-editor.on('nodeAdded', (node) => {
-    console.log('node added', node);
-});
-// selected node change
-editor.on('selectedNodeChange', (node) => {
-    console.log('selected node changed', node);
-    const oNodePanel = dom_1.getDom('#node-panel');
-    const oCanvasPanel = dom_1.getDom('#canvas-panel');
-    if (node) {
-        oNodePanel.classList.add('show');
-        oCanvasPanel.classList.remove('show');
-        store.currentNode = node;
-    }
-    else {
-        oNodePanel.classList.remove('show');
-        oCanvasPanel.classList.add('show');
-    }
-});
-// node deleted
-editor.on('nodeDeleted', (nodeId) => {
-    console.log(`node deleted: node-id: ${nodeId}`);
-});
-// new edge added
-editor.on('edgeAdded', (edge) => {
-    console.log('edge added', edge);
-});
-// edge deleted
-editor.on('edgeDeleted', (edge) => {
-    console.log('edge deleted', edge);
-});
-for (let shape of dag_shapes_1.default) {
-    editor.registerShape(shape.shape, shape);
-}
-// check source data
-dom_1.getDom('#source-btn').addEventListener('click', () => {
-    dom_1.getDom('#code').innerHTML = JSON.stringify(editor.getData());
-});
-
-
-/***/ }),
-
-/***/ "./src/demo/store.ts":
-/*!***************************!*\
-  !*** ./src/demo/store.ts ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Store = void 0;
-const dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
-// example to show Editor callback and data binding
-class Store {
-    constructor({ editor }) {
-        this.editor = editor;
-        this.oName = dom_1.getDom('#node-name');
-        this.oW = dom_1.getDom('#node-width');
-        this._bind();
-    }
-    _bind() {
-        this.oName.addEventListener('change', () => {
-            this.currentNode.name = this.oName.value.trim();
-            this.editor.repaint();
-        });
-        this.oW.addEventListener('change', () => {
-            this.currentNode.w = Number(this.oW.value.trim());
-            this.editor.repaint();
-        });
-    }
-    get currentNode() {
-        return this.__node;
-    }
-    set currentNode(node) {
-        this.__node = node;
-        this.oName.value = node.name;
-        this.oW.value = node.w.toString();
-    }
-}
-exports.Store = Store;
+const core_1 = __webpack_require__(/*! ./core */ "./src/core.ts");
+console.log(core_1.Editor);
+console.log(123);
 
 
 /***/ })
 
 /******/ });
-//# sourceMappingURL=editor.js.map
+//# sourceMappingURL=test.js.map

@@ -2,14 +2,14 @@
  *  mind-map
  */
 
-import { createDom, getDom } from '@lib/dom'
-import { figureNodeLevel } from '@lib/tree'
-import MockData from '@data/mind-map-data'
+import { createDom, getDom } from './dom'
+import { figureNodeLevel } from './tree'
+
 import COLOR from './color'
 import Toolbar from './toolbar'
-import Event from './old-event'
+import Event from './event'
 
-class Mind {
+export class Mind {
     constructor({ container = '#mind-map-container', data = {}, options = {} }) {
         if (!getDom(container)) {
             throw Error('null canvas container found')
@@ -363,30 +363,3 @@ class Mind {
         this._repaint()
     }
 }
-
-new Mind({
-    data: MockData,
-    options: {
-        toolbar: '#toolbar',
-        legends: {
-            // type: { name, color }
-            'default': { name: '业务场景', color: COLOR.blue },
-            'tech': { name: '技术应用', color: COLOR.green },
-            'todo': { name: 'TODO', color: COLOR.red }
-        },
-        lineType: 'curve',      // curve, polygon
-    },
-})
-
-const oCodeBtn = document.getElementById('code-btn')
-const oBg = document.querySelector('.popup-bg')
-
-oCodeBtn.addEventListener('click', () => {
-    const o = document.querySelector('.popup')
-    o && o.classList.add('show')
-})
-
-oBg.addEventListener('click', () => {
-    const o = document.querySelector('.popup')
-    o && o.classList.remove('show')
-})

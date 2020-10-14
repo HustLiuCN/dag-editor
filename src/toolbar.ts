@@ -12,10 +12,10 @@ class Toolbar {
         }
     }
     events = {}
-
+    oToolbar: HTMLElement
     _bind() {
         this.oToolbar.addEventListener('click', e => {
-            const o = e.target
+            const o = e.target as HTMLElement
             const command = o.getAttribute('data-command')
             if (!command) {
                 return

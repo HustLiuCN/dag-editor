@@ -5,8 +5,10 @@ const webpackConfig = {
 	mode: 'development',
 	// watch: true,
 	entry: {
-		mind: './src/mind',
-		editor: './src/editor',
+		index: './src/index',
+		mind: './src/demo/mind',
+		editor: './src/demo/editor',
+		test: './src/test',
 	},
 	output: {
 		filename: '[name].js',

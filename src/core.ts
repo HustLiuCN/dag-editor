@@ -3,8 +3,8 @@
  *	@liupd
  *	email: liupeidong1027@gmail.com
  */
-import { getDom, createDom, getAttr } from '@lib/dom'
-import { randomID, checkInNode, checkInNodeAnchor, getAnchorPos, checkInCircle, compareEdge} from '@lib/utils'
+import { getDom, createDom, getAttr } from './dom'
+import { randomID, checkInNode, checkInNodeAnchor, getAnchorPos, checkInCircle, compareEdge} from './utils'
 import { Canvas } from './canvas'
 import { Event } from './event'
 import { Command } from './command'

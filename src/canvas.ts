@@ -1,6 +1,6 @@
 import COLOR from './color'
 import { Editor } from './core'
-import { getAnchorPos } from '@lib/utils'
+import { getAnchorPos } from './utils'
 
 export class Canvas {
 	constructor(cvs: HTMLCanvasElement, {
