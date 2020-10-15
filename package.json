@@ -1,6 +1,6 @@
 {
   "name": "simple-dag-editor",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A Simple Web DAG-Editor",
   "main": "lib/index.js",
   "repository": "git@github.com:HustLiuCN/dag-editor.git",
