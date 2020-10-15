@@ -1,8 +1,8 @@
 {
   "name": "simple-dag-editor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Simple Web DAG-Editor",
-  "main": "lib/index.js",
+  "main": "index.js",
   "repository": "git@github.com:HustLiuCN/dag-editor.git",
   "author": "hustliu<liupeidong1027@gmail.com>",
   "license": "MIT",
