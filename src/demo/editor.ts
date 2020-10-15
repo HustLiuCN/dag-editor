@@ -2,7 +2,6 @@
 *  dag-editor
 *  author: liupeidong@gmail.com
 */
-console.log('demo editor')
 import { getDom } from '../dom'
 import shapes from '@data/dag-shapes'
 import { Editor } from '../index'

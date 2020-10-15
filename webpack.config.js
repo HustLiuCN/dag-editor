@@ -8,11 +8,10 @@ const webpackConfig = {
 		index: './src/index',
 		mind: './src/demo/mind',
 		editor: './src/demo/editor',
-		test: './src/test',
 	},
 	output: {
 		filename: '[name].js',
-		path: path.resolve(__dirname, './dist'),
+		path: path.resolve(__dirname, './lib'),
 	},
 	// TODO
 	module: {
@@ -29,22 +28,22 @@ const webpackConfig = {
 			},
 		]
 	},
-	optimization: {
-		splitChunks: {
-			chunks: 'initial',
-			minSize: 10000,
-			minChunks: 3,
-			name: 'common',
-			cacheGroups: {
-				lib: {
-					test: /[\\/]node_modules[\\/]/,
-					name: 'lib',
-					priority: 10,
-					enforce: true,
-				},
-			},
-		},
-	},
+	// optimization: {
+	// 	splitChunks: {
+	// 		chunks: 'initial',
+	// 		minSize: 10000,
+	// 		minChunks: 3,
+	// 		name: 'common',
+	// 		cacheGroups: {
+	// 			lib: {
+	// 				test: /[\\/]node_modules[\\/]/,
+	// 				name: 'lib',
+	// 				priority: 10,
+	// 				enforce: true,
+	// 			},
+	// 		},
+	// 	},
+	// },
 	resolve: {
 		extensions: ['.js', '.json', '.ts'],
 		alias: {
