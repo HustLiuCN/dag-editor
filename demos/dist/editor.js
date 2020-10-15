@@ -81,10 +81,122 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = "./src/demo/editor.ts");
+/******/ 	return __webpack_require__(__webpack_require__.s = "./demos/js/editor.ts");
 /******/ })
 /************************************************************************/
 /******/ ({
+
+/***/ "./demos/js/editor.ts":
+/*!****************************!*\
+  !*** ./demos/js/editor.ts ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+/*
+*  dag-editor
+*  author: liupeidong@gmail.com
+*/
+const dom_1 = __webpack_require__(/*! ../../src/dom */ "./src/dom.ts");
+const dag_shapes_1 = __webpack_require__(/*! ../../mock-data/dag-shapes */ "./mock-data/dag-shapes.ts");
+const index_1 = __webpack_require__(/*! ../../src/index */ "./src/index.ts");
+const store_1 = __webpack_require__(/*! ./store */ "./demos/js/store.ts");
+// example
+const editor = new index_1.Editor({
+    container: '#container',
+    page: '#editor',
+    itempanel: '#itempanel',
+});
+// example data store
+const store = new store_1.Store({ editor });
+// new node added
+editor.on('nodeAdded', (node) => {
+    console.log('node added', node);
+});
+// selected node change
+editor.on('selectedNodeChange', (node) => {
+    console.log('selected node changed', node);
+    const oNodePanel = dom_1.getDom('#node-panel');
+    const oCanvasPanel = dom_1.getDom('#canvas-panel');
+    if (node) {
+        oNodePanel.classList.add('show');
+        oCanvasPanel.classList.remove('show');
+        store.currentNode = node;
+    }
+    else {
+        oNodePanel.classList.remove('show');
+        oCanvasPanel.classList.add('show');
+    }
+});
+// node deleted
+editor.on('nodeDeleted', (nodeId) => {
+    console.log(`node deleted: node-id: ${nodeId}`);
+});
+// new edge added
+editor.on('edgeAdded', (edge) => {
+    console.log('edge added', edge);
+});
+// edge deleted
+editor.on('edgeDeleted', (edge) => {
+    console.log('edge deleted', edge);
+});
+for (let shape of dag_shapes_1.default) {
+    editor.registerShape(shape.shape, shape);
+}
+// check source data
+dom_1.getDom('#source-btn').addEventListener('click', () => {
+    dom_1.getDom('#code').innerHTML = JSON.stringify(editor.getData());
+});
+
+
+/***/ }),
+
+/***/ "./demos/js/store.ts":
+/*!***************************!*\
+  !*** ./demos/js/store.ts ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Store = void 0;
+const dom_1 = __webpack_require__(/*! ../../src/dom */ "./src/dom.ts");
+// example to show Editor callback and data binding
+class Store {
+    constructor({ editor }) {
+        this.editor = editor;
+        this.oName = dom_1.getDom('#node-name');
+        this.oW = dom_1.getDom('#node-width');
+        this._bind();
+    }
+    _bind() {
+        this.oName.addEventListener('change', () => {
+            this.currentNode.name = this.oName.value.trim();
+            this.editor.repaint();
+        });
+        this.oW.addEventListener('change', () => {
+            this.currentNode.w = Number(this.oW.value.trim());
+            this.editor.repaint();
+        });
+    }
+    get currentNode() {
+        return this.__node;
+    }
+    set currentNode(node) {
+        this.__node = node;
+        this.oName.value = node.name;
+        this.oW.value = node.w.toString();
+    }
+}
+exports.Store = Store;
+
+
+/***/ }),
 
 /***/ "./mock-data/dag-shapes.ts":
 /*!*********************************!*\
@@ -929,118 +1041,6 @@ class Editor {
     }
 }
 exports.Editor = Editor;
-
-
-/***/ }),
-
-/***/ "./src/demo/editor.ts":
-/*!****************************!*\
-  !*** ./src/demo/editor.ts ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-/*
-*  dag-editor
-*  author: liupeidong@gmail.com
-*/
-const dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
-const dag_shapes_1 = __webpack_require__(/*! @data/dag-shapes */ "./mock-data/dag-shapes.ts");
-const index_1 = __webpack_require__(/*! ../index */ "./src/index.ts");
-const store_1 = __webpack_require__(/*! ./store */ "./src/demo/store.ts");
-// example
-const editor = new index_1.Editor({
-    container: '#container',
-    page: '#editor',
-    itempanel: '#itempanel',
-});
-// example data store
-const store = new store_1.Store({ editor });
-// new node added
-editor.on('nodeAdded', (node) => {
-    console.log('node added', node);
-});
-// selected node change
-editor.on('selectedNodeChange', (node) => {
-    console.log('selected node changed', node);
-    const oNodePanel = dom_1.getDom('#node-panel');
-    const oCanvasPanel = dom_1.getDom('#canvas-panel');
-    if (node) {
-        oNodePanel.classList.add('show');
-        oCanvasPanel.classList.remove('show');
-        store.currentNode = node;
-    }
-    else {
-        oNodePanel.classList.remove('show');
-        oCanvasPanel.classList.add('show');
-    }
-});
-// node deleted
-editor.on('nodeDeleted', (nodeId) => {
-    console.log(`node deleted: node-id: ${nodeId}`);
-});
-// new edge added
-editor.on('edgeAdded', (edge) => {
-    console.log('edge added', edge);
-});
-// edge deleted
-editor.on('edgeDeleted', (edge) => {
-    console.log('edge deleted', edge);
-});
-for (let shape of dag_shapes_1.default) {
-    editor.registerShape(shape.shape, shape);
-}
-// check source data
-dom_1.getDom('#source-btn').addEventListener('click', () => {
-    dom_1.getDom('#code').innerHTML = JSON.stringify(editor.getData());
-});
-
-
-/***/ }),
-
-/***/ "./src/demo/store.ts":
-/*!***************************!*\
-  !*** ./src/demo/store.ts ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.Store = void 0;
-const dom_1 = __webpack_require__(/*! ../dom */ "./src/dom.ts");
-// example to show Editor callback and data binding
-class Store {
-    constructor({ editor }) {
-        this.editor = editor;
-        this.oName = dom_1.getDom('#node-name');
-        this.oW = dom_1.getDom('#node-width');
-        this._bind();
-    }
-    _bind() {
-        this.oName.addEventListener('change', () => {
-            this.currentNode.name = this.oName.value.trim();
-            this.editor.repaint();
-        });
-        this.oW.addEventListener('change', () => {
-            this.currentNode.w = Number(this.oW.value.trim());
-            this.editor.repaint();
-        });
-    }
-    get currentNode() {
-        return this.__node;
-    }
-    set currentNode(node) {
-        this.__node = node;
-        this.oName.value = node.name;
-        this.oW.value = node.w.toString();
-    }
-}
-exports.Store = Store;
 
 
 /***/ }),

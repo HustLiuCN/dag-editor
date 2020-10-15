@@ -1,4 +1,4 @@
-import { Editor } from '@src/core'
+import { Editor } from './core'
 
 export function randomID(): string {
   return Date.now().toString(16)

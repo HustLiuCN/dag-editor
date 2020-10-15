@@ -1,18 +1,17 @@
-import { getDom } from "../dom";
-import { Editor } from "../core";
+import { getDom } from "../../src/dom";
 
 // example to show Editor callback and data binding
 export class Store {
-  constructor({ editor }: { editor: Editor }) {
+  constructor({ editor }) {
     this.editor = editor
 
-    this.oName = getDom('#node-name') as HTMLInputElement
-    this.oW = getDom('#node-width') as HTMLInputElement
+    this.oName = getDom('#node-name')
+    this.oW = getDom('#node-width')
 
     this._bind()
   }
 
-  private _bind() {
+  _bind() {
     this.oName.addEventListener('change', () => {
       this.currentNode.name = this.oName.value.trim()
       this.editor.repaint()
@@ -22,16 +21,10 @@ export class Store {
       this.editor.repaint()
     })
   }
-
-  editor: Editor
-  oName: HTMLInputElement
-  oW: HTMLInputElement
-
-  __node: Editor.INode
-  get currentNode() {
+get currentNode() {
     return this.__node
   }
-  set currentNode(node: Editor.INode) {
+  set currentNode(node) {
     this.__node = node
     this.oName.value = node.name
     this.oW.value = node.w.toString()

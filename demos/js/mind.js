@@ -1,6 +1,6 @@
-import { Mind } from '../index'
-import MockData from '@data/mind-map-data'
-import COLOR from '../color'
+import { Mind } from '../../src/index'
+import MockData from '../../mock-data/mind-map-data'
+import COLOR from '../../src/color'
 
 new Mind({
   data: MockData,

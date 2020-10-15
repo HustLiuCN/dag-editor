@@ -1,11 +1,10 @@
 import COLOR from '@src/color'
-import { Editor } from '@src/core'
 
 const w = 160
 const h = 36
 const c = COLOR['blue']
 
-const shapes: Editor.IShape[] = [
+const shapes = [
 	{
 		shape: 'shape-001',
 		w, h, color: c,

@@ -5,13 +5,12 @@ const webpackConfig = {
 	mode: 'development',
 	// watch: true,
 	entry: {
-		index: './src/index',
-		mind: './src/demo/mind',
-		editor: './src/demo/editor',
+		mind: './demos/js/mind',
+		editor: './demos/js/editor',
 	},
 	output: {
-		filename: '[name].js',
-		path: path.resolve(__dirname, './lib'),
+		filename: '[name].build.js',
+		path: path.resolve(__dirname, './demos/dist'),
 	},
 	// TODO
 	module: {
@@ -47,7 +46,7 @@ const webpackConfig = {
 	resolve: {
 		extensions: ['.js', '.json', '.ts'],
 		alias: {
-			'@data': path.resolve(__dirname, './mock-data'),
+			// '@data': path.resolve(__dirname, './mock-data'),
 			'@style': path.resolve(__dirname, './style'),
 			'@lib': path.resolve(__dirname, './lib'),
 			'@src': path.resolve(__dirname, './src'),

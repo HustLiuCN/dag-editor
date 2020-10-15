@@ -2,9 +2,9 @@
 *  dag-editor
 *  author: liupeidong@gmail.com
 */
-import { getDom } from '../dom'
-import shapes from '@data/dag-shapes'
-import { Editor } from '../index'
+import { getDom } from '../../src/dom'
+import shapes from '../../mock-data/dag-shapes'
+import { Editor } from '../../src/index'
 import { Store } from './store'
 
 // example
@@ -18,11 +18,11 @@ const editor = new Editor({
 const store = new Store({ editor })
 
 // new node added
-editor.on('nodeAdded', (node: Editor.INode) => {
+editor.on('nodeAdded', (node) => {
   console.log('node added', node)
 })
 // selected node change
-editor.on('selectedNodeChange', (node: Editor.INode) => {
+editor.on('selectedNodeChange', (node) => {
   console.log('selected node changed', node)
   const oNodePanel = getDom('#node-panel')
   const oCanvasPanel = getDom('#canvas-panel')
@@ -37,15 +37,15 @@ editor.on('selectedNodeChange', (node: Editor.INode) => {
   }
 })
 // node deleted
-editor.on('nodeDeleted', (nodeId: string) => {
+editor.on('nodeDeleted', (nodeId) => {
   console.log(`node deleted: node-id: ${nodeId}`)
 })
 // new edge added
-editor.on('edgeAdded', (edge: Editor.IEdge) => {
+editor.on('edgeAdded', (edge) => {
   console.log('edge added', edge)
 })
 // edge deleted
-editor.on('edgeDeleted', (edge: Editor.IEdge) => {
+editor.on('edgeDeleted', (edge) => {
   console.log('edge deleted', edge)
 })
 

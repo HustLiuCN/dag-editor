@@ -1,18 +1,17 @@
 {
   "compilerOptions": {
-    "outDir": "./built",
+    "outDir": "./lib",
     "allowJs": true,
     "target": "ES6",
     "module": "commonjs",
-    "baseUrl": "./",
-    "paths": {
-      "@data/*": ["mock-data/*"],
-      "@lib/*": ["lib/*"],
-      "@src/*": ["src/*"]
-    }
+    // "baseUrl": "./",
+    "declaration": true
   },
   "include": [
-    "./src/**/*",
-    "./lib/**/*"
+    "./src/*",
+  ],
+  "exclude": [
+    "./mock-data",
+    "./demos"
   ]
 }
