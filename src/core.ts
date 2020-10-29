@@ -163,7 +163,7 @@ export class Editor {
 		this.__selectedEdge = edge
 		this._renderTask('selected edge change')
 	}
-	private hoverAnchor: [Editor.INode, number]
+	private hoverAnchor: [Editor.INode, string, number]		// [node, type, index]
 	// private selectedAnchor: [Editor.INode, number]
 	private anchorStartPos = { x: 0, y: 0 }
 
@@ -210,8 +210,8 @@ export class Editor {
 			const start = this.nodes.find(n => n.id === source)
 			const end = this.nodes.find(n => n.id === target)
 			this.mainCvs.paintEdge(
-				getAnchorPos(start, start.anchors[sourceAnchorIndex]),
-				getAnchorPos(end, end.anchors[targetAnchorIndex]),
+				getAnchorPos(start, 'output', sourceAnchorIndex, start.anchors.output),
+				getAnchorPos(end, 'input', targetAnchorIndex, end.anchors.input),
 				{ id, selected: this.selectedEdge && this.selectedEdge.id === id },
 			)
 		})
@@ -309,8 +309,9 @@ export class Editor {
 			// this.selectedNode = this.selectedNode
 			if (this.hoverAnchor) {
 				// u can't drag an edge from input anchor
-				this.mouseDownType = this.selectedNode.anchors[this.hoverAnchor[1]][2] === 'output' ? 'add-edge' : null
-				this.anchorStartPos = getAnchorPos(this.hoverAnchor[0], this.hoverAnchor[0].anchors[this.hoverAnchor[1]])
+				const [node, type, index] = this.hoverAnchor
+				this.mouseDownType = type === 'output' ? 'add-edge' : null
+				this.anchorStartPos = getAnchorPos(node, type, index, node.anchors[type])
 			} else {
 				this.mouseDownType = 'move-node'
 			}
@@ -391,7 +392,7 @@ export class Editor {
 				this._addNode({ ...this.selectedShape, x, y })
 				break
 			case 'move-node':
-				if (dx < 5 && dy < 5) {
+				if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
 					break
 				}
 				console.log('move')
@@ -403,15 +404,14 @@ export class Editor {
 				break
 			case 'add-edge':
 				this.nodes.forEach(node => {
-					if (node.id !== this.selectedNode.id && node.anchors) {
-						node.anchors.forEach((anchor, i) => {
-							if (anchor[2] === 'input') {
-								let pos = getAnchorPos(node, anchor)
-								if (checkInCircle({ x, y }, pos, 12)) {
-									this._addEdge(this.hoverAnchor, [ node, i ])
-								}
+					const { input } = node.anchors
+					if (node.id !== this.selectedNode.id && input) {		// not link to self && link to an input-anchor
+						for (let i = 0; i < input; i ++) {
+							let pos = getAnchorPos(node, 'input', i, input)
+							if (checkInCircle({ x, y }, pos, 12)) {
+								this._addEdge([ this.hoverAnchor[0], this.hoverAnchor[2] ], [ node, i ])
 							}
-						})
+						}
 					}
 				})
 				break
@@ -538,7 +538,8 @@ export namespace Editor {
 	}
 	// anchor: [x, y, type]
 	export interface IAnchor {
-		type: 'input' | 'output',
+		input?: number,		// input count
+		output?: number,	// output count
 	}
 	// shape
 	export interface IShapes {
@@ -548,9 +549,9 @@ export namespace Editor {
 		w: number,
 		h: number,
 		shape: string,
-		name?: string,
-		color: string,
-		anchors?: IAnchor[]
+		name: string,
+		color?: string,
+		anchors: IAnchor,
 	}
 	export interface IEdge {
 		id?: string,

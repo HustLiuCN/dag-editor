@@ -93,7 +93,8 @@ export declare namespace Editor {
         y: number;
     }
     interface IAnchor {
-        type: 'input' | 'output';
+        input?: number;
+        output?: number;
     }
     interface IShapes {
         [shape: string]: IShape;
@@ -102,9 +103,9 @@ export declare namespace Editor {
         w: number;
         h: number;
         shape: string;
-        name?: string;
-        color: string;
-        anchors?: IAnchor[];
+        name: string;
+        color?: string;
+        anchors: IAnchor;
     }
     interface IEdge {
         id?: string;

@@ -85,14 +85,17 @@ export class Canvas {
 			if (node.id && this.hasStore) {
 				this.paths.nodes[node.id] = path
 			}
-			if (node.anchors) {
-				node.anchors.forEach(anchor => {
-					let pos = getAnchorPos(node, anchor)
-					this._paintAnchor(pos)
-				})
-			}
+			// paint anchors
+			const { anchors } = node
+			Object.keys(anchors).forEach(k => {
+				if (anchors[k]) {
+					for (let i = 0; i < anchors[k]; i ++) {
+						let pos = getAnchorPos(node, k, i, anchors[k])
+						this._paintAnchor(pos)
+					}
+				}
+			})
 			ctx.restore()
-			// TODO paint anchor
 		} else {		// undefined
 			ctx.strokeRect(x - w/2, y - h/2, w, h)
 		}
@@ -121,13 +124,13 @@ export class Canvas {
 		ctx.stroke()
 	}
 	paintActiveAnchors(node: Editor.INode) {
-		const { anchors } = node
-		anchors.forEach(anchor => {
-			if (anchor[2] === 'input') {
-				let pos = getAnchorPos(node, anchor)
+		const { input } = node.anchors
+		if (input) {
+			for (let i = 0; i < input; i ++) {
+				let pos = getAnchorPos(node, 'input', i, input)
 				this._paintActiveAnchor(pos)
 			}
-		})
+		}
 	}
 	private _paintActiveAnchor({ x, y }: Editor.IPos) {
 		const { ctx, ratio: r } = this

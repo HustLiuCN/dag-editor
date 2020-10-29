@@ -8,23 +8,33 @@ export function checkInNode({ x, y }, { x: nx, y: ny, w, h }) {
   return Math.abs(x - nx) <= w/2 && Math.abs(y - ny) <= h/2
 }
 
-export function getAnchorPos(node: Editor.INode, anchor: Editor.IAnchor) {
+export function getAnchorPos(node: Editor.INode, type: string, i: number, n: number) {
   const { x, y, w, h } = node
-  let x0 = x - w/2
-  let y0 = y - h/2
+  let ax = x - w/2 + (i + 1) / (n + 1) * w
+  let ay = type === 'input' ? y - h/2 : y + h/2
 
-  return { x: x0 + anchor[0] * w, y: y0 + anchor[1] * h }
+  return { x: ax, y: ay }
 }
 
-export function checkInNodeAnchor({ x, y }: Editor.IPos, node: Editor.INode): [Editor.INode, number] {
-  const { anchors } = node
-  for (let i = 0, n = anchors.length; i < n; i ++) {
-      let anchor = anchors[i]
-      let pos = getAnchorPos(node, anchor)
+export function checkInNodeAnchor({ x, y }: Editor.IPos, node: Editor.INode): [Editor.INode, string, number] {
+  const { input, output } = node.anchors
+  if (input) {
+    for (let i = 0; i < input; i ++) {
+      let pos = getAnchorPos(node, 'input', i, input)
       if (checkInCircle({ x, y }, pos)) {
-          return [node, i]
+          return [node, 'input', i]
       }
+    }
   }
+  if (output) {
+    for (let i = 0; i < output; i ++) {
+      let pos = getAnchorPos(node, 'output', i, output)
+      if (checkInCircle({ x, y }, pos)) {
+          return [node, 'output', i]
+      }
+    }
+  }
+
   return null
 }
 

@@ -266,15 +266,29 @@ var shapes = [{
   h: h,
   color: c,
   name: 'Node-ABC',
-  anchors: [[0.5, 0, 'input'], // [x, y, type]
-  [0.5, 1, 'output']]
+  // anchors: [
+  // 	{ type: 'input' },
+  // 	{ type: 'output' },
+  // ],
+  anchors: {
+    input: 1,
+    output: 1
+  }
 }, {
   shape: 'shape-002',
   w: w,
   h: h,
   color: _src_color__WEBPACK_IMPORTED_MODULE_0___default.a['green'],
   name: 'Node-XYZ',
-  anchors: [[0.5, 0, 'input'], [0.3, 1, 'output'], [0.7, 1, 'output']]
+  // anchors: [
+  // 	[0.5, 0, 'input'],
+  // 	[0.3, 1, 'output'],
+  // 	[0.7, 1, 'output'],
+  // ],
+  anchors: {
+    input: 1,
+    output: 2
+  }
 }];
 /* harmony default export */ __webpack_exports__["default"] = (shapes);
 
@@ -355,14 +369,17 @@ class Canvas {
             if (node.id && this.hasStore) {
                 this.paths.nodes[node.id] = path;
             }
-            if (node.anchors) {
-                node.anchors.forEach(anchor => {
-                    let pos = utils_1.getAnchorPos(node, anchor);
-                    this._paintAnchor(pos);
-                });
-            }
+            // paint anchors
+            const { anchors } = node;
+            Object.keys(anchors).forEach(k => {
+                if (anchors[k]) {
+                    for (let i = 0; i < anchors[k]; i++) {
+                        let pos = utils_1.getAnchorPos(node, k, i, anchors[k]);
+                        this._paintAnchor(pos);
+                    }
+                }
+            });
             ctx.restore();
-            // TODO paint anchor
         }
         else { // undefined
             ctx.strokeRect(x - w / 2, y - h / 2, w, h);
@@ -392,13 +409,13 @@ class Canvas {
         ctx.stroke();
     }
     paintActiveAnchors(node) {
-        const { anchors } = node;
-        anchors.forEach(anchor => {
-            if (anchor[2] === 'input') {
-                let pos = utils_1.getAnchorPos(node, anchor);
+        const { input } = node.anchors;
+        if (input) {
+            for (let i = 0; i < input; i++) {
+                let pos = utils_1.getAnchorPos(node, 'input', i, input);
                 this._paintActiveAnchor(pos);
             }
-        });
+        }
     }
     _paintActiveAnchor({ x, y }) {
         const { ctx, ratio: r } = this;
@@ -859,7 +876,7 @@ class Editor {
         this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex, id }) => {
             const start = this.nodes.find(n => n.id === source);
             const end = this.nodes.find(n => n.id === target);
-            this.mainCvs.paintEdge(utils_1.getAnchorPos(start, start.anchors[sourceAnchorIndex]), utils_1.getAnchorPos(end, end.anchors[targetAnchorIndex]), { id, selected: this.selectedEdge && this.selectedEdge.id === id });
+            this.mainCvs.paintEdge(utils_1.getAnchorPos(start, 'output', sourceAnchorIndex, start.anchors.output), utils_1.getAnchorPos(end, 'input', targetAnchorIndex, end.anchors.input), { id, selected: this.selectedEdge && this.selectedEdge.id === id });
         });
     }
     on(ev, cb) {
@@ -908,8 +925,9 @@ class Editor {
             // this.selectedNode = this.selectedNode
             if (this.hoverAnchor) {
                 // u can't drag an edge from input anchor
-                this.mouseDownType = this.selectedNode.anchors[this.hoverAnchor[1]][2] === 'output' ? 'add-edge' : null;
-                this.anchorStartPos = utils_1.getAnchorPos(this.hoverAnchor[0], this.hoverAnchor[0].anchors[this.hoverAnchor[1]]);
+                const [node, type, index] = this.hoverAnchor;
+                this.mouseDownType = type === 'output' ? 'add-edge' : null;
+                this.anchorStartPos = utils_1.getAnchorPos(node, type, index, node.anchors[type]);
             }
             else {
                 this.mouseDownType = 'move-node';
@@ -989,7 +1007,7 @@ class Editor {
                 this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x, y }));
                 break;
             case 'move-node':
-                if (dx < 5 && dy < 5) {
+                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
                     break;
                 }
                 console.log('move');
@@ -997,15 +1015,14 @@ class Editor {
                 break;
             case 'add-edge':
                 this.nodes.forEach(node => {
-                    if (node.id !== this.selectedNode.id && node.anchors) {
-                        node.anchors.forEach((anchor, i) => {
-                            if (anchor[2] === 'input') {
-                                let pos = utils_1.getAnchorPos(node, anchor);
-                                if (utils_1.checkInCircle({ x, y }, pos, 12)) {
-                                    this._addEdge(this.hoverAnchor, [node, i]);
-                                }
+                    const { input } = node.anchors;
+                    if (node.id !== this.selectedNode.id && input) { // not link to self && link to an input-anchor
+                        for (let i = 0; i < input; i++) {
+                            let pos = utils_1.getAnchorPos(node, 'input', i, input);
+                            if (utils_1.checkInCircle({ x, y }, pos, 12)) {
+                                this._addEdge([this.hoverAnchor[0], this.hoverAnchor[2]], [node, i]);
                             }
-                        });
+                        }
                     }
                 });
                 break;
@@ -1840,20 +1857,29 @@ function checkInNode({ x, y }, { x: nx, y: ny, w, h }) {
     return Math.abs(x - nx) <= w / 2 && Math.abs(y - ny) <= h / 2;
 }
 exports.checkInNode = checkInNode;
-function getAnchorPos(node, anchor) {
+function getAnchorPos(node, type, i, n) {
     const { x, y, w, h } = node;
-    let x0 = x - w / 2;
-    let y0 = y - h / 2;
-    return { x: x0 + anchor[0] * w, y: y0 + anchor[1] * h };
+    let ax = x - w / 2 + (i + 1) / (n + 1) * w;
+    let ay = type === 'input' ? y - h / 2 : y + h / 2;
+    return { x: ax, y: ay };
 }
 exports.getAnchorPos = getAnchorPos;
 function checkInNodeAnchor({ x, y }, node) {
-    const { anchors } = node;
-    for (let i = 0, n = anchors.length; i < n; i++) {
-        let anchor = anchors[i];
-        let pos = getAnchorPos(node, anchor);
-        if (checkInCircle({ x, y }, pos)) {
-            return [node, i];
+    const { input, output } = node.anchors;
+    if (input) {
+        for (let i = 0; i < input; i++) {
+            let pos = getAnchorPos(node, 'input', i, input);
+            if (checkInCircle({ x, y }, pos)) {
+                return [node, 'input', i];
+            }
+        }
+    }
+    if (output) {
+        for (let i = 0; i < output; i++) {
+            let pos = getAnchorPos(node, 'output', i, output);
+            if (checkInCircle({ x, y }, pos)) {
+                return [node, 'output', i];
+            }
         }
     }
     return null;
