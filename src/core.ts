@@ -4,7 +4,7 @@
  *	email: liupeidong1027@gmail.com
  */
 import { getDom, createDom, getAttr } from './dom'
-import { randomID, checkInNode, checkInNodeAnchor, getAnchorPos, checkInCircle, compareEdge} from './utils'
+import { randomID, checkInNodeAnchor, getAnchorPos, checkInCircle, compareEdge} from './utils'
 import { Canvas } from './canvas'
 import { Event } from './event'
 import { Command } from './command'
@@ -318,7 +318,6 @@ export class Editor {
 		} else {
 			this.selectedNode = null
 			this.selectedEdge = this._getSelectedEdge({ x, y })
-			// TODO start drag canvas
 			this.mouseDownType = 'drag-canvas'
 		}
 		// trigger contextmenu
@@ -348,9 +347,14 @@ export class Editor {
 							this.dynamicCvs.paintActiveAnchors(node)
 						}
 					})
-					this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y })
+					this.dynamicCvs.paintEdge(
+						this.anchorStartPos,
+						{
+							x,
+							y,
+						},
+					)
 					break
-				// TODO
 				case 'drag-canvas':
 					this.mainCvs.clear()
 					this.mainCvs.transform(dx, dy)
@@ -362,8 +366,10 @@ export class Editor {
 			}
 		} else {		// hover
 			const hoverNode = this._getSelectedNode({ x, y })
+			// TODO bugfix: get hover anchor error after canvas moved
 			if (this.hoverNode) {
-				let hoverAnchor = checkInNodeAnchor({ x, y }, this.hoverNode)
+				// let hoverAnchor = checkInNodeAnchor({ x, y }, this.hoverNode)
+				let hoverAnchor = this.mainCvs.checkInNodeAnchor(this.hoverNode, { x, y })
 				this.hoverAnchor = hoverAnchor
 				if (!hoverAnchor) {
 					this.hoverNode = hoverNode

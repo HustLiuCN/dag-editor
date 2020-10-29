@@ -1,14 +1,5 @@
 import { Editor } from './core';
 export declare function randomID(): string;
-export declare function checkInNode({ x, y }: {
-    x: any;
-    y: any;
-}, { x: nx, y: ny, w, h }: {
-    x: any;
-    y: any;
-    w: any;
-    h: any;
-}): boolean;
 export declare function getAnchorPos(node: Editor.INode, type: string, i: number, n: number): {
     x: number;
     y: number;

@@ -4,10 +4,6 @@ export function randomID(): string {
   return Date.now().toString(16)
 }
 
-export function checkInNode({ x, y }, { x: nx, y: ny, w, h }) {
-  return Math.abs(x - nx) <= w/2 && Math.abs(y - ny) <= h/2
-}
-
 export function getAnchorPos(node: Editor.INode, type: string, i: number, n: number) {
   const { x, y, w, h } = node
   let ax = x - w/2 + (i + 1) / (n + 1) * w

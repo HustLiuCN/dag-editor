@@ -29,6 +29,7 @@ export class Canvas {
 		this.paths = {
 			nodes: {},
 			edges: {},
+			anchors: {},
 		}
 		// translate
 		this.translateInfo = {
@@ -43,6 +44,9 @@ export class Canvas {
 	paths: {		// store the paths for node & edge
 		nodes: { [id: string]: Path2D },
 		edges: { [id: string]: Path2D },
+		anchors: {
+			[id: string]: Array<{ type: string, index: number, path: Path2D }>
+		},
 	}
 	translateInfo: { x: number, y: number }
 	translate(dx: number, dy: number) {
@@ -52,6 +56,7 @@ export class Canvas {
 		ctx.translate(dx, dy)
 		this.translateInfo.x += dx
 		this.translateInfo.y += dy
+		console.log(`===translate: (${this.translateInfo.x}, ${this.translateInfo.y})===`)
 	}
 	transform(dx: number, dy: number) {
 		const { ctx, ratio: r } = this
@@ -87,11 +92,15 @@ export class Canvas {
 			}
 			// paint anchors
 			const { anchors } = node
+			if (this.hasStore) {
+				this.paths.anchors[node.id] = []
+			}
 			Object.keys(anchors).forEach(k => {
 				if (anchors[k]) {
 					for (let i = 0; i < anchors[k]; i ++) {
 						let pos = getAnchorPos(node, k, i, anchors[k])
-						this._paintAnchor(pos)
+						let anchorPath = this._paintAnchor(pos)
+						this.paths.anchors[node.id].push({ type: k, index: i, path: anchorPath })
 					}
 				}
 			})
@@ -118,10 +127,25 @@ export class Canvas {
 		const { ctx, ratio: r } = this
 		x *= r
 		y *= r
-		ctx.beginPath()
-		ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false)
-		ctx.fill()
-		ctx.stroke()
+		const path = new Path2D()
+		path.arc(x, y, 4 * r, 0, Math.PI * 2, false)
+		ctx.fill(path)
+		ctx.stroke(path)
+		return path
+	}
+	checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos): [Editor.INode, string, number] {
+		const r = this.ratio
+		let { x, y } = pos
+		x *= r
+		y *= r
+		const paths = this.paths.anchors[node.id]
+		for (let i = 0, n = paths.length; i < n; i ++) {
+			const cur = paths[i]
+			if (this.ctx.isPointInPath(cur.path, x, y)) {
+				return [node, cur.type, cur.index]
+			}
+		}
+		return null
 	}
 	paintActiveAnchors(node: Editor.INode) {
 		const { input } = node.anchors
@@ -160,6 +184,8 @@ export class Canvas {
 		sy *= r
 		ex *= r
 		ey *= r
+		ex -= this.translateInfo.x
+		ey -= this.translateInfo.y
 		const path = new Path2D()
 		ctx.beginPath()
 		path.moveTo(sx, sy)

@@ -348,6 +348,7 @@ class Canvas {
         this.paths = {
             nodes: {},
             edges: {},
+            anchors: {},
         };
         // translate
         this.translateInfo = {
@@ -362,6 +363,7 @@ class Canvas {
         ctx.translate(dx, dy);
         this.translateInfo.x += dx;
         this.translateInfo.y += dy;
+        console.log(`===translate: (${this.translateInfo.x}, ${this.translateInfo.y})===`);
     }
     transform(dx, dy) {
         const { ctx, ratio: r } = this;
@@ -397,11 +399,15 @@ class Canvas {
             }
             // paint anchors
             const { anchors } = node;
+            if (this.hasStore) {
+                this.paths.anchors[node.id] = [];
+            }
             Object.keys(anchors).forEach(k => {
                 if (anchors[k]) {
                     for (let i = 0; i < anchors[k]; i++) {
                         let pos = utils_1.getAnchorPos(node, k, i, anchors[k]);
-                        this._paintAnchor(pos);
+                        let anchorPath = this._paintAnchor(pos);
+                        this.paths.anchors[node.id].push({ type: k, index: i, path: anchorPath });
                     }
                 }
             });
@@ -429,10 +435,25 @@ class Canvas {
         const { ctx, ratio: r } = this;
         x *= r;
         y *= r;
-        ctx.beginPath();
-        ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.stroke();
+        const path = new Path2D();
+        path.arc(x, y, 4 * r, 0, Math.PI * 2, false);
+        ctx.fill(path);
+        ctx.stroke(path);
+        return path;
+    }
+    checkInNodeAnchor(node, pos) {
+        const r = this.ratio;
+        let { x, y } = pos;
+        x *= r;
+        y *= r;
+        const paths = this.paths.anchors[node.id];
+        for (let i = 0, n = paths.length; i < n; i++) {
+            const cur = paths[i];
+            if (this.ctx.isPointInPath(cur.path, x, y)) {
+                return [node, cur.type, cur.index];
+            }
+        }
+        return null;
     }
     paintActiveAnchors(node) {
         const { input } = node.anchors;
@@ -470,6 +491,8 @@ class Canvas {
         sy *= r;
         ex *= r;
         ey *= r;
+        ex -= this.translateInfo.x;
+        ey -= this.translateInfo.y;
         const path = new Path2D();
         ctx.beginPath();
         path.moveTo(sx, sy);
@@ -962,7 +985,6 @@ class Editor {
         else {
             this.selectedNode = null;
             this.selectedEdge = this._getSelectedEdge({ x, y });
-            // TODO start drag canvas
             this.mouseDownType = 'drag-canvas';
         }
         // trigger contextmenu
@@ -988,9 +1010,11 @@ class Editor {
                             this.dynamicCvs.paintActiveAnchors(node);
                         }
                     });
-                    this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y });
+                    this.dynamicCvs.paintEdge(this.anchorStartPos, {
+                        x,
+                        y,
+                    });
                     break;
-                // TODO
                 case 'drag-canvas':
                     this.mainCvs.clear();
                     this.mainCvs.transform(dx, dy);
@@ -1003,8 +1027,10 @@ class Editor {
         }
         else { // hover
             const hoverNode = this._getSelectedNode({ x, y });
+            // TODO bugfix: get hover anchor error after canvas moved
             if (this.hoverNode) {
-                let hoverAnchor = utils_1.checkInNodeAnchor({ x, y }, this.hoverNode);
+                // let hoverAnchor = checkInNodeAnchor({ x, y }, this.hoverNode)
+                let hoverAnchor = this.mainCvs.checkInNodeAnchor(this.hoverNode, { x, y });
                 this.hoverAnchor = hoverAnchor;
                 if (!hoverAnchor) {
                     this.hoverNode = hoverNode;
@@ -1874,15 +1900,11 @@ exports.figureNodeLevel = figureNodeLevel;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compareEdge = exports.checkInCircle = exports.checkInNodeAnchor = exports.getAnchorPos = exports.checkInNode = exports.randomID = void 0;
+exports.compareEdge = exports.checkInCircle = exports.checkInNodeAnchor = exports.getAnchorPos = exports.randomID = void 0;
 function randomID() {
     return Date.now().toString(16);
 }
 exports.randomID = randomID;
-function checkInNode({ x, y }, { x: nx, y: ny, w, h }) {
-    return Math.abs(x - nx) <= w / 2 && Math.abs(y - ny) <= h / 2;
-}
-exports.checkInNode = checkInNode;
 function getAnchorPos(node, type, i, n) {
     const { x, y, w, h } = node;
     let ax = x - w / 2 + (i + 1) / (n + 1) * w;
