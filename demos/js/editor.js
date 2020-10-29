@@ -55,5 +55,6 @@ for (let shape of shapes) {
 
 // check source data
 getDom('#source-btn').addEventListener('click', () => {
+  editor.resize()
   getDom('#code').innerHTML = JSON.stringify(editor.getData())
 })

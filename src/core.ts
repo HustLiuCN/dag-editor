@@ -28,27 +28,41 @@ export class Editor {
 		this.nodes = []
 		this.edges = []
 
-		this._initCanvas()
-		this._bindEvents()
-		this._initCommand()
+		this._init()
 	}
 	private oContainer: HTMLElement
 	private oItemPanel: HTMLElement
 	private oPage: HTMLElement
 	// init canvas
-	private _initCanvas() {
-		const rect = this.oPage.getBoundingClientRect()
-		// const { width, height, left, top } = rect
+	private _init() {
+		this._initCanvas()
+		this._bindEvents()
+		this._initCommand()
+	}
+	resize() {
+
+	}
+	private _initPageConfig() {
+		if (!this.oPage) {
+			throw Error('cannot find Editor page container')
+		}
+		let rect = this.oPage.getBoundingClientRect()
 		const ratio = window.devicePixelRatio || 1
+		rect = rect.toJSON()
 		// page config
 		this.pageConfig = {
 			...rect,
 			ratio,
 		}
+	}
+	private _initCanvas() {
+		this._initPageConfig()
+		const { width, height, ratio } = this.pageConfig
+
 		// create canvas dom
 		const oc = createDom('canvas', 'editor-canvas') as HTMLCanvasElement
-		oc.width = rect.width * ratio
-		oc.height = rect.height * ratio
+		oc.width = width * ratio
+		oc.height = height * ratio
 		const odc = oc.cloneNode() as HTMLCanvasElement
 		odc.style.pointerEvents = 'none'
 		odc.style.backgroundColor = 'transparent'
@@ -522,11 +536,9 @@ export namespace Editor {
 		x: number,
 		y: number,
 	}
-	// anchor
-	export interface IAnchor extends Array<number | string>{
-		[0]: number,
-		[1]: number,
-		[2]: 'input' | 'output',
+	// anchor: [x, y, type]
+	export interface IAnchor {
+		type: 'input' | 'output',
 	}
 	// shape
 	export interface IShapes {

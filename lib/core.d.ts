@@ -3,6 +3,9 @@ export declare class Editor {
     private oContainer;
     private oItemPanel;
     private oPage;
+    private _init;
+    resize(): void;
+    private _initPageConfig;
     private _initCanvas;
     private pageConfig;
     private mainCvs;
@@ -89,10 +92,8 @@ export declare namespace Editor {
         x: number;
         y: number;
     }
-    interface IAnchor extends Array<number | string> {
-        [0]: number;
-        [1]: number;
-        [2]: 'input' | 'output';
+    interface IAnchor {
+        type: 'input' | 'output';
     }
     interface IShapes {
         [shape: string]: IShape;

@@ -20,6 +20,9 @@ export class Event {
         'mousemove': 'touchmove',
     }
     add(dom: HTMLElement, ev: string, fn: (e: globalThis.Event) => void) {
+        if (!dom) {
+            return
+        }
         ev = this.isMobile ? (this.mobileEvent[ev] || ev) : ev
         dom.addEventListener(ev, e => {
             if (this.isMobile) {

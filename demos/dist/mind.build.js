@@ -754,21 +754,33 @@ class Editor {
         this.shapes = {};
         this.nodes = [];
         this.edges = [];
+        this._init();
+    }
+    // init canvas
+    _init() {
         this._initCanvas();
         this._bindEvents();
         this._initCommand();
     }
-    // init canvas
-    _initCanvas() {
-        const rect = this.oPage.getBoundingClientRect();
-        // const { width, height, left, top } = rect
+    resize() {
+    }
+    _initPageConfig() {
+        if (!this.oPage) {
+            throw Error('cannot find Editor page container');
+        }
+        let rect = this.oPage.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
+        rect = rect.toJSON();
         // page config
         this.pageConfig = Object.assign(Object.assign({}, rect), { ratio });
+    }
+    _initCanvas() {
+        this._initPageConfig();
+        const { width, height, ratio } = this.pageConfig;
         // create canvas dom
         const oc = dom_1.createDom('canvas', 'editor-canvas');
-        oc.width = rect.width * ratio;
-        oc.height = rect.height * ratio;
+        oc.width = width * ratio;
+        oc.height = height * ratio;
         const odc = oc.cloneNode();
         odc.style.pointerEvents = 'none';
         odc.style.backgroundColor = 'transparent';
@@ -1189,6 +1201,9 @@ class Event {
         }
     }
     add(dom, ev, fn) {
+        if (!dom) {
+            return;
+        }
         ev = this.isMobile ? (this.mobileEvent[ev] || ev) : ev;
         dom.addEventListener(ev, e => {
             if (this.isMobile) {
