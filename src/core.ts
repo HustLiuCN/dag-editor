@@ -4,7 +4,7 @@
  *	email: liupeidong1027@gmail.com
  */
 import { getDom, createDom, getAttr } from './dom'
-import { randomID, checkInNodeAnchor, getAnchorPos, checkInCircle, compareEdge} from './utils'
+import { randomID, getAnchorPos, checkInCircle, compareEdge} from './utils'
 import { Canvas } from './canvas'
 import { Event } from './event'
 import { Command } from './command'
@@ -18,7 +18,7 @@ export class Editor {
 		itempanel,
 		page,
 	}: Editor.IOption) {
-		console.log('dag-editor created')
+		console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;')
 		// dom container
 		this.oContainer = getDom(container)
 		this.oItemPanel = getDom(itempanel)
@@ -43,8 +43,8 @@ export class Editor {
 
 	}
 	private _initPageConfig() {
-		if (!this.oPage) {
-			throw Error('cannot find Editor page container')
+		if (!this.oPage || !this.oContainer) {
+			throw Error('cannot find Editor editor container')
 		}
 		let rect = this.oPage.getBoundingClientRect()
 		const ratio = window.devicePixelRatio || 1
@@ -226,7 +226,7 @@ export class Editor {
 		edgeAdded: null,
 		edgeDeleted: null,
 	}
-	on(ev: string, cb: Function) {
+	on(ev: Editor.ICallback, cb: Function) {
 		if (this.callback.hasOwnProperty(ev)) {
 			this.callback[ev] = cb
 		}
@@ -347,13 +347,7 @@ export class Editor {
 							this.dynamicCvs.paintActiveAnchors(node)
 						}
 					})
-					this.dynamicCvs.paintEdge(
-						this.anchorStartPos,
-						{
-							x,
-							y,
-						},
-					)
+					this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y })
 					break
 				case 'drag-canvas':
 					this.mainCvs.clear()
@@ -567,5 +561,5 @@ export namespace Editor {
 		targetAnchorIndex: number,
 	}
 	// event
-
+	export type ICallback = 'selectedNodeChange' | 'nodeAdded' | 'nodeDeleted' | 'edgeAdded' | 'edgeDeleted'
 }

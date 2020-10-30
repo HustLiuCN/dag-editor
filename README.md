@@ -3,10 +3,14 @@ a simple dag editor tool for web
 
 # usage
 
+## install
+
+``yarn add simple-dag-editor``
+
 ## init
 
 ```javascript
-import { Editor } from './src/core'
+import { Editor } from 'simple-dag-editor'
 
 const editor = new Editor({
   container: string, // editor container dom selector
@@ -25,13 +29,12 @@ interface IShape {
   w: number,  // width
   h: number,  // height
   name: string, // node-item shown text
-  anchors: IAnchor[],
+  anchors: IAnchor,
   [customProp: string]: any,  // any custom define property
 }
-interface IAnchor extends Array<number | string> {
-  [0]: number,  // relative x position to node-item
-  [1]: number,  // relative y position to node-item
-  [2]: 'input' | 'output',  // type of anchor
+interface IAnchor {
+  input?: number,     // input count
+  output?: number,    // output count
 }
 ```
 

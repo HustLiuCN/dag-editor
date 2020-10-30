@@ -745,7 +745,7 @@ class Editor {
             'del:edge': '_delEdgeCommand',
             'clear': '_clear',
         };
-        console.log('dag-editor created');
+        console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;');
         // dom container
         this.oContainer = dom_1.getDom(container);
         this.oItemPanel = dom_1.getDom(itempanel);
@@ -765,8 +765,8 @@ class Editor {
     resize() {
     }
     _initPageConfig() {
-        if (!this.oPage) {
-            throw Error('cannot find Editor page container');
+        if (!this.oPage || !this.oContainer) {
+            throw Error('cannot find Editor editor container');
         }
         let rect = this.oPage.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
@@ -984,10 +984,7 @@ class Editor {
                             this.dynamicCvs.paintActiveAnchors(node);
                         }
                     });
-                    this.dynamicCvs.paintEdge(this.anchorStartPos, {
-                        x,
-                        y,
-                    });
+                    this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y });
                     break;
                 case 'drag-canvas':
                     this.mainCvs.clear();

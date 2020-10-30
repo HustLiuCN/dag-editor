@@ -36,7 +36,7 @@ export declare class Editor {
     private _renderTask;
     private _render;
     private callback;
-    on(ev: string, cb: Function): void;
+    on(ev: Editor.ICallback, cb: Function): void;
     update(type: 'node' | 'edge'): void;
     repaint(): void;
     getData(): {
@@ -114,4 +114,5 @@ export declare namespace Editor {
         target: string;
         targetAnchorIndex: number;
     }
+    type ICallback = 'selectedNodeChange' | 'nodeAdded' | 'nodeDeleted' | 'edgeAdded' | 'edgeDeleted';
 }

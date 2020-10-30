@@ -21,7 +21,7 @@ export class Store {
       this.editor.repaint()
     })
   }
-get currentNode() {
+  get currentNode() {
     return this.__node
   }
   set currentNode(node) {
