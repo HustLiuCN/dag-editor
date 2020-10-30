@@ -1,6 +1,7 @@
 a simple dag editor tool for web
 
 [Demo](https://stillbold.com/demos/dag-editor/demos/editor.html)
+
 [GitHub](https://github.com/HustLiuCN/dag-editor)
 
 # usage
