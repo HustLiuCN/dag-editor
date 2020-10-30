@@ -58,3 +58,10 @@ getDom('#source-btn').addEventListener('click', () => {
   editor.resize()
   getDom('#code').innerHTML = JSON.stringify(editor.getData())
 })
+
+getDom('#export-btn').addEventListener('click', () => {
+  console.log('===save===')
+  editor.saveFile().then(imgURL => {
+    getDom('#preview').src = imgURL
+  })
+})

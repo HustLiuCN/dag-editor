@@ -47,4 +47,5 @@ export declare class Canvas {
     checkOnEdge(eid: string, pos: Editor.IPos): boolean;
     private _paintArrow;
     clear(): void;
+    preFill(): void;
 }

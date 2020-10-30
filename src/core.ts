@@ -202,6 +202,7 @@ export class Editor {
 	private _render(msg?: string) {
 		msg && console.log(`===render by: ${msg}===`)
 		this.mainCvs.clear()
+		this.mainCvs.preFill()
 		this.nodes.forEach(node => {
 			let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null)
 			this.mainCvs.paintNode(node, status)
@@ -232,7 +233,7 @@ export class Editor {
 		}
 	}
 	update(type: 'node' | 'edge') {
-
+		// TODO
 	}
 	repaint() {
 		this._renderTask('repaint')
@@ -242,6 +243,28 @@ export class Editor {
 			nodes: this.nodes,
 			edges: this.edges,
 		}
+	}
+	saveFile(fileName = 'simple-dag-editor-export-picture', type = 'jpeg'): Promise<string> {
+		return new Promise(rs => {
+			this.getFileBlob(type).then(blob => {
+				const url = URL.createObjectURL(blob)
+				const a = document.createElement('a')
+				a.download = `${fileName}.${type}`
+				a.href = url
+				a.click()
+
+				rs(url)
+			})
+		})
+	}
+	getFileBlob(type: string): Promise<Blob> {
+		const { canvas } = this.mainCvs
+		const MIME_TYPE = `image/${type}`
+		return new Promise(rs => {
+			canvas.toBlob(blob => {
+				rs(blob)
+			}, MIME_TYPE)
+		})
 	}
 	/*
 	 *	events

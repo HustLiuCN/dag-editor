@@ -43,6 +43,8 @@ export declare class Editor {
         nodes: Editor.INode[];
         edges: Editor.IEdge[];
     };
+    saveFile(fileName?: string, type?: string): Promise<string>;
+    getFileBlob(type: string): Promise<Blob>;
     private isMouseDown;
     private mouseDownType;
     private eventList;

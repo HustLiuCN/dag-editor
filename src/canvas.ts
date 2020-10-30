@@ -237,5 +237,13 @@ export class Canvas {
 		const { x, y } = this.translateInfo
 		this.ctx.clearRect(-x, -y, this.canvas.width, this.canvas.height)
 	}
+	// fill canvas white background
+	preFill() {
+		const { x, y } = this.translateInfo
+		this.ctx.save()
+		this.ctx.fillStyle = '#fcfcfc'
+		this.ctx.fillRect(-x, -y, this.canvas.width, this.canvas.height)
+		this.ctx.restore()
+	}
 }
 

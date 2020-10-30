@@ -4,10 +4,12 @@
     display: flex;
 }
 #itempanel {
+    position: relative;
     flex: 0 0 200px;
     background-color: #fff;
     box-shadow: 1px 0 6px 0 rgba(0, 0, 0, 0.05);
     padding: 10px;
+    z-index: 2;
 }
 .itempanel-item {
     border: 1px solid #ddd;
@@ -18,12 +20,14 @@
 }
 /* detail panel */
 #panel {
+    position: relative;
     flex: 0 0 300px;
     padding: 20px;
     background-color: #fff;
     box-shadow: -1px 0 6px 0 rgba(0, 0, 0, 0.05);
     position: relative;
     overflow: hidden;
+    z-index: 2;
 }
 .panel {
     display: none;
@@ -45,6 +49,8 @@
 #editor {
     position: relative;
     flex: 1;
+    z-index: 1;
+    background-color: #fcfcfc;
 }
 #editor > canvas {
     position: absolute;

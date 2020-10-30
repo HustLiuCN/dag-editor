@@ -176,6 +176,12 @@ Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#source-btn').addEventL
   editor.resize();
   Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#code').innerHTML = JSON.stringify(editor.getData());
 });
+Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#export-btn').addEventListener('click', function () {
+  console.log('===save===');
+  editor.saveFile().then(function (imgURL) {
+    Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#preview').src = imgURL;
+  });
+});
 
 /***/ }),
 
@@ -518,6 +524,14 @@ class Canvas {
     clear() {
         const { x, y } = this.translateInfo;
         this.ctx.clearRect(-x, -y, this.canvas.width, this.canvas.height);
+    }
+    // fill canvas white background
+    preFill() {
+        const { x, y } = this.translateInfo;
+        this.ctx.save();
+        this.ctx.fillStyle = '#fcfcfc';
+        this.ctx.fillRect(-x, -y, this.canvas.width, this.canvas.height);
+        this.ctx.restore();
     }
 }
 exports.Canvas = Canvas;
@@ -892,6 +906,7 @@ class Editor {
     _render(msg) {
         msg && console.log(`===render by: ${msg}===`);
         this.mainCvs.clear();
+        this.mainCvs.preFill();
         this.nodes.forEach(node => {
             let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null);
             this.mainCvs.paintNode(node, status);
@@ -908,6 +923,7 @@ class Editor {
         }
     }
     update(type) {
+        // TODO
     }
     repaint() {
         this._renderTask('repaint');
@@ -917,6 +933,27 @@ class Editor {
             nodes: this.nodes,
             edges: this.edges,
         };
+    }
+    saveFile(fileName = 'simple-dag-editor-export-picture', type = 'jpeg') {
+        return new Promise(rs => {
+            this.getFileBlob(type).then(blob => {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.download = `${fileName}.${type}`;
+                a.href = url;
+                a.click();
+                rs(url);
+            });
+        });
+    }
+    getFileBlob(type) {
+        const { canvas } = this.mainCvs;
+        const MIME_TYPE = `image/${type}`;
+        return new Promise(rs => {
+            canvas.toBlob(blob => {
+                rs(blob);
+            }, MIME_TYPE);
+        });
     }
     _bindEvents() {
         const event = new event_1.Event({
