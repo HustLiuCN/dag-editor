@@ -3,6 +3,7 @@
  *	@liupd
  *	email: liupeidong1027@gmail.com
  */
+import '../style/editor.css'
 import { getDom, createDom, getAttr } from './dom'
 import { randomID, getAnchorPos, checkInCircle, compareEdge} from './utils'
 import { Canvas } from './canvas'
@@ -45,6 +46,9 @@ export class Editor {
 	private _initPageConfig() {
 		if (!this.oPage || !this.oContainer) {
 			throw Error('cannot find Editor editor container')
+		} else {
+			this.oPage.classList.add('editor-page')
+			this.oContainer.classList.add('editor-container')
 		}
 		let rect = this.oPage.getBoundingClientRect()
 		const ratio = window.devicePixelRatio || 1
@@ -370,7 +374,7 @@ export class Editor {
 							this.dynamicCvs.paintActiveAnchors(node)
 						}
 					})
-					this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y })
+					this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y }, { needTranslate: true })
 					break
 				case 'drag-canvas':
 					this.mainCvs.clear()
@@ -426,6 +430,7 @@ export class Editor {
 				})
 				break
 			case 'add-edge':
+				// TODO bugfix: moving canvas
 				this.nodes.forEach(node => {
 					const { input } = node.anchors
 					if (node.id !== this.selectedNode.id && input) {		// not link to self && link to an input-anchor

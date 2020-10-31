@@ -2,12 +2,11 @@ import COLOR from '@src/color'
 
 const w = 160
 const h = 36
-const c = COLOR['blue']
 
 const shapes = [
 	{
 		shape: 'shape-001',
-		w, h, color: c,
+		w, h, color: COLOR.blue,
 		name: 'Node-ABC',
 		// anchors: [
 		// 	{ type: 'input' },
@@ -20,7 +19,7 @@ const shapes = [
 	},
 	{
 		shape: 'shape-002',
-		w, h, color: COLOR['green'],
+		w, h, color: COLOR.red,
 		name: 'Node-XYZ',
 		// anchors: [
 		// 	[0.5, 0, 'input'],

@@ -77,19 +77,33 @@ export class Canvas {
 		y *= r
 		w *= r
 		h *= r
-		// fill the white rectangle
-		ctx.fillRect(x - w/2, y - h/2, w, h)
+		const ox = x - w/2
+		const oy = y - h/2
+		// paint shadow
+		ctx.save()
+		const shadow = this._paintRoundRect(ox + 2*r, oy + 2*r, w, h, 4*r)
+		ctx.fillStyle = 'rgba(35,35,35,0.08)'
+		ctx.fill(shadow)
+		ctx.restore()
+		// create & save rectangle path
+		const path = this._paintRoundRect(ox, oy, w, h, 4*r)
+		if (node.id && this.hasStore) {
+			this.paths.nodes[node.id] = path
+		}
+		ctx.fill(path)
+		// left color border
+		ctx.save()
+		const leftBorder = this._paintRoundRect(ox, oy, 4*r, h, 4*r, true)
+		ctx.fillStyle = node.color || COLOR.blue
+		ctx.fill(leftBorder)
+		ctx.restore()
+
 		// stroke the border
 		if (status) {		// hover | selected
 			ctx.save()
-			ctx.strokeStyle = COLOR.blue
+			ctx.strokeStyle = node.color || COLOR.blue
 			ctx.lineWidth = 2
-			const path = new Path2D()
-			path.rect(x - w/2, y - h/2, w, h)
 			ctx.stroke(path)
-			if (node.id && this.hasStore) {
-				this.paths.nodes[node.id] = path
-			}
 			// paint anchors
 			const { anchors } = node
 			if (this.hasStore) {
@@ -106,13 +120,27 @@ export class Canvas {
 			})
 			ctx.restore()
 		} else {		// undefined
-			ctx.strokeRect(x - w/2, y - h/2, w, h)
+			// ctx.stroke(path)
 		}
 		// paint text
 		ctx.save()
 		ctx.fillStyle = COLOR.font
 		ctx.fillText(node.name || node.shape, x, y)
 		ctx.restore()
+	}
+	private _paintRoundRect(x: number, y: number, w: number, h: number, r: number, leftBorder?: boolean) {
+		const path = new Path2D()
+		path.moveTo(x + r, y)
+		if (leftBorder) {
+			path.lineTo(x + r, y + h)
+		} else {
+			path.arcTo(x + w, y, x + w, y + h, r)
+			path.arcTo(x + w, y + h, x, y + h, r)
+		}
+		path.arcTo(x, y + h, x, y, r)
+		path.arcTo(x, y, x + r, y, r)
+		path.closePath()
+		return path
 	}
 	checkInNode(nid: string, pos: Editor.IPos) {
 		const r = this.ratio
@@ -152,16 +180,16 @@ export class Canvas {
 		if (input) {
 			for (let i = 0; i < input; i ++) {
 				let pos = getAnchorPos(node, 'input', i, input)
-				this._paintActiveAnchor(pos)
+				this._paintActiveAnchor(pos, node)
 			}
 		}
 	}
-	private _paintActiveAnchor({ x, y }: Editor.IPos) {
+	private _paintActiveAnchor({ x, y }: Editor.IPos, node: Editor.INode) {
 		const { ctx, ratio: r } = this
 		x *= r
 		y *= r
 		ctx.save()
-		ctx.fillStyle = COLOR.lingthBlue
+		ctx.fillStyle = node.color || COLOR.lingthBlue
 		ctx.beginPath()
 		ctx.arc(x, y, 12 * r, 0, Math.PI * 2, false)
 		ctx.fill()
@@ -177,15 +205,17 @@ export class Canvas {
 	paintEdge(
 		{ x: sx, y: sy }: Editor.IPos,	// start
 		{ x: ex, y: ey }: Editor.IPos,	// end
-		opts?: { id?: string, selected?: boolean }		// options
+		opts?: { id?: string, selected?: boolean, needTranslate?: boolean }		// options
 	) {
 		const { ctx, ratio: r } = this
 		sx *= r
 		sy *= r
 		ex *= r
 		ey *= r
-		ex -= this.translateInfo.x
-		ey -= this.translateInfo.y
+		if (opts.needTranslate) {
+			ex -= this.translateInfo.x
+			ey -= this.translateInfo.y
+		}
 		const path = new Path2D()
 		ctx.beginPath()
 		path.moveTo(sx, sy)
@@ -241,7 +271,7 @@ export class Canvas {
 	preFill() {
 		const { x, y } = this.translateInfo
 		this.ctx.save()
-		this.ctx.fillStyle = '#fcfcfc'
+		this.ctx.fillStyle = '#F3F4F8'
 		this.ctx.fillRect(-x, -y, this.canvas.width, this.canvas.height)
 		this.ctx.restore()
 	}

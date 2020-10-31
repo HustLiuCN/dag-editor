@@ -1,3 +1,4 @@
+import '../style/editor.css';
 export declare class Editor {
     constructor({ container, itempanel, page, }: Editor.IOption);
     private oContainer;

@@ -33,6 +33,7 @@ export declare class Canvas {
     transform(dx: number, dy: number): void;
     restore(): void;
     paintNode(node: Editor.INode, status?: string): void;
+    private _paintRoundRect;
     checkInNode(nid: string, pos: Editor.IPos): boolean;
     private _paintAnchor;
     checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos): [Editor.INode, string, number];
@@ -43,6 +44,7 @@ export declare class Canvas {
     opts?: {
         id?: string;
         selected?: boolean;
+        needTranslate?: boolean;
     }): void;
     checkOnEdge(eid: string, pos: Editor.IPos): boolean;
     private _paintArrow;
