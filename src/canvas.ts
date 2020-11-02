@@ -1,6 +1,6 @@
 import COLOR, { lighter } from './color'
 import { Editor } from './core'
-import { getAnchorPos } from './utils'
+import { getAnchorPos, logger } from './utils'
 
 export class Canvas {
 	constructor(cvs: HTMLCanvasElement, {
@@ -64,14 +64,14 @@ export class Canvas {
 		ctx.translate(dx, dy)
 		this.translateInfo.x += dx
 		this.translateInfo.y += dy
-		console.log(`===translate: (${this.translateInfo.x}, ${this.translateInfo.y})===`)
+		logger(`===translate: (${this.translateInfo.x}, ${this.translateInfo.y})===`)
 	}
 	transform(dx: number, dy: number) {
 		const { ctx, ratio: r } = this
 		ctx.save()
 		ctx.transform(1, 0, 0, 1, dx*r, dy*r)
 		// ctx.setTransform(1, 0, 0, 1, dx * r, dy * r)
-		// console.log(ctx.getTransform())
+		// logger(ctx.getTransform())
 	}
 	restore() {
 		this.ctx.restore()

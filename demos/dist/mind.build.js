@@ -793,14 +793,14 @@ class Canvas {
         ctx.translate(dx, dy);
         this.translateInfo.x += dx;
         this.translateInfo.y += dy;
-        console.log(`===translate: (${this.translateInfo.x}, ${this.translateInfo.y})===`);
+        utils_1.logger(`===translate: (${this.translateInfo.x}, ${this.translateInfo.y})===`);
     }
     transform(dx, dy) {
         const { ctx, ratio: r } = this;
         ctx.save();
         ctx.transform(1, 0, 0, 1, dx * r, dy * r);
         // ctx.setTransform(1, 0, 0, 1, dx * r, dy * r)
-        // console.log(ctx.getTransform())
+        // logger(ctx.getTransform())
     }
     restore() {
         this.ctx.restore();
@@ -1324,7 +1324,7 @@ class Editor {
     }
     set selectedNode(node) {
         if (node === this.__selectedNode) {
-            console.log('no change');
+            utils_1.logger('no change');
             return;
         }
         this.__selectedNode = node;
@@ -1413,7 +1413,7 @@ class Editor {
         this.renderTask = window.requestAnimationFrame(() => { this._render(msg); });
     }
     _render(msg) {
-        msg && console.log(`===render by: ${msg}===`);
+        msg && utils_1.logger(`===render by: ${msg}===`);
         this.mainCvs.clear();
         this.mainCvs.preFill();
         this.nodes.forEach(node => {
@@ -1581,7 +1581,7 @@ class Editor {
                 if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
                     break;
                 }
-                console.log('move');
+                utils_1.logger('move');
                 this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
                 break;
             case 'add-edge':
@@ -2415,7 +2415,7 @@ exports.figureNodeLevel = figureNodeLevel;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.compareEdge = exports.checkInCircle = exports.checkInNodeAnchor = exports.getAnchorPos = exports.randomID = void 0;
+exports.logger = exports.compareEdge = exports.checkInCircle = exports.checkInNodeAnchor = exports.getAnchorPos = exports.randomID = void 0;
 function randomID() {
     return Date.now().toString(16);
 }
@@ -2461,6 +2461,12 @@ function compareEdge(a, b) {
     return true;
 }
 exports.compareEdge = compareEdge;
+function logger(msg) {
+    if (true) {
+        console.log(msg);
+    }
+}
+exports.logger = logger;
 
 
 /***/ }),

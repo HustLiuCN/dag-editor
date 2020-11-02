@@ -5,7 +5,7 @@
  */
 import '../style/editor.css'
 import { getDom, createDom, getAttr } from './dom'
-import { randomID, getAnchorPos, checkInCircle, compareEdge} from './utils'
+import { randomID, getAnchorPos, logger, compareEdge} from './utils'
 import { Canvas } from './canvas'
 import { Event } from './event'
 import { Command } from './command'
@@ -101,7 +101,7 @@ export class Editor {
 	}
 	private set selectedNode(node: Editor.INode) {
 		if (node === this.__selectedNode) {
-			console.log('no change')
+			logger('no change')
 			return
 		}
 		this.__selectedNode = node
@@ -204,7 +204,7 @@ export class Editor {
 		this.renderTask = window.requestAnimationFrame(() => { this._render(msg) })
 	}
 	private _render(msg?: string) {
-		msg && console.log(`===render by: ${msg}===`)
+		msg && logger(`===render by: ${msg}===`)
 		this.mainCvs.clear()
 		this.mainCvs.preFill()
 		this.nodes.forEach(node => {
@@ -424,7 +424,7 @@ export class Editor {
 				if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
 					break
 				}
-				console.log('move')
+				logger('move')
 				this._updateNode({
 					...this.selectedNode,
 					x: this.selectedNode.x + dx,
