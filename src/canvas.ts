@@ -1,4 +1,4 @@
-import COLOR from './color'
+import COLOR, { lighter } from './color'
 import { Editor } from './core'
 import { getAnchorPos } from './utils'
 
@@ -196,7 +196,7 @@ export class Canvas {
 				let pos = getAnchorPos(node, 'input', i, input)
 				let [anchorPath, activeAnchorPath] = this._paintAnchor(pos)
 				ctx.save()
-				ctx.fillStyle = node.color || COLOR.lingthBlue
+				ctx.fillStyle = lighter(node.color || COLOR.blue)
 				ctx.fill(activeAnchorPath)
 				ctx.restore()
 				ctx.fill(anchorPath)
