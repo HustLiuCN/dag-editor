@@ -2,7 +2,7 @@ const path = require('path')
 const webpack = require('webpack')
 
 const webpackConfig = {
-	mode: 'development',
+	mode: process.env.NODE_ENV || 'production',
 	// watch: true,
 	entry: {
 		mind: './demos/js/mind',

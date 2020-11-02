@@ -9,7 +9,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "webpack --config webpack.config.js",
-    "watch": "webpack -w --config webpack.config.js"
+    "watch": "NODE_ENV=development webpack -w --config webpack.config.js"
   },
   "dependencies": {
     "@types/node": "^14.14.6",
