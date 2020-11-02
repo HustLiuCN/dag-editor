@@ -52,9 +52,9 @@ interface INode extends IShape {
 interface IEdge {
   id: string,
   source: string,   // source node id
-  sourceAnchorIndex: number,
+  sourceAnchorIndex: number,    // source node output anchor index
   target: string,   // target node id
-  targetAnchorIndex: number,
+  targetAnchorIndex: number,    // target node input anchor index
 }
 ```
 
@@ -78,3 +78,4 @@ interface callback {
 - ~~`edgeAdded` & `edgeDeleted` callback~~
 - ~~**drag canvas**~~
 - **scale**
+- `editor.update()`
