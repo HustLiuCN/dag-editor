@@ -35,6 +35,8 @@ export class Canvas {
 		this.translateInfo = {
 			x: 0,
 			y: 0,
+			tx: 0,
+			ty: 0,
 		}
 	}
 	canvas: HTMLCanvasElement
@@ -48,9 +50,11 @@ export class Canvas {
 			[id: string]: Array<{ type: string, index: number, path: Path2D }>
 		},
 	}
-	translateInfo: { x: number, y: number }
+	translateInfo: { x: number, y: number, tx: number, ty: number }
 	translate(dx: number, dy: number) {
 		const { ratio: r, ctx } = this
+		this.translateInfo.tx += dx
+		this.translateInfo.ty += dy
 		dx *= r
 		dy *= r
 		ctx.translate(dx, dy)
@@ -70,7 +74,7 @@ export class Canvas {
 		// this.translate(-this.translateInfo.x, -this.translateInfo.y)
 	}
 	// paint node
-	paintNode(node: Editor.INode, status?: string) {
+	paintNode(node: Editor.INode, opts?: { status?: string, isNew?: boolean }) {
 		const { ctx, ratio: r } = this
 		let { x, y, w, h } = node
 		x *= r
@@ -99,7 +103,7 @@ export class Canvas {
 		ctx.restore()
 
 		// stroke the border
-		if (status) {		// hover | selected
+		if (opts && opts.status) {		// hover | selected
 			ctx.save()
 			ctx.strokeStyle = node.color || COLOR.blue
 			ctx.lineWidth = 2

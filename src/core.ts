@@ -209,7 +209,7 @@ export class Editor {
 		this.mainCvs.preFill()
 		this.nodes.forEach(node => {
 			let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null)
-			this.mainCvs.paintNode(node, status)
+			this.mainCvs.paintNode(node, { status })
 		})
 		this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex, id }) => {
 			const start = this.nodes.find(n => n.id === source)
@@ -354,12 +354,16 @@ export class Editor {
 	private _mouseMove(e: MouseEvent) {
 		this.dynamicCvs.clear()
 		const { offsetX: x, offsetY: y } = e
+		// diff (x, y) from mouse down start point
 		const dx = x - this.mouseEventStartPos.x
 		const dy = y - this.mouseEventStartPos.y
+		// canvas translate info
+		const { tx, ty } = this.dynamicCvs.translateInfo
+
 		if (this.isMouseDown) {		// move
 			switch(this.mouseDownType) {
 				case 'add-node':
-					this.dynamicCvs.paintNode({ ...this.selectedShape, x, y })
+					this.dynamicCvs.paintNode({ ...this.selectedShape, x: x - tx, y: y - ty })
 					break
 				case 'move-node':
 					this.dynamicCvs.paintNode({
@@ -400,7 +404,6 @@ export class Editor {
 				this.hoverNode = hoverNode
 			}
 		}
-
 	}
 	// mouseleave
 	private _mouseLeavePage() {
@@ -414,9 +417,10 @@ export class Editor {
 		const { offsetX: x, offsetY: y } = e
 		const dx = x - this.mouseEventStartPos.x
 		const dy = y - this.mouseEventStartPos.y
+		const { tx, ty } = this.dynamicCvs.translateInfo
 		switch(this.mouseDownType) {
 			case 'add-node':
-				this._addNode({ ...this.selectedShape, x, y })
+				this._addNode({ ...this.selectedShape, x: x - tx, y: y - ty })
 				break
 			case 'move-node':
 				if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {

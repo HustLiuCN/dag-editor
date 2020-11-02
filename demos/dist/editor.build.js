@@ -174,7 +174,9 @@ try {
 
 Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#source-btn').addEventListener('click', function () {
   editor.resize();
-  Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#code').innerHTML = JSON.stringify(editor.getData());
+  var data = editor.getData();
+  console.log(data);
+  Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#code').innerHTML = JSON.stringify(data);
 });
 Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#export-btn').addEventListener('click', function () {
   console.log('===save===');
@@ -758,10 +760,14 @@ class Canvas {
         this.translateInfo = {
             x: 0,
             y: 0,
+            tx: 0,
+            ty: 0,
         };
     }
     translate(dx, dy) {
         const { ratio: r, ctx } = this;
+        this.translateInfo.tx += dx;
+        this.translateInfo.ty += dy;
         dx *= r;
         dy *= r;
         ctx.translate(dx, dy);
@@ -781,7 +787,7 @@ class Canvas {
         // this.translate(-this.translateInfo.x, -this.translateInfo.y)
     }
     // paint node
-    paintNode(node, status) {
+    paintNode(node, opts) {
         const { ctx, ratio: r } = this;
         let { x, y, w, h } = node;
         x *= r;
@@ -809,7 +815,7 @@ class Canvas {
         ctx.fill(leftBorder);
         ctx.restore();
         // stroke the border
-        if (status) { // hover | selected
+        if (opts && opts.status) { // hover | selected
             ctx.save();
             ctx.strokeStyle = node.color || color_1.default.blue;
             ctx.lineWidth = 2;
@@ -1368,7 +1374,7 @@ class Editor {
         this.mainCvs.preFill();
         this.nodes.forEach(node => {
             let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null);
-            this.mainCvs.paintNode(node, status);
+            this.mainCvs.paintNode(node, { status });
         });
         this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex, id }) => {
             const start = this.nodes.find(n => n.id === source);
@@ -1464,12 +1470,15 @@ class Editor {
     _mouseMove(e) {
         this.dynamicCvs.clear();
         const { offsetX: x, offsetY: y } = e;
+        // diff (x, y) from mouse down start point
         const dx = x - this.mouseEventStartPos.x;
         const dy = y - this.mouseEventStartPos.y;
+        // canvas translate info
+        const { tx, ty } = this.dynamicCvs.translateInfo;
         if (this.isMouseDown) { // move
             switch (this.mouseDownType) {
                 case 'add-node':
-                    this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedShape), { x, y }));
+                    this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedShape), { x: x - tx, y: y - ty }));
                     break;
                 case 'move-node':
                     this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
@@ -1521,9 +1530,10 @@ class Editor {
         const { offsetX: x, offsetY: y } = e;
         const dx = x - this.mouseEventStartPos.x;
         const dy = y - this.mouseEventStartPos.y;
+        const { tx, ty } = this.dynamicCvs.translateInfo;
         switch (this.mouseDownType) {
             case 'add-node':
-                this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x, y }));
+                this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x: x - tx, y: y - ty }));
                 break;
             case 'move-node':
                 if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {

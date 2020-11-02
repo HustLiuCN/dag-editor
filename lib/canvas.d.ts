@@ -28,11 +28,16 @@ export declare class Canvas {
     translateInfo: {
         x: number;
         y: number;
+        tx: number;
+        ty: number;
     };
     translate(dx: number, dy: number): void;
     transform(dx: number, dy: number): void;
     restore(): void;
-    paintNode(node: Editor.INode, status?: string): void;
+    paintNode(node: Editor.INode, opts?: {
+        status?: string;
+        isNew?: boolean;
+    }): void;
     private _paintRoundRect;
     checkInNode(nid: string, pos: Editor.IPos): boolean;
     private _paintAnchor;
