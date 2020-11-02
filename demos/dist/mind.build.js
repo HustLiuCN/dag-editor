@@ -774,6 +774,7 @@ class Canvas {
             nodes: {},
             edges: {},
             anchors: {},
+            activeAnchors: {},
         };
         // translate
         this.translateInfo = {
@@ -834,22 +835,27 @@ class Canvas {
         ctx.fill(leftBorder);
         ctx.restore();
         // stroke the border
-        if (opts && opts.status) { // hover | selected
+        if (node.id && opts && opts.status) { // hover | selected
             ctx.save();
             ctx.strokeStyle = node.color || color_1.default.blue;
             ctx.lineWidth = 2;
             ctx.stroke(path);
             // paint anchors
             const { anchors } = node;
-            if (this.hasStore) {
-                this.paths.anchors[node.id] = [];
-            }
+            // TODO
+            // if (this.hasStore) {
+            this.paths.anchors[node.id] = [];
+            this.paths.activeAnchors[node.id] = [];
+            // }
             Object.keys(anchors).forEach(k => {
                 if (anchors[k]) {
                     for (let i = 0; i < anchors[k]; i++) {
                         let pos = utils_1.getAnchorPos(node, k, i, anchors[k]);
-                        let anchorPath = this._paintAnchor(pos);
+                        let [anchorPath, activeAnchorPath] = this._paintAnchor(pos);
+                        ctx.fill(anchorPath);
+                        ctx.stroke(anchorPath);
                         this.paths.anchors[node.id].push({ type: k, index: i, path: anchorPath });
+                        this.paths.activeAnchors[node.id].push({ type: k, index: i, path: activeAnchorPath });
                     }
                 }
             });
@@ -889,21 +895,21 @@ class Canvas {
     }
     // paint anchor
     _paintAnchor({ x, y }) {
-        const { ctx, ratio: r } = this;
+        const { ratio: r } = this;
         x *= r;
         y *= r;
-        const path = new Path2D();
-        path.arc(x, y, 4 * r, 0, Math.PI * 2, false);
-        ctx.fill(path);
-        ctx.stroke(path);
-        return path;
+        const anchorPath = new Path2D();
+        anchorPath.arc(x, y, 4 * r, 0, Math.PI * 2, false);
+        const activeAnchorPath = new Path2D();
+        activeAnchorPath.arc(x, y, 12 * r, 0, Math.PI * 2, false);
+        return [anchorPath, activeAnchorPath];
     }
-    checkInNodeAnchor(node, pos) {
+    checkInNodeAnchor(node, pos, opts) {
         const r = this.ratio;
         let { x, y } = pos;
         x *= r;
         y *= r;
-        const paths = this.paths.anchors[node.id];
+        const paths = (opts && opts.active) ? this.paths.activeAnchors[node.id] : this.paths.anchors[node.id];
         for (let i = 0, n = paths.length; i < n; i++) {
             const cur = paths[i];
             if (this.ctx.isPointInPath(cur.path, x, y)) {
@@ -913,30 +919,20 @@ class Canvas {
         return null;
     }
     paintActiveAnchors(node) {
+        const { ctx } = this;
         const { input } = node.anchors;
         if (input) {
             for (let i = 0; i < input; i++) {
                 let pos = utils_1.getAnchorPos(node, 'input', i, input);
-                this._paintActiveAnchor(pos, node);
+                let [anchorPath, activeAnchorPath] = this._paintAnchor(pos);
+                ctx.save();
+                ctx.fillStyle = node.color || color_1.default.lingthBlue;
+                ctx.fill(activeAnchorPath);
+                ctx.restore();
+                ctx.fill(anchorPath);
+                ctx.stroke(anchorPath);
             }
         }
-    }
-    _paintActiveAnchor({ x, y }, node) {
-        const { ctx, ratio: r } = this;
-        x *= r;
-        y *= r;
-        ctx.save();
-        ctx.fillStyle = node.color || color_1.default.lingthBlue;
-        ctx.beginPath();
-        ctx.arc(x, y, 12 * r, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.closePath();
-        ctx.restore();
-        ctx.beginPath();
-        ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false);
-        ctx.fill();
-        ctx.stroke();
-        ctx.closePath();
     }
     // paint edge
     paintEdge({ x: sx, y: sy }, // start
@@ -1522,9 +1518,7 @@ class Editor {
         }
         else { // hover
             const hoverNode = this._getSelectedNode({ x, y });
-            // TODO bugfix: get hover anchor error after canvas moved
             if (this.hoverNode) {
-                // let hoverAnchor = checkInNodeAnchor({ x, y }, this.hoverNode)
                 let hoverAnchor = this.mainCvs.checkInNodeAnchor(this.hoverNode, { x, y });
                 this.hoverAnchor = hoverAnchor;
                 if (!hoverAnchor) {
@@ -1562,21 +1556,16 @@ class Editor {
                 this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
                 break;
             case 'add-edge':
-                // TODO bugfix: moving canvas
                 this.nodes.forEach(node => {
-                    const { input } = node.anchors;
-                    if (node.id !== this.selectedNode.id && input) { // not link to self && link to an input-anchor
-                        for (let i = 0; i < input; i++) {
-                            let pos = utils_1.getAnchorPos(node, 'input', i, input);
-                            if (utils_1.checkInCircle({ x, y }, pos, 12)) {
-                                this._addEdge([this.hoverAnchor[0], this.hoverAnchor[2]], [node, i]);
-                            }
+                    if (node.id !== this.selectedNode.id) { // not link to self && link to an input-anchor
+                        const target = this.mainCvs.checkInNodeAnchor(node, { x, y }, { active: true });
+                        if (target && target[1] === 'input') {
+                            this._addEdge([this.hoverAnchor[0], this.hoverAnchor[2]], [node, target[2]]);
                         }
                     }
                 });
                 break;
             case 'drag-canvas':
-                // this.mainCvs.reset()
                 this.mainCvs.translate(dx, dy);
                 this.dynamicCvs.translate(dx, dy);
                 break;

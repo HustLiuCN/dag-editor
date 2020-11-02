@@ -391,9 +391,7 @@ export class Editor {
 			}
 		} else {		// hover
 			const hoverNode = this._getSelectedNode({ x, y })
-			// TODO bugfix: get hover anchor error after canvas moved
 			if (this.hoverNode) {
-				// let hoverAnchor = checkInNodeAnchor({ x, y }, this.hoverNode)
 				let hoverAnchor = this.mainCvs.checkInNodeAnchor(this.hoverNode, { x, y })
 				this.hoverAnchor = hoverAnchor
 				if (!hoverAnchor) {
@@ -434,21 +432,16 @@ export class Editor {
 				})
 				break
 			case 'add-edge':
-				// TODO bugfix: moving canvas
 				this.nodes.forEach(node => {
-					const { input } = node.anchors
-					if (node.id !== this.selectedNode.id && input) {		// not link to self && link to an input-anchor
-						for (let i = 0; i < input; i ++) {
-							let pos = getAnchorPos(node, 'input', i, input)
-							if (checkInCircle({ x, y }, pos, 12)) {
-								this._addEdge([ this.hoverAnchor[0], this.hoverAnchor[2] ], [ node, i ])
-							}
+					if (node.id !== this.selectedNode.id) {		// not link to self && link to an input-anchor
+						const target = this.mainCvs.checkInNodeAnchor(node, { x, y }, { active: true })
+						if (target && target[1] === 'input') {
+							this._addEdge([ this.hoverAnchor[0], this.hoverAnchor[2] ], [ node, target[2] ])
 						}
 					}
 				})
 				break
 			case 'drag-canvas':
-				// this.mainCvs.reset()
 				this.mainCvs.translate(dx, dy)
 				this.dynamicCvs.translate(dx, dy)
 				break

@@ -24,6 +24,13 @@ export declare class Canvas {
                 path: Path2D;
             }>;
         };
+        activeAnchors: {
+            [id: string]: Array<{
+                type: string;
+                index: number;
+                path: Path2D;
+            }>;
+        };
     };
     translateInfo: {
         x: number;
@@ -41,9 +48,10 @@ export declare class Canvas {
     private _paintRoundRect;
     checkInNode(nid: string, pos: Editor.IPos): boolean;
     private _paintAnchor;
-    checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos): [Editor.INode, string, number];
+    checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos, opts?: {
+        active?: boolean;
+    }): [Editor.INode, string, number];
     paintActiveAnchors(node: Editor.INode): void;
-    private _paintActiveAnchor;
     paintEdge({ x: sx, y: sy }: Editor.IPos, // start
     { x: ex, y: ey }: Editor.IPos, // end
     opts?: {

@@ -30,6 +30,7 @@ export class Canvas {
 			nodes: {},
 			edges: {},
 			anchors: {},
+			activeAnchors: {},
 		}
 		// translate
 		this.translateInfo = {
@@ -47,6 +48,9 @@ export class Canvas {
 		nodes: { [id: string]: Path2D },
 		edges: { [id: string]: Path2D },
 		anchors: {
+			[id: string]: Array<{ type: string, index: number, path: Path2D }>
+		},
+		activeAnchors: {
 			[id: string]: Array<{ type: string, index: number, path: Path2D }>
 		},
 	}
@@ -103,22 +107,27 @@ export class Canvas {
 		ctx.restore()
 
 		// stroke the border
-		if (opts && opts.status) {		// hover | selected
+		if (node.id && opts && opts.status) {		// hover | selected
 			ctx.save()
 			ctx.strokeStyle = node.color || COLOR.blue
 			ctx.lineWidth = 2
 			ctx.stroke(path)
 			// paint anchors
 			const { anchors } = node
-			if (this.hasStore) {
-				this.paths.anchors[node.id] = []
-			}
+			// TODO
+			// if (this.hasStore) {
+			this.paths.anchors[node.id] = []
+			this.paths.activeAnchors[node.id] = []
+			// }
 			Object.keys(anchors).forEach(k => {
 				if (anchors[k]) {
 					for (let i = 0; i < anchors[k]; i ++) {
 						let pos = getAnchorPos(node, k, i, anchors[k])
-						let anchorPath = this._paintAnchor(pos)
+						let [anchorPath, activeAnchorPath] = this._paintAnchor(pos)
+						ctx.fill(anchorPath)
+						ctx.stroke(anchorPath)
 						this.paths.anchors[node.id].push({ type: k, index: i, path: anchorPath })
+						this.paths.activeAnchors[node.id].push({ type: k, index: i, path: activeAnchorPath })
 					}
 				}
 			})
@@ -132,7 +141,7 @@ export class Canvas {
 		ctx.fillText(node.name || node.shape, x, y)
 		ctx.restore()
 	}
-	private _paintRoundRect(x: number, y: number, w: number, h: number, r: number, leftBorder?: boolean) {
+	private _paintRoundRect(x: number, y: number, w: number, h: number, r: number, leftBorder?: boolean): Path2D {
 		const path = new Path2D()
 		path.moveTo(x + r, y)
 		if (leftBorder) {
@@ -155,22 +164,22 @@ export class Canvas {
 		return path && this.ctx.isPointInPath(path, x, y)
 	}
 	// paint anchor
-	private _paintAnchor({ x, y }: { x: number, y: number }) {
-		const { ctx, ratio: r } = this
+	private _paintAnchor({ x, y }: { x: number, y: number }): [Path2D, Path2D] {
+		const { ratio: r } = this
 		x *= r
 		y *= r
-		const path = new Path2D()
-		path.arc(x, y, 4 * r, 0, Math.PI * 2, false)
-		ctx.fill(path)
-		ctx.stroke(path)
-		return path
+		const anchorPath = new Path2D()
+		anchorPath.arc(x, y, 4 * r, 0, Math.PI * 2, false)
+		const activeAnchorPath = new Path2D()
+		activeAnchorPath.arc(x, y, 12 * r, 0, Math.PI * 2, false)
+		return [anchorPath, activeAnchorPath]
 	}
-	checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos): [Editor.INode, string, number] {
+	checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos, opts?: { active?: boolean }): [Editor.INode, string, number] {
 		const r = this.ratio
 		let { x, y } = pos
 		x *= r
 		y *= r
-		const paths = this.paths.anchors[node.id]
+		const paths = (opts && opts.active) ? this.paths.activeAnchors[node.id] : this.paths.anchors[node.id]
 		for (let i = 0, n = paths.length; i < n; i ++) {
 			const cur = paths[i]
 			if (this.ctx.isPointInPath(cur.path, x, y)) {
@@ -180,30 +189,20 @@ export class Canvas {
 		return null
 	}
 	paintActiveAnchors(node: Editor.INode) {
+		const { ctx } = this
 		const { input } = node.anchors
 		if (input) {
 			for (let i = 0; i < input; i ++) {
 				let pos = getAnchorPos(node, 'input', i, input)
-				this._paintActiveAnchor(pos, node)
+				let [anchorPath, activeAnchorPath] = this._paintAnchor(pos)
+				ctx.save()
+				ctx.fillStyle = node.color || COLOR.lingthBlue
+				ctx.fill(activeAnchorPath)
+				ctx.restore()
+				ctx.fill(anchorPath)
+				ctx.stroke(anchorPath)
 			}
 		}
-	}
-	private _paintActiveAnchor({ x, y }: Editor.IPos, node: Editor.INode) {
-		const { ctx, ratio: r } = this
-		x *= r
-		y *= r
-		ctx.save()
-		ctx.fillStyle = node.color || COLOR.lingthBlue
-		ctx.beginPath()
-		ctx.arc(x, y, 12 * r, 0, Math.PI * 2, false)
-		ctx.fill()
-		ctx.closePath()
-		ctx.restore()
-		ctx.beginPath()
-		ctx.arc(x, y, 4 * r, 0, Math.PI * 2, false)
-		ctx.fill()
-		ctx.stroke()
-		ctx.closePath()
 	}
 	// paint edge
 	paintEdge(
