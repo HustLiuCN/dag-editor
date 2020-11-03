@@ -7,7 +7,7 @@
   "author": "hustliu<liupeidong1027@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc",
+    "build": "NODE_ENV=production tsc",
     "dev": "webpack --config webpack.config.js",
     "watch": "NODE_ENV=development webpack -w --config webpack.config.js"
   },
