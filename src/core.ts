@@ -31,17 +31,14 @@ export class Editor {
 
 		this._init()
 	}
-	private oContainer: HTMLElement
+	readonly oContainer: HTMLElement
 	private oItemPanel: HTMLElement
-	private oPage: HTMLElement
+	readonly oPage: HTMLElement
 	// init canvas
 	private _init() {
 		this._initCanvas()
 		this._bindEvents()
 		this._initCommand()
-	}
-	resize() {
-
 	}
 	private _initPageConfig() {
 		if (!this.oPage || !this.oContainer) {
@@ -81,7 +78,7 @@ export class Editor {
 		this.oPage.appendChild(oc)
 		this.oPage.appendChild(odc)
 	}
-	private pageConfig: Editor.IPageConfig
+	pageConfig: Editor.IPageConfig
 	private mainCvs: Canvas
 	private dynamicCvs: Canvas
 	// register shape
@@ -236,8 +233,8 @@ export class Editor {
 			this.callback[ev] = cb
 		}
 	}
-	update(type: 'node' | 'edge') {
-		// TODO
+	update(node: Editor.INode) {
+		this._updateNode(node)
 	}
 	repaint() {
 		this._renderTask('repaint')
@@ -247,6 +244,11 @@ export class Editor {
 			nodes: this.nodes,
 			edges: this.edges,
 		}
+	}
+	setData({ nodes = [], edges = [] }: { nodes?: Editor.INode[], edges?: Editor.IEdge[] }) {
+		this.nodes = nodes
+		this.edges = edges
+		this._renderTask('set data')
 	}
 	saveFile(fileName = 'simple-dag-editor-export-picture', type = 'jpeg'): Promise<string> {
 		return new Promise(rs => {
@@ -269,6 +271,10 @@ export class Editor {
 				rs(blob)
 			}, MIME_TYPE)
 		})
+	}
+	resize() {}
+	execute(cmd: string, opts?: any) {
+		this.command.execute(cmd, opts)
 	}
 	/*
 	 *	events

@@ -14,6 +14,14 @@ const editor = new Editor({
   itempanel: '#itempanel',
 })
 
+// init data
+const mockData = [{"shape":"shape-001","w":160,"h":36,"color":"#b3e5fc","name":"Node-ABC","anchors":{"input":1,"output":1},"x":216,"y":113,"id":"1759b6e4951"},{"shape":"shape-002","w":160,"h":36,"color":"#ffcdd2","name":"Node-XYZ","anchors":{"input":1,"output":2},"x":182,"y":258,"id":"1759b6e4f33"}]
+editor.setData({ nodes: mockData })
+
+setTimeout(() => {
+  editor.update({"shape":"shape-001","w":160,"h":36,"color":"#b3e5fc","name":"Node-ABC-update","anchors":{"input":1,"output":1},"x":200,"y":100,"id":"1759b6e4951"})
+}, 1000)
+
 // example data store
 const store = new Store({ editor })
 

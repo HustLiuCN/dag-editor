@@ -132,8 +132,6 @@ export class Canvas {
 				}
 			})
 			ctx.restore()
-		} else {		// undefined
-			// ctx.stroke(path)
 		}
 		// paint text
 		ctx.save()
@@ -180,6 +178,9 @@ export class Canvas {
 		x *= r
 		y *= r
 		const paths = (opts && opts.active) ? this.paths.activeAnchors[node.id] : this.paths.anchors[node.id]
+		if (!paths) {
+			return
+		}
 		for (let i = 0, n = paths.length; i < n; i ++) {
 			const cur = paths[i]
 			if (this.ctx.isPointInPath(cur.path, x, y)) {

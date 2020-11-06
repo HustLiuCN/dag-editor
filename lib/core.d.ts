@@ -1,14 +1,13 @@
 import '../style/editor.css';
 export declare class Editor {
     constructor({ container, itempanel, page, }: Editor.IOption);
-    private oContainer;
+    readonly oContainer: HTMLElement;
     private oItemPanel;
-    private oPage;
+    readonly oPage: HTMLElement;
     private _init;
-    resize(): void;
     private _initPageConfig;
     private _initCanvas;
-    private pageConfig;
+    pageConfig: Editor.IPageConfig;
     private mainCvs;
     private dynamicCvs;
     private shapes;
@@ -38,14 +37,20 @@ export declare class Editor {
     private _render;
     private callback;
     on(ev: Editor.ICallback, cb: Function): void;
-    update(type: 'node' | 'edge'): void;
+    update(node: Editor.INode): void;
     repaint(): void;
     getData(): {
         nodes: Editor.INode[];
         edges: Editor.IEdge[];
     };
+    setData({ nodes, edges }: {
+        nodes?: Editor.INode[];
+        edges?: Editor.IEdge[];
+    }): void;
     saveFile(fileName?: string, type?: string): Promise<string>;
     getFileBlob(type: string): Promise<Blob>;
+    resize(): void;
+    execute(cmd: string, opts?: any): void;
     private isMouseDown;
     private mouseDownType;
     private eventList;
