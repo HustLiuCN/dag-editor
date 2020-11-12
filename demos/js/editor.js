@@ -13,7 +13,7 @@ const editor = new Editor({
   page: '#editor',
   itempanel: '#itempanel',
   config: {
-    grid: false,
+    grid: true,
   },
 })
 

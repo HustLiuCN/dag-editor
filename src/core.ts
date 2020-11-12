@@ -33,6 +33,7 @@ export class Editor {
 		this.extraConfig = config
 
 		this._init()
+		this._renderTask('init')
 	}
 	readonly oContainer: HTMLElement
 	private oItemPanel: HTMLElement
