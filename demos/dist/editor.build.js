@@ -119,7 +119,10 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 var editor = new _src_index__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
   container: '#container',
   page: '#editor',
-  itempanel: '#itempanel'
+  itempanel: '#itempanel',
+  config: {
+    grid: false
+  }
 }); // init data
 
 var mockData = [{
@@ -151,23 +154,7 @@ var mockData = [{
 }];
 editor.setData({
   nodes: mockData
-});
-setTimeout(function () {
-  editor.update({
-    "shape": "shape-001",
-    "w": 160,
-    "h": 36,
-    "color": "#b3e5fc",
-    "name": "Node-ABC-update",
-    "anchors": {
-      "input": 1,
-      "output": 1
-    },
-    "x": 200,
-    "y": 100,
-    "id": "1759b6e4951"
-  });
-}, 1000); // example data store
+}); // example data store
 
 var store = new _store__WEBPACK_IMPORTED_MODULE_3__["Store"]({
   editor: editor
@@ -224,6 +211,9 @@ Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#source-btn').addEventL
   var data = editor.getData();
   console.log(data);
   Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#code').innerHTML = JSON.stringify(data);
+  editor.setConfig({
+    grid: true
+  });
 });
 Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#export-btn').addEventListener('click', function () {
   console.log('===save===');
@@ -366,7 +356,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default.a);
 // Module
-___CSS_LOADER_EXPORT___.push([module.i, ".editor-container {\n    position: relative;\n}\n/* editor */\n.editor-page {\n    position: relative;\n    flex: 1;\n    z-index: 1;\n    background-color: #F3F4F8;\n}\n.editor-page > canvas {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    cursor: default;\n}\n\n/* contextmenu */\n.editor-contextmenu {\n    display: none;\n    position: fixed;\n    width: 100px;\n    padding: 5px 0;\n    background-color: #fff;\n    z-index: 9;\n    flex-direction: column;\n    border-radius: 2px;\n    overflow: hidden;\n}\n.editor-contextmenu.show {\n    display: flex;\n}\n.editor-contextmenu-item {\n    padding: 5px 10px;\n    cursor: default;\n    transition: color .2s ease;\n}\n.editor-contextmenu-item:hover {\n    color: #03a9f4;\n}\n", "",{"version":3,"sources":["webpack://style/editor.css"],"names":[],"mappings":"AAAA;IACI,kBAAkB;AACtB;AACA,WAAW;AACX;IACI,kBAAkB;IAClB,OAAO;IACP,UAAU;IACV,yBAAyB;AAC7B;AACA;IACI,kBAAkB;IAClB,WAAW;IACX,YAAY;IACZ,OAAO;IACP,MAAM;IACN,eAAe;AACnB;;AAEA,gBAAgB;AAChB;IACI,aAAa;IACb,eAAe;IACf,YAAY;IACZ,cAAc;IACd,sBAAsB;IACtB,UAAU;IACV,sBAAsB;IACtB,kBAAkB;IAClB,gBAAgB;AACpB;AACA;IACI,aAAa;AACjB;AACA;IACI,iBAAiB;IACjB,eAAe;IACf,0BAA0B;AAC9B;AACA;IACI,cAAc;AAClB","sourcesContent":[".editor-container {\n    position: relative;\n}\n/* editor */\n.editor-page {\n    position: relative;\n    flex: 1;\n    z-index: 1;\n    background-color: #F3F4F8;\n}\n.editor-page > canvas {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    cursor: default;\n}\n\n/* contextmenu */\n.editor-contextmenu {\n    display: none;\n    position: fixed;\n    width: 100px;\n    padding: 5px 0;\n    background-color: #fff;\n    z-index: 9;\n    flex-direction: column;\n    border-radius: 2px;\n    overflow: hidden;\n}\n.editor-contextmenu.show {\n    display: flex;\n}\n.editor-contextmenu-item {\n    padding: 5px 10px;\n    cursor: default;\n    transition: color .2s ease;\n}\n.editor-contextmenu-item:hover {\n    color: #03a9f4;\n}\n"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.i, ".editor-container {\n    position: relative;\n}\n/* editor */\n.editor-page {\n    position: relative;\n    flex: 1;\n    z-index: 1;\n    background-color: #fff;\n}\n.editor-page > canvas {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    cursor: default;\n}\n\n/* contextmenu */\n.editor-contextmenu {\n    display: none;\n    position: fixed;\n    width: 100px;\n    padding: 5px 0;\n    background-color: #fff;\n    z-index: 9;\n    flex-direction: column;\n    border-radius: 2px;\n    overflow: hidden;\n}\n.editor-contextmenu.show {\n    display: flex;\n}\n.editor-contextmenu-item {\n    padding: 5px 10px;\n    cursor: default;\n    transition: color .2s ease;\n}\n.editor-contextmenu-item:hover {\n    color: #03a9f4;\n}\n", "",{"version":3,"sources":["webpack://style/editor.css"],"names":[],"mappings":"AAAA;IACI,kBAAkB;AACtB;AACA,WAAW;AACX;IACI,kBAAkB;IAClB,OAAO;IACP,UAAU;IACV,sBAAsB;AAC1B;AACA;IACI,kBAAkB;IAClB,WAAW;IACX,YAAY;IACZ,OAAO;IACP,MAAM;IACN,eAAe;AACnB;;AAEA,gBAAgB;AAChB;IACI,aAAa;IACb,eAAe;IACf,YAAY;IACZ,cAAc;IACd,sBAAsB;IACtB,UAAU;IACV,sBAAsB;IACtB,kBAAkB;IAClB,gBAAgB;AACpB;AACA;IACI,aAAa;AACjB;AACA;IACI,iBAAiB;IACjB,eAAe;IACf,0BAA0B;AAC9B;AACA;IACI,cAAc;AAClB","sourcesContent":[".editor-container {\n    position: relative;\n}\n/* editor */\n.editor-page {\n    position: relative;\n    flex: 1;\n    z-index: 1;\n    background-color: #fff;\n}\n.editor-page > canvas {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    left: 0;\n    top: 0;\n    cursor: default;\n}\n\n/* contextmenu */\n.editor-contextmenu {\n    display: none;\n    position: fixed;\n    width: 100px;\n    padding: 5px 0;\n    background-color: #fff;\n    z-index: 9;\n    flex-direction: column;\n    border-radius: 2px;\n    overflow: hidden;\n}\n.editor-contextmenu.show {\n    display: flex;\n}\n.editor-contextmenu-item {\n    padding: 5px 10px;\n    cursor: default;\n    transition: color .2s ease;\n}\n.editor-contextmenu-item:hover {\n    color: #03a9f4;\n}\n"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ __webpack_exports__["default"] = (___CSS_LOADER_EXPORT___);
 
@@ -787,9 +777,10 @@ exports.Canvas = void 0;
 const color_1 = __webpack_require__(/*! ./color */ "./src/color.ts");
 const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 class Canvas {
-    constructor(cvs, { ratio = 1, fillStyle = color_1.default.white, strokeStyle = color_1.default.line, hasStore, }) {
+    constructor(cvs, { ratio = 1, fillStyle = color_1.default.white, strokeStyle = color_1.default.line, hasStore, config, }) {
         this.canvas = cvs;
         this.ratio = ratio;
+        this.config = config;
         const ctx = cvs.getContext('2d');
         ctx.fillStyle = fillStyle;
         ctx.strokeStyle = strokeStyle;
@@ -814,7 +805,7 @@ class Canvas {
     }
     translate(dx, dy) {
         const { ratio: r, ctx } = this;
-        this.translateInfo.tx += dx;
+        this.translateInfo.tx += dx; // origin translate x & y
         this.translateInfo.ty += dy;
         dx *= r;
         dy *= r;
@@ -1030,11 +1021,43 @@ class Canvas {
     }
     // fill canvas white background
     preFill() {
+        var _a;
         const { x, y } = this.translateInfo;
         this.ctx.save();
-        this.ctx.fillStyle = '#F3F4F8';
+        this.ctx.fillStyle = '#f8f8f8';
         this.ctx.fillRect(-x, -y, this.canvas.width, this.canvas.height);
+        if ((_a = this.config) === null || _a === void 0 ? void 0 : _a.grid) {
+            this.paintGrid();
+        }
         this.ctx.restore();
+    }
+    paintGrid() {
+        const { ctx, ratio } = this;
+        const { width, height } = this.canvas;
+        const { x, y } = this.translateInfo;
+        const d = 16 * ratio;
+        const xn = Math.ceil(width / d);
+        const yn = Math.ceil(height / d);
+        ctx.save();
+        ctx.strokeStyle = '#e9e9e9';
+        ctx.lineWidth = 1;
+        for (let i = 1; i < xn + 1; i++) {
+            let sx = -x + d * i;
+            ctx.beginPath();
+            ctx.moveTo(sx, -y);
+            ctx.lineTo(sx, -y + height);
+            ctx.stroke();
+            ctx.closePath();
+        }
+        for (let i = 1; i < yn + 1; i++) {
+            let sy = -y + d * i;
+            ctx.beginPath();
+            ctx.moveTo(-x, sy);
+            ctx.lineTo(-x + width, sy);
+            ctx.stroke();
+            ctx.closePath();
+        }
+        ctx.restore();
     }
 }
 exports.Canvas = Canvas;
@@ -1243,7 +1266,7 @@ const contextmenu_1 = __webpack_require__(/*! ./contextmenu */ "./src/contextmen
 class Editor {
     constructor({ container, 
     // toolbar,
-    itempanel, page, }) {
+    itempanel, page, config, }) {
         // private selectedAnchor: [Editor.INode, number]
         this.anchorStartPos = { x: 0, y: 0 };
         /*
@@ -1301,6 +1324,8 @@ class Editor {
         this.shapes = {};
         this.nodes = [];
         this.edges = [];
+        // extra config
+        this.extraConfig = config;
         this._init();
     }
     // init canvas
@@ -1335,7 +1360,7 @@ class Editor {
         odc.style.backgroundColor = 'transparent';
         // define canvas object
         // main canvas paint all nodes & edges that exist in this.nodes & this.edges
-        this.mainCvs = new canvas_1.Canvas(oc, { ratio, hasStore: true });
+        this.mainCvs = new canvas_1.Canvas(oc, { ratio, hasStore: true, config: this.extraConfig });
         // dynamic canvas paint nodes & edges which is being added or moved
         this.dynamicCvs = new canvas_1.Canvas(odc, { ratio });
         // append to page container
@@ -1474,6 +1499,11 @@ class Editor {
         this.edges = edges;
         this._renderTask('set data');
     }
+    setConfig(config) {
+        this.extraConfig = config;
+        this.mainCvs.config = config;
+        this._renderTask('change config');
+    }
     saveFile(fileName = 'simple-dag-editor-export-picture', type = 'jpeg') {
         return new Promise(rs => {
             this.getFileBlob(type).then(blob => {
@@ -1495,6 +1525,7 @@ class Editor {
             }, MIME_TYPE);
         });
     }
+    // TODO
     resize() { }
     execute(cmd, opts) {
         this.command.execute(cmd, opts);

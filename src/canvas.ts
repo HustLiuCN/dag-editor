@@ -8,14 +8,17 @@ export class Canvas {
 		fillStyle = COLOR.white,
 		strokeStyle = COLOR.line,
 		hasStore,
+		config,
 	}: {
 		ratio: number,
 		fillStyle?: string,
 		strokeStyle?: string,
-		hasStore?: boolean
+		hasStore?: boolean,
+		config?: any,
 	}) {
 		this.canvas = cvs
 		this.ratio = ratio
+		this.config = config
 
 		const ctx = cvs.getContext('2d')
 		ctx.fillStyle = fillStyle
@@ -40,6 +43,7 @@ export class Canvas {
 			ty: 0,
 		}
 	}
+	config: any
 	canvas: HTMLCanvasElement
 	ratio: number
 	ctx: CanvasRenderingContext2D
@@ -57,7 +61,7 @@ export class Canvas {
 	translateInfo: { x: number, y: number, tx: number, ty: number }
 	translate(dx: number, dy: number) {
 		const { ratio: r, ctx } = this
-		this.translateInfo.tx += dx
+		this.translateInfo.tx += dx		// origin translate x & y
 		this.translateInfo.ty += dy
 		dx *= r
 		dy *= r
@@ -275,9 +279,41 @@ export class Canvas {
 	preFill() {
 		const { x, y } = this.translateInfo
 		this.ctx.save()
-		this.ctx.fillStyle = '#F3F4F8'
+		this.ctx.fillStyle = '#f8f8f8'
 		this.ctx.fillRect(-x, -y, this.canvas.width, this.canvas.height)
+		if (this.config?.grid) {
+			this.paintGrid()
+		}
 		this.ctx.restore()
+	}
+	paintGrid() {
+		const { ctx, ratio } = this
+		const { width, height } = this.canvas
+		const { x, y } = this.translateInfo
+		const d = 16 * ratio
+		const xn = Math.ceil(width / d)
+		const yn = Math.ceil(height / d)
+
+		ctx.save()
+		ctx.strokeStyle = '#e9e9e9'
+		ctx.lineWidth = 1
+		for (let i = 1; i < xn + 1; i ++) {
+			let sx = -x + d * i
+			ctx.beginPath()
+			ctx.moveTo(sx, -y)
+			ctx.lineTo(sx, -y + height)
+			ctx.stroke()
+			ctx.closePath()
+		}
+		for (let i = 1; i < yn + 1; i ++) {
+			let sy = -y + d * i
+			ctx.beginPath()
+			ctx.moveTo(-x, sy)
+			ctx.lineTo(-x + width, sy)
+			ctx.stroke()
+			ctx.closePath()
+		}
+		ctx.restore()
 	}
 }
 

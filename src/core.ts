@@ -18,6 +18,7 @@ export class Editor {
 		// toolbar,
 		itempanel,
 		page,
+		config,
 	}: Editor.IOption) {
 		console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;')
 		// dom container
@@ -28,12 +29,15 @@ export class Editor {
 		this.shapes = {}
 		this.nodes = []
 		this.edges = []
+		// extra config
+		this.extraConfig = config
 
 		this._init()
 	}
 	readonly oContainer: HTMLElement
 	private oItemPanel: HTMLElement
 	readonly oPage: HTMLElement
+	extraConfig: any
 	// init canvas
 	private _init() {
 		this._initCanvas()
@@ -70,7 +74,7 @@ export class Editor {
 
 		// define canvas object
 		// main canvas paint all nodes & edges that exist in this.nodes & this.edges
-		this.mainCvs = new Canvas(oc, { ratio, hasStore: true })
+		this.mainCvs = new Canvas(oc, { ratio, hasStore: true, config: this.extraConfig })
 		// dynamic canvas paint nodes & edges which is being added or moved
 		this.dynamicCvs = new Canvas(odc, { ratio })
 
@@ -250,6 +254,11 @@ export class Editor {
 		this.edges = edges
 		this._renderTask('set data')
 	}
+	setConfig(config: any) {
+		this.extraConfig = config
+		this.mainCvs.config = config
+		this._renderTask('change config')
+	}
 	saveFile(fileName = 'simple-dag-editor-export-picture', type = 'jpeg'): Promise<string> {
 		return new Promise(rs => {
 			this.getFileBlob(type).then(blob => {
@@ -272,6 +281,7 @@ export class Editor {
 			}, MIME_TYPE)
 		})
 	}
+	// TODO
 	resize() {}
 	execute(cmd: string, opts?: any) {
 		this.command.execute(cmd, opts)
@@ -548,6 +558,10 @@ export namespace Editor {
 		container: string,
 		itempanel: string,
 		page: string,
+		config?: {
+			bgColor?: string,
+			grid?: boolean,
+		},
 	}
 	export interface IPageConfig extends DOMRect {
 		width: number,

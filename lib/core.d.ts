@@ -1,9 +1,10 @@
 import '../style/editor.css';
 export declare class Editor {
-    constructor({ container, itempanel, page, }: Editor.IOption);
+    constructor({ container, itempanel, page, config, }: Editor.IOption);
     readonly oContainer: HTMLElement;
     private oItemPanel;
     readonly oPage: HTMLElement;
+    extraConfig: any;
     private _init;
     private _initPageConfig;
     private _initCanvas;
@@ -47,6 +48,7 @@ export declare class Editor {
         nodes?: Editor.INode[];
         edges?: Editor.IEdge[];
     }): void;
+    setConfig(config: any): void;
     saveFile(fileName?: string, type?: string): Promise<string>;
     getFileBlob(type: string): Promise<Blob>;
     resize(): void;
@@ -83,6 +85,10 @@ export declare namespace Editor {
         container: string;
         itempanel: string;
         page: string;
+        config?: {
+            bgColor?: string;
+            grid?: boolean;
+        };
     }
     interface IPageConfig extends DOMRect {
         width: number;

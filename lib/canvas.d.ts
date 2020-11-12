@@ -1,11 +1,13 @@
 import { Editor } from './core';
 export declare class Canvas {
-    constructor(cvs: HTMLCanvasElement, { ratio, fillStyle, strokeStyle, hasStore, }: {
+    constructor(cvs: HTMLCanvasElement, { ratio, fillStyle, strokeStyle, hasStore, config, }: {
         ratio: number;
         fillStyle?: string;
         strokeStyle?: string;
         hasStore?: boolean;
+        config?: any;
     });
+    config: any;
     canvas: HTMLCanvasElement;
     ratio: number;
     ctx: CanvasRenderingContext2D;
@@ -63,4 +65,5 @@ export declare class Canvas {
     private _paintArrow;
     clear(): void;
     preFill(): void;
+    paintGrid(): void;
 }
