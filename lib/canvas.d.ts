@@ -1,12 +1,14 @@
 import { Editor } from './core';
 export declare class Canvas {
-    constructor(cvs: HTMLCanvasElement, { ratio, fillStyle, strokeStyle, hasStore, config, }: {
+    constructor(cvs: HTMLCanvasElement, { ratio, fillStyle, strokeStyle, hasStore, hasBg, config, }: {
         ratio: number;
         fillStyle?: string;
         strokeStyle?: string;
         hasStore?: boolean;
+        hasBg?: boolean;
         config?: any;
     });
+    hasBg: boolean;
     config: any;
     canvas: HTMLCanvasElement;
     ratio: number;

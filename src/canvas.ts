@@ -8,17 +8,20 @@ export class Canvas {
 		fillStyle = COLOR.white,
 		strokeStyle = COLOR.line,
 		hasStore,
+		hasBg,
 		config,
 	}: {
 		ratio: number,
 		fillStyle?: string,
 		strokeStyle?: string,
 		hasStore?: boolean,
+		hasBg?: boolean,
 		config?: any,
 	}) {
 		this.canvas = cvs
 		this.ratio = ratio
 		this.config = config
+		this.hasBg = hasBg
 
 		const ctx = cvs.getContext('2d')
 		ctx.fillStyle = fillStyle
@@ -43,6 +46,7 @@ export class Canvas {
 			ty: 0,
 		}
 	}
+	hasBg: boolean
 	config: any
 	canvas: HTMLCanvasElement
 	ratio: number
@@ -279,8 +283,9 @@ export class Canvas {
 	preFill() {
 		const { x, y } = this.translateInfo
 		this.ctx.save()
-		this.ctx.fillStyle = '#f8f8f8'
+		this.ctx.fillStyle = '#f9f9f9'
 		this.ctx.fillRect(-x, -y, this.canvas.width, this.canvas.height)
+
 		if (this.config?.grid) {
 			this.paintGrid()
 		}
@@ -289,13 +294,15 @@ export class Canvas {
 	paintGrid() {
 		const { ctx, ratio } = this
 		const { width, height } = this.canvas
-		const { x, y } = this.translateInfo
+		const ts = this.ctx.getTransform()
+		const x = ts.e
+		const y = ts.f
 		const d = 16 * ratio
 		const xn = Math.ceil(width / d)
 		const yn = Math.ceil(height / d)
 
 		ctx.save()
-		ctx.strokeStyle = '#e9e9e9'
+		ctx.strokeStyle = '#e1e1e1'
 		ctx.lineWidth = 1
 		for (let i = 1; i < xn + 1; i ++) {
 			let sx = -x + d * i

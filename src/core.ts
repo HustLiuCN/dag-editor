@@ -75,7 +75,7 @@ export class Editor {
 
 		// define canvas object
 		// main canvas paint all nodes & edges that exist in this.nodes & this.edges
-		this.mainCvs = new Canvas(oc, { ratio, hasStore: true, config: this.extraConfig })
+		this.mainCvs = new Canvas(oc, { ratio, hasStore: true, hasBg: true, config: this.extraConfig })
 		// dynamic canvas paint nodes & edges which is being added or moved
 		this.dynamicCvs = new Canvas(odc, { ratio })
 
@@ -401,6 +401,7 @@ export class Editor {
 					this.mainCvs.clear()
 					this.mainCvs.transform(dx, dy)
 					this.dynamicCvs.transform(dx, dy)
+					this.mainCvs.preFill()
 					this._render()
 					this.mainCvs.restore()
 					this.dynamicCvs.restore()
