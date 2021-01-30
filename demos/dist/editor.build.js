@@ -126,31 +126,21 @@ var editor = new _src_index__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
 }); // init data
 
 var mockData = [{
+  // 渲染初始化添加
   "shape": "shape-001",
   "w": 160,
   "h": 36,
   "color": "#b3e5fc",
-  "name": "Node-ABC",
   "anchors": {
     "input": 1,
     "output": 1
   },
+  // 计算后添加
   "x": 216,
   "y": 113,
+  // 源数据字段
+  "name": "Node-ABC",
   "id": "1759b6e4951"
-}, {
-  "shape": "shape-002",
-  "w": 160,
-  "h": 36,
-  "color": "#ffcdd2",
-  "name": "Node-XYZ",
-  "anchors": {
-    "input": 1,
-    "output": 2
-  },
-  "x": 182,
-  "y": 258,
-  "id": "1759b6e4f33"
 }];
 editor.setData({
   nodes: mockData
@@ -309,31 +299,21 @@ var shapes = [{
   w: w,
   h: h,
   color: _src_color__WEBPACK_IMPORTED_MODULE_0___default.a.blue,
-  name: 'Node-ABC',
-  // anchors: [
-  // 	{ type: 'input' },
-  // 	{ type: 'output' },
-  // ],
+  name: '布局测试节点',
   anchors: {
     input: 1,
     output: 1
   }
-}, {
-  shape: 'shape-002',
-  w: w,
-  h: h,
-  color: _src_color__WEBPACK_IMPORTED_MODULE_0___default.a.red,
-  name: 'Node-XYZ',
-  // anchors: [
-  // 	[0.5, 0, 'input'],
-  // 	[0.3, 1, 'output'],
-  // 	[0.7, 1, 'output'],
-  // ],
-  anchors: {
-    input: 1,
-    output: 2
-  }
-}];
+} // {
+//   shape: 'shape-002',
+//   w, h, color: COLOR.red,
+//   name: 'Node-XYZ',
+//   anchors: {
+//     input: 1,
+//     output: 2,
+//   },
+// },
+];
 /* harmony default export */ __webpack_exports__["default"] = (shapes);
 
 /***/ }),
