@@ -209,6 +209,11 @@ export class Editor {
 		msg && logger(`===render by: ${msg}===`)
 		this.mainCvs.clear()
 		this.mainCvs.preFill()
+		/**
+		 * @sd-layout
+		 * 绘制节点
+		 * 绘制边
+		 */
 		this.nodes.forEach(node => {
 			let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null)
 			this.mainCvs.paintNode(node, { status })

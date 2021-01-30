@@ -7,6 +7,9 @@ import shapes from '../../mock-data/dag-shapes'
 import { Editor } from '../../src/index'
 import { Store } from './store'
 
+/**
+ * 应用实例
+ */
 // example
 const editor = new Editor({
   container: '#container',
@@ -17,33 +20,57 @@ const editor = new Editor({
   },
 })
 
-// init data
-const mockData = [
+/**
+ * 数据
+ * { nodes, edges }
+ */
+const mockNodes = [
   {
-    // 渲染初始化添加
+    // 固定填充
     "shape":"shape-001",
     "w":160,
     "h":36,
-    "color":"#b3e5fc",
     "anchors":{"input":1,"output":1},
+    // 源数据字段
+    "name":"Node-ABC",
+    "id":"node1",
+    "color":"#b3e5fc",
     // 计算后添加
     "x":216,
     "y":113,
-    // 源数据字段
-    "name":"Node-ABC",
-    "id":"1759b6e4951",
+  },
+  {
+    "shape":"shape-001",
+    "w":160,
+    "h":36,
+    "anchors":{"input":1,"output":1},
+    "x":416,
+    "y":313,
+    "name":"测试节点2",
+    "id":"node2",
+    "color":"#b3e5fc",
   },
 ]
-editor.setData({ nodes: mockData })
+const mockEdges = [
+  {
+    // 源数据
+    source: 'node1',
+    target: 'node2',
+    // 固定填充
+    id: 'edge1',
+    sourceAnchorIndex: 0,
+    targetAnchorIndex: 0,
+  },
+]
+editor.setData({ nodes: mockNodes, edges: mockEdges })
 
 // example data store
 const store = new Store({ editor })
 
-// new node added
-editor.on('nodeAdded', (node) => {
-  console.log('node added', node)
-})
-// selected node change
+
+/**
+ * 预留接口
+ */
 editor.on('selectedNodeChange', (node) => {
   console.log('selected node changed', node)
   const oNodePanel = getDom('#node-panel')
@@ -57,18 +84,6 @@ editor.on('selectedNodeChange', (node) => {
     oNodePanel.classList.remove('show')
     oCanvasPanel.classList.add('show')
   }
-})
-// node deleted
-editor.on('nodeDeleted', (nodeId) => {
-  console.log(`node deleted: node-id: ${nodeId}`)
-})
-// new edge added
-editor.on('edgeAdded', (edge) => {
-  console.log('edge added', edge)
-})
-// edge deleted
-editor.on('edgeDeleted', (edge) => {
-  console.log('edge deleted', edge)
 })
 
 for (let shape of shapes) {

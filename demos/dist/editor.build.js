@@ -114,7 +114,11 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
- // example
+
+/**
+ * 应用实例
+ */
+// example
 
 var editor = new _src_index__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
   container: '#container',
@@ -123,36 +127,62 @@ var editor = new _src_index__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
   config: {
     grid: true
   }
-}); // init data
+});
+/**
+ * 数据
+ * { nodes, edges }
+ */
 
-var mockData = [{
-  // 渲染初始化添加
+var mockNodes = [{
+  // 固定填充
   "shape": "shape-001",
   "w": 160,
   "h": 36,
-  "color": "#b3e5fc",
   "anchors": {
     "input": 1,
     "output": 1
   },
-  // 计算后添加
-  "x": 216,
-  "y": 113,
   // 源数据字段
   "name": "Node-ABC",
-  "id": "1759b6e4951"
+  "id": "node1",
+  "color": "#b3e5fc",
+  // 计算后添加
+  "x": 216,
+  "y": 113
+}, {
+  "shape": "shape-001",
+  "w": 160,
+  "h": 36,
+  "anchors": {
+    "input": 1,
+    "output": 1
+  },
+  "x": 416,
+  "y": 313,
+  "name": "测试节点2",
+  "id": "node2",
+  "color": "#b3e5fc"
+}];
+var mockEdges = [{
+  // 源数据
+  source: 'node1',
+  target: 'node2',
+  // 固定填充
+  id: 'edge1',
+  sourceAnchorIndex: 0,
+  targetAnchorIndex: 0
 }];
 editor.setData({
-  nodes: mockData
+  nodes: mockNodes,
+  edges: mockEdges
 }); // example data store
 
 var store = new _store__WEBPACK_IMPORTED_MODULE_3__["Store"]({
   editor: editor
-}); // new node added
-
-editor.on('nodeAdded', function (node) {
-  console.log('node added', node);
-}); // selected node change
+});
+/**
+ * 预留接口
+ */
 
 editor.on('selectedNodeChange', function (node) {
   console.log('selected node changed', node);
@@ -167,18 +197,6 @@ editor.on('selectedNodeChange', function (node) {
     oNodePanel.classList.remove('show');
     oCanvasPanel.classList.add('show');
   }
-}); // node deleted
-
-editor.on('nodeDeleted', function (nodeId) {
-  console.log("node deleted: node-id: ".concat(nodeId));
-}); // new edge added
-
-editor.on('edgeAdded', function (edge) {
-  console.log('edge added', edge);
-}); // edge deleted
-
-editor.on('edgeDeleted', function (edge) {
-  console.log('edge deleted', edge);
 });
 
 var _iterator = _createForOfIteratorHelper(_mock_data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__["default"]),
@@ -1451,6 +1469,11 @@ class Editor {
         msg && utils_1.logger(`===render by: ${msg}===`);
         this.mainCvs.clear();
         this.mainCvs.preFill();
+        /**
+         * @sd-layout
+         * 绘制节点
+         * 绘制边
+         */
         this.nodes.forEach(node => {
             let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null);
             this.mainCvs.paintNode(node, { status });
