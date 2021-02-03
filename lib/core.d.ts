@@ -36,6 +36,7 @@ export declare class Editor {
     private renderTask;
     private _renderTask;
     private _render;
+    private _paintEdgeTask;
     private callback;
     on(ev: Editor.ICallback, cb: Function): void;
     update(node: Editor.INode): void;
@@ -44,9 +45,11 @@ export declare class Editor {
         nodes: Editor.INode[];
         edges: Editor.IEdge[];
     };
-    setData({ nodes, edges }: {
+    layout: any;
+    setData({ nodes, edges, layout }: {
         nodes?: Editor.INode[];
         edges?: Editor.IEdge[];
+        layout: any;
     }): void;
     setConfig(config: any): void;
     saveFile(fileName?: string, type?: string): Promise<string>;
@@ -105,6 +108,9 @@ export declare namespace Editor {
         id?: string;
         x: number;
         y: number;
+        depth?: number;
+        treeWidth?: number;
+        hasNoSon?: boolean;
     }
     interface IAnchor {
         input?: number;

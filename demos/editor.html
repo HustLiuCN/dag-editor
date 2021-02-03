@@ -8,54 +8,7 @@
 </head>
 <body>
 	<div id="container">
-		<div id="itempanel">
-			<div class="itempanel-item" data-shape="shape-001">布局测试节点</div>
-			<!-- <div class="itempanel-item" data-shape="shape-002">Node-XYZ drag this</div> -->
-		</div>
 		<div id="editor"></div>
-		<div id="panel">
-			<!-- custom detail panel here -->
-			<div id="node-panel" class="panel">
-				<h3>Current Selected Node</h3>
-				<div class="panel-row">
-					<h4>Node Name:</h4>
-					<div class="panel-item">
-						<input type="text" id="node-name">
-					</div>
-				</div>
-				<div class="panel-row">
-					<h4>Node Width:</h4>
-					<div class="panel-item">
-						<input type="text" id="node-width">
-						<span>px</span>
-					</div>
-				</div>
-				<div class="panel-row">
-					<p class="sub-ft">
-						we provide some callback handlers, such as `onSelectedNodeChange`, `onNodeDeleted` and so on.
-					</p>
-					<p class="sub-ft">
-						u can define any custom properties on node,
-						and then u can use any methods such ad Vue, React, to bind the node-property and
-						the view (like all mvvm frame did),
-						in order to use the data that created by the Editor for anything.
-					</p>
-				</div>
-			</div>
-			<div id="canvas-panel" class="panel show">
-				<h3>Nothing Selected</h3>
-				<div class="panel-row">
-					<button id="export-btn">导出为图片</button>
-					<img id="preview" src="" style="width: 200px;height: 100px;">
-				</div>
-				<div class="panel-row">
-					<button id="source-btn">查看Editor源数据</button>
-				</div>
-				<div class="panel-row">
-					<pre id="code"></pre>
-				</div>
-			</div>
-		</div>
 	</div>
 </body>
 <script src="dist/editor.build.js"></script>

@@ -49,6 +49,6 @@ export function compareEdge(a: Editor.IEdge, b: Editor.IEdge) {
 
 export function logger(msg: string) {
   if (process.env.NODE_ENV === 'development') {
-    console.log(msg)
+    // console.log(msg)
   }
 }

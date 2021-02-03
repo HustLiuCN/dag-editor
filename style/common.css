@@ -125,7 +125,7 @@ pre {
 /* detail panel */
 #panel {
 	position: relative;
-	flex: 0 0 300px;
+	flex: 0 0 100px;
 	padding: 20px;
 	background-color: #fff;
 	box-shadow: -1px 0 6px 0 rgba(0, 0, 0, 0.05);

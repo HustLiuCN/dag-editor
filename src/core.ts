@@ -11,6 +11,9 @@ import { Event } from './event'
 import { Command } from './command'
 import { ContextMenu } from './contextmenu'
 
+import { findMaxLevel } from './layout/calculate'
+import { count } from 'console'
+
 // Editor core
 export class Editor {
 	constructor({
@@ -218,15 +221,40 @@ export class Editor {
 			let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null)
 			this.mainCvs.paintNode(node, { status })
 		})
-		this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex, id }) => {
-			const start = this.nodes.find(n => n.id === source)
-			const end = this.nodes.find(n => n.id === target)
-			this.mainCvs.paintEdge(
-				getAnchorPos(start, 'output', sourceAnchorIndex, start.anchors.output),
-				getAnchorPos(end, 'input', targetAnchorIndex, end.anchors.input),
-				{ id, selected: this.selectedEdge && this.selectedEdge.id === id },
-			)
-		})
+		this._paintEdgeTask()
+	}
+	private _paintEdgeTask() {
+		const { levels } = this.layout
+		const edges = this.edges.slice()
+
+		let gap = 1
+		let count = 0
+		while (count < edges.length) {
+			edges.forEach(({ source, target, id }, i) => {
+				const start = this.nodes.find(n => n.id === source)
+				const end = this.nodes.find(n => n.id === target)
+				let startPos = getAnchorPos(start, 'output', 0, start.anchors.output)
+				let endPos = getAnchorPos(end, 'input', 0, end.anchors.input)
+				if (end.depth - start.depth === gap) {
+					this.mainCvs.paintEdge(
+						startPos,
+						endPos,
+						{
+							id,
+							selected: this.selectedEdge && this.selectedEdge.id === id,
+							gap,
+							// TODO
+							maxWidth: start.treeWidth * 100,
+							isLeaf: start.hasNoSon,
+						},
+					)
+					count ++
+					// edges.splice(i, 1)
+				}
+			})
+			gap ++
+		}
+		// console.log(gap, count, edges.length);
 	}
 	/*
 	 *	public
@@ -255,9 +283,11 @@ export class Editor {
 			edges: this.edges,
 		}
 	}
-	setData({ nodes = [], edges = [] }: { nodes?: Editor.INode[], edges?: Editor.IEdge[] }) {
+	layout: any
+	setData({ nodes = [], edges = [], layout }: { nodes?: Editor.INode[], edges?: Editor.IEdge[], layout: any }) {
 		this.nodes = nodes
 		this.edges = edges
+		this.layout = layout
 		this._renderTask('set data')
 	}
 	setConfig(config: any) {
@@ -299,8 +329,6 @@ export class Editor {
 	private mouseDownType: 'add-node' | 'move-node' | 'add-edge' | 'drag-canvas'
 
 	private eventList = [
-		['oItemPanel', 'mousedown', '_beginAddNode'],
-		['oItemPanel', 'mouseup', '_mouseUp'],
 		['oPage', 'mousedown', '_mouseDownOnPage'],
 		['oPage', 'mousemove', '_mouseMove'],
 		['oPage', 'mouseleave', '_mouseLeavePage'],
@@ -384,23 +412,12 @@ export class Editor {
 
 		if (this.isMouseDown) {		// move
 			switch(this.mouseDownType) {
-				case 'add-node':
-					this.dynamicCvs.paintNode({ ...this.selectedShape, x: x - tx, y: y - ty })
-					break
 				case 'move-node':
 					this.dynamicCvs.paintNode({
 						...this.selectedNode,
 						x: this.selectedNode.x + dx,
 						y: this.selectedNode.y + dy,
 					})
-					break
-				case 'add-edge':
-					this.nodes.forEach(node => {
-						if (node.id !== this.selectedNode.id && node.anchors) {
-							this.dynamicCvs.paintActiveAnchors(node)
-						}
-					})
-					this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y }, { needTranslate: true })
 					break
 				case 'drag-canvas':
 					this.mainCvs.clear()
@@ -587,6 +604,9 @@ export namespace Editor {
 		id?: string,
 		x: number,
 		y: number,
+		depth?: number,
+		treeWidth?: number,
+		hasNoSon?: boolean,
 	}
 	// anchor: [x, y, type]
 	export interface IAnchor {

@@ -1,84 +1,84 @@
 export const mock_data_1 = {
   "nodes": [{
       "id": "AUD_MATCHED",
-      "label": "AUD_MATCHED",
+      "name": "AUD_MATCHED",
       "color": "blue"
   }, {
       "id": "BEGIN_CONVERT_CALC",
-      "label": "BEGIN_CONVERT_CALC",
+      "name": "BEGIN_CONVERT_CALC",
       "color": "blue"
   }, {
       "id": "CONVERT_END",
-      "label": "CONVERT_END"
+      "name": "CONVERT_END"
   }, {
       "id": "MSG_SEND",
-      "label": "MSG_SEND",
+      "name": "MSG_SEND",
       "color": "blue"
   }, {
       "id": "MSG_SEND_CHECK",
-      "label": "MSG_SEND_CHECK",
+      "name": "MSG_SEND_CHECK",
       "color": "blue"
   }, {
       "id": "MSG_SEND_CHECK_FAILED",
-      "label": "MSG_SEND_CHECK_FAILED"
+      "name": "MSG_SEND_CHECK_FAILED"
   }, {
       "id": "MSG_SEND_CHECK_PASSED",
-      "label": "MSG_SEND_CHECK_PASSED"
+      "name": "MSG_SEND_CHECK_PASSED"
   }, {
       "id": "MSG_SEND_FAILED",
-      "label": "MSG_SEND_FAILED"
+      "name": "MSG_SEND_FAILED"
   }, {
       "id": "MSG_SEND_PASSED",
-      "label": "MSG_SEND_PASSED"
+      "name": "MSG_SEND_PASSED"
   }, {
       "id": "ROOT",
-      "label": "ROOT",
+      "name": "ROOT",
       "color": "red"
   }],
   "edges": [{
       "source": "AUD_MATCHED",
       "target": "MSG_SEND_CHECK",
-      "label": "0",
+      "name": "0",
       "color": "black"
   }, {
       "source": "BEGIN_CONVERT_CALC",
       "target": "CONVERT_END",
-      "label": "1",
+      "name": "1",
       "color": "black"
   }, {
       "source": "MSG_SEND",
       "target": "MSG_SEND_FAILED",
-      "label": "2",
+      "name": "2",
       "color": "black"
   }, {
       "source": "MSG_SEND",
       "target": "MSG_SEND_PASSED",
-      "label": "3",
+      "name": "3",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK",
       "target": "MSG_SEND_CHECK_FAILED",
-      "label": "4",
+      "name": "4",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK",
       "target": "MSG_SEND_CHECK_PASSED",
-      "label": "5",
+      "name": "5",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK_PASSED",
       "target": "MSG_SEND",
-      "label": "6",
+      "name": "6",
       "color": "black"
   }, {
       "source": "MSG_SEND_PASSED",
       "target": "BEGIN_CONVERT_CALC",
-      "label": "7",
+      "name": "7",
       "color": "black"
   }, {
       "source": "ROOT",
       "target": "AUD_MATCHED",
-      "label": "8",
+      "name": "8",
       "color": "black"
   }]
 }
@@ -86,52 +86,52 @@ export const mock_data_1 = {
 export const mock_data_2 = {
   "nodes": [{
       "id": "CV_CONVERTED_C1",
-      "label": "CV_CONVERTED_C1",
+      "name": "CV_CONVERTED_C1",
       "color": "blue"
   }, {
       "id": "CV_CONVERTING_C1",
-      "label": "CV_CONVERTING_C1"
+      "name": "CV_CONVERTING_C1"
   }, {
       "id": "CV_CONVERT_END_C1",
-      "label": "CV_CONVERT_END_C1",
+      "name": "CV_CONVERT_END_C1",
       "color": "blue"
   }, {
       "id": "CV_CONVERT_TIMEOUT_C1",
-      "label": "CV_CONVERT_TIMEOUT_C1"
+      "name": "CV_CONVERT_TIMEOUT_C1"
   }, {
       "id": "CV_ROOT_C1",
-      "label": "CV_ROOT_C1",
+      "name": "CV_ROOT_C1",
       "color": "red"
   }],
   "edges": [{
       "source": "CV_CONVERTED_C1",
       "target": "CV_CONVERT_END_C1",
-      "label": "0",
+      "name": "0",
       "color": "black"
   }, {
       "source": "CV_CONVERTING_C1",
       "target": "CV_CONVERTED_C1",
-      "label": "1",
+      "name": "1",
       "color": "black"
   }, {
       "source": "CV_CONVERTING_C1",
       "target": "CV_CONVERT_TIMEOUT_C1",
-      "label": "2",
+      "name": "2",
       "color": "black"
   }, {
       "source": "CV_CONVERT_END_C1",
       "target": "CV_ROOT_C1",
-      "label": "3",
+      "name": "3",
       "color": "black"
   }, {
       "source": "CV_CONVERT_TIMEOUT_C1",
       "target": "CV_CONVERT_END_C1",
-      "label": "4",
+      "name": "4",
       "color": "black"
   }, {
       "source": "CV_ROOT_C1",
       "target": "CV_CONVERTING_C1",
-      "label": "5",
+      "name": "5",
       "color": "black"
   }]
 }
@@ -139,31 +139,31 @@ export const mock_data_2 = {
 export const mock_data_3 = {
   "nodes": [{
       "id": "CC_ALL_CONVERT_END",
-      "label": "CC_ALL_CONVERT_END",
+      "name": "CC_ALL_CONVERT_END",
       "color": "blue"
   }, {
       "id": "CC_CONVERTING",
-      "label": "CC_CONVERTING",
+      "name": "CC_CONVERTING",
       "color": "blue"
   }, {
       "id": "CC_ROOT",
-      "label": "CC_ROOT",
+      "name": "CC_ROOT",
       "color": "red"
   }],
   "edges": [{
       "source": "CC_ALL_CONVERT_END",
       "target": "CC_ROOT",
-      "label": "0",
+      "name": "0",
       "color": "black"
   }, {
       "source": "CC_CONVERTING",
       "target": "CC_ALL_CONVERT_END",
-      "label": "1",
+      "name": "1",
       "color": "black"
   }, {
       "source": "CC_ROOT",
       "target": "CC_CONVERTING",
-      "label": "2",
+      "name": "2",
       "color": "black"
   }]
 }
@@ -171,142 +171,142 @@ export const mock_data_3 = {
 export const mock_data_4 = {
   "nodes": [{
       "id": "AUD_MATCHED",
-      "label": "AUD_MATCHED",
+      "name": "AUD_MATCHED",
       "color": "blue"
   }, {
       "id": "BEGIN_CONVERT_CALC",
-      "label": "BEGIN_CONVERT_CALC",
+      "name": "BEGIN_CONVERT_CALC",
       "color": "blue"
   }, {
       "id": "CONVERT_END",
-      "label": "CONVERT_END"
+      "name": "CONVERT_END"
   }, {
       "id": "MSG_SEND",
-      "label": "MSG_SEND",
+      "name": "MSG_SEND",
       "color": "blue"
   }, {
       "id": "MSG_SEND_CHECK",
-      "label": "MSG_SEND_CHECK",
+      "name": "MSG_SEND_CHECK",
       "color": "blue"
   }, {
       "id": "MSG_SEND_CHECK_FAILED",
-      "label": "MSG_SEND_CHECK_FAILED"
+      "name": "MSG_SEND_CHECK_FAILED"
   }, {
       "id": "MSG_SEND_CHECK_PASSED",
-      "label": "MSG_SEND_CHECK_PASSED"
+      "name": "MSG_SEND_CHECK_PASSED"
   }, {
       "id": "MSG_SEND_FAILED",
-      "label": "MSG_SEND_FAILED"
+      "name": "MSG_SEND_FAILED"
   }, {
       "id": "MSG_SEND_PASSED",
-      "label": "MSG_SEND_PASSED"
+      "name": "MSG_SEND_PASSED"
   }, {
       "id": "RECYCLE_BIN",
-      "label": "RECYCLE_BIN"
+      "name": "RECYCLE_BIN"
   }, {
       "id": "RE_ENTER_CHECK",
-      "label": "RE_ENTER_CHECK",
+      "name": "RE_ENTER_CHECK",
       "color": "blue"
   }, {
       "id": "RE_ENTER_FAILED",
-      "label": "RE_ENTER_FAILED"
+      "name": "RE_ENTER_FAILED"
   }, {
       "id": "RE_ENTER_PASSED",
-      "label": "RE_ENTER_PASSED"
+      "name": "RE_ENTER_PASSED"
   }, {
       "id": "ROOT",
-      "label": "ROOT",
+      "name": "ROOT",
       "color": "red"
   }],
   "edges": [{
       "source": "AUD_MATCHED",
       "target": "RE_ENTER_CHECK",
-      "label": "0",
+      "name": "0",
       "color": "black"
   }, {
       "source": "BEGIN_CONVERT_CALC",
       "target": "CONVERT_END",
-      "label": "1",
+      "name": "1",
       "color": "black"
   }, {
       "source": "BEGIN_CONVERT_CALC",
       "target": "RECYCLE_BIN",
-      "label": "2",
+      "name": "2",
       "color": "black"
   }, {
       "source": "CONVERT_END",
       "target": "RECYCLE_BIN",
-      "label": "3",
+      "name": "3",
       "color": "black"
   }, {
       "source": "MSG_SEND",
       "target": "MSG_SEND_FAILED",
-      "label": "4",
+      "name": "4",
       "color": "black"
   }, {
       "source": "MSG_SEND",
       "target": "MSG_SEND_PASSED",
-      "label": "5",
+      "name": "5",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK",
       "target": "MSG_SEND_CHECK_FAILED",
-      "label": "6",
+      "name": "6",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK",
       "target": "MSG_SEND_CHECK_PASSED",
-      "label": "7",
+      "name": "7",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK_FAILED",
       "target": "RECYCLE_BIN",
-      "label": "8",
+      "name": "8",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK_PASSED",
       "target": "MSG_SEND",
-      "label": "9",
+      "name": "9",
       "color": "black"
   }, {
       "source": "MSG_SEND_FAILED",
       "target": "RECYCLE_BIN",
-      "label": "10",
+      "name": "10",
       "color": "black"
   }, {
       "source": "MSG_SEND_PASSED",
       "target": "BEGIN_CONVERT_CALC",
-      "label": "11",
+      "name": "11",
       "color": "black"
   }, {
       "source": "RECYCLE_BIN",
       "target": "ROOT",
-      "label": "12",
+      "name": "12",
       "color": "black"
   }, {
       "source": "RE_ENTER_CHECK",
       "target": "RE_ENTER_FAILED",
-      "label": "13",
+      "name": "13",
       "color": "black"
   }, {
       "source": "RE_ENTER_CHECK",
       "target": "RE_ENTER_PASSED",
-      "label": "14",
+      "name": "14",
       "color": "black"
   }, {
       "source": "RE_ENTER_FAILED",
       "target": "RECYCLE_BIN",
-      "label": "15",
+      "name": "15",
       "color": "black"
   }, {
       "source": "RE_ENTER_PASSED",
       "target": "MSG_SEND_CHECK",
-      "label": "16",
+      "name": "16",
       "color": "black"
   }, {
       "source": "ROOT",
       "target": "AUD_MATCHED",
-      "label": "17",
+      "name": "17",
       "color": "LightGrey"
   }]
 }
@@ -314,185 +314,185 @@ export const mock_data_4 = {
 export const mock_data_5 = {
   "nodes": [{
       "id": "AUD_MATCHED",
-      "label": "AUD_MATCHED",
+      "name": "AUD_MATCHED",
       "color": "blue"
   }, {
       "id": "BEGIN_CONVERT_CALC",
-      "label": "BEGIN_CONVERT_CALC",
+      "name": "BEGIN_CONVERT_CALC",
       "color": "blue"
   }, {
       "id": "CONVERT_END",
-      "label": "CONVERT_END"
+      "name": "CONVERT_END"
   }, {
       "id": "DELAY_BEGIN",
-      "label": "DELAY_BEGIN"
+      "name": "DELAY_BEGIN"
   }, {
       "id": "DELAY_END",
-      "label": "DELAY_END"
+      "name": "DELAY_END"
   }, {
       "id": "MSG_SEND",
-      "label": "MSG_SEND",
+      "name": "MSG_SEND",
       "color": "blue"
   }, {
       "id": "MSG_SEND_CHECK",
-      "label": "MSG_SEND_CHECK",
+      "name": "MSG_SEND_CHECK",
       "color": "blue"
   }, {
       "id": "MSG_SEND_CHECK_FAILED",
-      "label": "MSG_SEND_CHECK_FAILED"
+      "name": "MSG_SEND_CHECK_FAILED"
   }, {
       "id": "MSG_SEND_CHECK_PASSED",
-      "label": "MSG_SEND_CHECK_PASSED"
+      "name": "MSG_SEND_CHECK_PASSED"
   }, {
       "id": "MSG_SEND_FAILED",
-      "label": "MSG_SEND_FAILED"
+      "name": "MSG_SEND_FAILED"
   }, {
       "id": "MSG_SEND_PASSED",
-      "label": "MSG_SEND_PASSED"
+      "name": "MSG_SEND_PASSED"
   }, {
       "id": "RECYCLE_BIN",
-      "label": "RECYCLE_BIN"
+      "name": "RECYCLE_BIN"
   }, {
       "id": "RE_ENTER_CHECK",
-      "label": "RE_ENTER_CHECK",
+      "name": "RE_ENTER_CHECK",
       "color": "blue"
   }, {
       "id": "RE_ENTER_FAILED",
-      "label": "RE_ENTER_FAILED"
+      "name": "RE_ENTER_FAILED"
   }, {
       "id": "RE_ENTER_PASSED",
-      "label": "RE_ENTER_PASSED"
+      "name": "RE_ENTER_PASSED"
   }, {
       "id": "ROOT",
-      "label": "ROOT",
+      "name": "ROOT",
       "color": "red"
   }, {
       "id": "TRIGGER_A_MATCHED",
-      "label": "TRIGGER_A_MATCHED"
+      "name": "TRIGGER_A_MATCHED"
   }, {
       "id": "TRIGGER_B_MATCHED",
-      "label": "TRIGGER_B_MATCHED",
+      "name": "TRIGGER_B_MATCHED",
       "color": "blue"
   }],
   "edges": [{
       "source": "AUD_MATCHED",
       "target": "RECYCLE_BIN",
-      "label": "0",
+      "name": "0",
       "color": "black"
   }, {
       "source": "AUD_MATCHED",
       "target": "TRIGGER_A_MATCHED",
-      "label": "1",
+      "name": "1",
       "color": "LightGrey"
   }, {
       "source": "BEGIN_CONVERT_CALC",
       "target": "CONVERT_END",
-      "label": "2",
+      "name": "2",
       "color": "black"
   }, {
       "source": "BEGIN_CONVERT_CALC",
       "target": "RECYCLE_BIN",
-      "label": "3",
+      "name": "3",
       "color": "black"
   }, {
       "source": "CONVERT_END",
       "target": "RECYCLE_BIN",
-      "label": "4",
+      "name": "4",
       "color": "black"
   }, {
       "source": "DELAY_BEGIN",
       "target": "DELAY_END",
-      "label": "5",
+      "name": "5",
       "color": "black"
   }, {
       "source": "DELAY_END",
       "target": "MSG_SEND_CHECK",
-      "label": "6",
+      "name": "6",
       "color": "black"
   }, {
       "source": "MSG_SEND",
       "target": "MSG_SEND_FAILED",
-      "label": "7",
+      "name": "7",
       "color": "black"
   }, {
       "source": "MSG_SEND",
       "target": "MSG_SEND_PASSED",
-      "label": "8",
+      "name": "8",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK",
       "target": "MSG_SEND_CHECK_FAILED",
-      "label": "9",
+      "name": "9",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK",
       "target": "MSG_SEND_CHECK_PASSED",
-      "label": "10",
+      "name": "10",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK_FAILED",
       "target": "RECYCLE_BIN",
-      "label": "11",
+      "name": "11",
       "color": "black"
   }, {
       "source": "MSG_SEND_CHECK_PASSED",
       "target": "MSG_SEND",
-      "label": "12",
+      "name": "12",
       "color": "black"
   }, {
       "source": "MSG_SEND_FAILED",
       "target": "RECYCLE_BIN",
-      "label": "13",
+      "name": "13",
       "color": "black"
   }, {
       "source": "MSG_SEND_PASSED",
       "target": "BEGIN_CONVERT_CALC",
-      "label": "14",
+      "name": "14",
       "color": "black"
   }, {
       "source": "RECYCLE_BIN",
       "target": "ROOT",
-      "label": "15",
+      "name": "15",
       "color": "black"
   }, {
       "source": "RE_ENTER_CHECK",
       "target": "RE_ENTER_FAILED",
-      "label": "16",
+      "name": "16",
       "color": "black"
   }, {
       "source": "RE_ENTER_CHECK",
       "target": "RE_ENTER_PASSED",
-      "label": "17",
+      "name": "17",
       "color": "black"
   }, {
       "source": "RE_ENTER_FAILED",
       "target": "RECYCLE_BIN",
-      "label": "18",
+      "name": "18",
       "color": "black"
   }, {
       "source": "RE_ENTER_PASSED",
       "target": "DELAY_BEGIN",
-      "label": "19",
+      "name": "19",
       "color": "black"
   }, {
       "source": "ROOT",
       "target": "AUD_MATCHED",
-      "label": "20",
+      "name": "20",
       "color": "black"
   }, {
       "source": "TRIGGER_A_MATCHED",
       "target": "TRIGGER_B_MATCHED",
-      "label": "21",
+      "name": "21",
       "color": "LightGrey"
   }, {
       "source": "TRIGGER_B_MATCHED",
       "target": "MSG_SEND",
-      "label": "22",
+      "name": "22",
       "color": "black"
   }, {
       "source": "TRIGGER_B_MATCHED",
       "target": "RE_ENTER_CHECK",
-      "label": "23",
+      "name": "23",
       "color": "black"
   }]
 }
@@ -500,762 +500,762 @@ export const mock_data_5 = {
 export const mock_data_6 = {
   "nodes": [{
       "id": "AUD_MATCHED",
-      "label": "AUD_MATCHED",
+      "name": "AUD_MATCHED",
       "color": "blue"
   }, {
       "id": "RECYCLE_BIN",
-      "label": "RECYCLE_BIN"
+      "name": "RECYCLE_BIN"
   }, {
       "id": "ROOT",
-      "label": "ROOT",
+      "name": "ROOT",
       "color": "red"
   }, {
       "id": "SU_DELAY_BEGIN_S100",
-      "label": "SU_DELAY_BEGIN_S100",
+      "name": "SU_DELAY_BEGIN_S100",
       "color": "blue"
   }, {
       "id": "SU_DELAY_BEGIN_S101",
-      "label": "SU_DELAY_BEGIN_S101",
+      "name": "SU_DELAY_BEGIN_S101",
       "color": "blue"
   }, {
       "id": "SU_DELAY_BEGIN_S102",
-      "label": "SU_DELAY_BEGIN_S102",
+      "name": "SU_DELAY_BEGIN_S102",
       "color": "blue"
   }, {
       "id": "SU_DELAY_BEGIN_S103",
-      "label": "SU_DELAY_BEGIN_S103",
+      "name": "SU_DELAY_BEGIN_S103",
       "color": "blue"
   }, {
       "id": "SU_DELAY_BEGIN_S104",
-      "label": "SU_DELAY_BEGIN_S104",
+      "name": "SU_DELAY_BEGIN_S104",
       "color": "blue"
   }, {
       "id": "SU_DELAY_BEGIN_S105",
-      "label": "SU_DELAY_BEGIN_S105",
+      "name": "SU_DELAY_BEGIN_S105",
       "color": "blue"
   }, {
       "id": "SU_DELAY_BEGIN_S106",
-      "label": "SU_DELAY_BEGIN_S106",
+      "name": "SU_DELAY_BEGIN_S106",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S100",
-      "label": "SU_DELAY_END_S100",
+      "name": "SU_DELAY_END_S100",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S101",
-      "label": "SU_DELAY_END_S101",
+      "name": "SU_DELAY_END_S101",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S102",
-      "label": "SU_DELAY_END_S102",
+      "name": "SU_DELAY_END_S102",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S103",
-      "label": "SU_DELAY_END_S103",
+      "name": "SU_DELAY_END_S103",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S104",
-      "label": "SU_DELAY_END_S104",
+      "name": "SU_DELAY_END_S104",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S105",
-      "label": "SU_DELAY_END_S105",
+      "name": "SU_DELAY_END_S105",
       "color": "blue"
   }, {
       "id": "SU_DELAY_END_S106",
-      "label": "SU_DELAY_END_S106",
+      "name": "SU_DELAY_END_S106",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S100",
-      "label": "SU_MATCHED_S100",
+      "name": "SU_MATCHED_S100",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S101",
-      "label": "SU_MATCHED_S101",
+      "name": "SU_MATCHED_S101",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S102",
-      "label": "SU_MATCHED_S102",
+      "name": "SU_MATCHED_S102",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S103",
-      "label": "SU_MATCHED_S103",
+      "name": "SU_MATCHED_S103",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S104",
-      "label": "SU_MATCHED_S104",
+      "name": "SU_MATCHED_S104",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S105",
-      "label": "SU_MATCHED_S105",
+      "name": "SU_MATCHED_S105",
       "color": "blue"
   }, {
       "id": "SU_MATCHED_S106",
-      "label": "SU_MATCHED_S106",
+      "name": "SU_MATCHED_S106",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S100",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S100"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S100"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S101",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S101"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S101"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S102",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S102"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S102"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S103",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S103"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S103"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S104",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S104"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S104"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S105",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S105"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S105"
   }, {
       "id": "SU_MSG_SEND_CHECK_FAILED_S106",
-      "label": "SU_MSG_SEND_CHECK_FAILED_S106"
+      "name": "SU_MSG_SEND_CHECK_FAILED_S106"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S100",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S100"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S100"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S101",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S101"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S101"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S102",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S102"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S102"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S103",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S103"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S103"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S104",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S104"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S104"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S105",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S105"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S105"
   }, {
       "id": "SU_MSG_SEND_CHECK_PASSED_S106",
-      "label": "SU_MSG_SEND_CHECK_PASSED_S106"
+      "name": "SU_MSG_SEND_CHECK_PASSED_S106"
   }, {
       "id": "SU_MSG_SEND_CHECK_S100",
-      "label": "SU_MSG_SEND_CHECK_S100",
+      "name": "SU_MSG_SEND_CHECK_S100",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_S101",
-      "label": "SU_MSG_SEND_CHECK_S101",
+      "name": "SU_MSG_SEND_CHECK_S101",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_S102",
-      "label": "SU_MSG_SEND_CHECK_S102",
+      "name": "SU_MSG_SEND_CHECK_S102",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_S103",
-      "label": "SU_MSG_SEND_CHECK_S103",
+      "name": "SU_MSG_SEND_CHECK_S103",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_S104",
-      "label": "SU_MSG_SEND_CHECK_S104",
+      "name": "SU_MSG_SEND_CHECK_S104",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_S105",
-      "label": "SU_MSG_SEND_CHECK_S105",
+      "name": "SU_MSG_SEND_CHECK_S105",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_CHECK_S106",
-      "label": "SU_MSG_SEND_CHECK_S106",
+      "name": "SU_MSG_SEND_CHECK_S106",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_FAILED_S100",
-      "label": "SU_MSG_SEND_FAILED_S100"
+      "name": "SU_MSG_SEND_FAILED_S100"
   }, {
       "id": "SU_MSG_SEND_FAILED_S101",
-      "label": "SU_MSG_SEND_FAILED_S101"
+      "name": "SU_MSG_SEND_FAILED_S101"
   }, {
       "id": "SU_MSG_SEND_FAILED_S102",
-      "label": "SU_MSG_SEND_FAILED_S102"
+      "name": "SU_MSG_SEND_FAILED_S102"
   }, {
       "id": "SU_MSG_SEND_FAILED_S103",
-      "label": "SU_MSG_SEND_FAILED_S103"
+      "name": "SU_MSG_SEND_FAILED_S103"
   }, {
       "id": "SU_MSG_SEND_FAILED_S104",
-      "label": "SU_MSG_SEND_FAILED_S104"
+      "name": "SU_MSG_SEND_FAILED_S104"
   }, {
       "id": "SU_MSG_SEND_FAILED_S105",
-      "label": "SU_MSG_SEND_FAILED_S105"
+      "name": "SU_MSG_SEND_FAILED_S105"
   }, {
       "id": "SU_MSG_SEND_FAILED_S106",
-      "label": "SU_MSG_SEND_FAILED_S106"
+      "name": "SU_MSG_SEND_FAILED_S106"
   }, {
       "id": "SU_MSG_SEND_PASSED_S100",
-      "label": "SU_MSG_SEND_PASSED_S100"
+      "name": "SU_MSG_SEND_PASSED_S100"
   }, {
       "id": "SU_MSG_SEND_PASSED_S101",
-      "label": "SU_MSG_SEND_PASSED_S101"
+      "name": "SU_MSG_SEND_PASSED_S101"
   }, {
       "id": "SU_MSG_SEND_PASSED_S102",
-      "label": "SU_MSG_SEND_PASSED_S102"
+      "name": "SU_MSG_SEND_PASSED_S102"
   }, {
       "id": "SU_MSG_SEND_PASSED_S103",
-      "label": "SU_MSG_SEND_PASSED_S103"
+      "name": "SU_MSG_SEND_PASSED_S103"
   }, {
       "id": "SU_MSG_SEND_PASSED_S104",
-      "label": "SU_MSG_SEND_PASSED_S104"
+      "name": "SU_MSG_SEND_PASSED_S104"
   }, {
       "id": "SU_MSG_SEND_PASSED_S105",
-      "label": "SU_MSG_SEND_PASSED_S105"
+      "name": "SU_MSG_SEND_PASSED_S105"
   }, {
       "id": "SU_MSG_SEND_PASSED_S106",
-      "label": "SU_MSG_SEND_PASSED_S106"
+      "name": "SU_MSG_SEND_PASSED_S106"
   }, {
       "id": "SU_MSG_SEND_S100",
-      "label": "SU_MSG_SEND_S100",
+      "name": "SU_MSG_SEND_S100",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_S101",
-      "label": "SU_MSG_SEND_S101",
+      "name": "SU_MSG_SEND_S101",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_S102",
-      "label": "SU_MSG_SEND_S102",
+      "name": "SU_MSG_SEND_S102",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_S103",
-      "label": "SU_MSG_SEND_S103",
+      "name": "SU_MSG_SEND_S103",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_S104",
-      "label": "SU_MSG_SEND_S104",
+      "name": "SU_MSG_SEND_S104",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_S105",
-      "label": "SU_MSG_SEND_S105",
+      "name": "SU_MSG_SEND_S105",
       "color": "blue"
   }, {
       "id": "SU_MSG_SEND_S106",
-      "label": "SU_MSG_SEND_S106",
+      "name": "SU_MSG_SEND_S106",
       "color": "blue"
   }, {
       "id": "SU_RECYCLE_BIN",
-      "label": "SU_RECYCLE_BIN"
+      "name": "SU_RECYCLE_BIN"
   }],
   "edges": [{
       "source": "AUD_MATCHED",
       "target": "SU_MATCHED_S100",
-      "label": "0",
+      "name": "0",
       "color": "LightGrey"
   }, {
       "source": "AUD_MATCHED",
       "target": "SU_MATCHED_S101",
-      "label": "1",
+      "name": "1",
       "color": "LightGrey"
   }, {
       "source": "RECYCLE_BIN",
       "target": "ROOT",
-      "label": "2",
+      "name": "2",
       "color": "black"
   }, {
       "source": "ROOT",
       "target": "AUD_MATCHED",
-      "label": "3",
+      "name": "3",
       "color": "LightGrey"
   }, {
       "source": "SU_DELAY_BEGIN_S100",
       "target": "SU_DELAY_END_S100",
-      "label": "4",
+      "name": "4",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S100",
       "target": "SU_RECYCLE_BIN",
-      "label": "5",
+      "name": "5",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S101",
       "target": "SU_DELAY_END_S101",
-      "label": "6",
+      "name": "6",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S101",
       "target": "SU_RECYCLE_BIN",
-      "label": "7",
+      "name": "7",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S102",
       "target": "SU_DELAY_END_S102",
-      "label": "8",
+      "name": "8",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S102",
       "target": "SU_RECYCLE_BIN",
-      "label": "9",
+      "name": "9",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S103",
       "target": "SU_DELAY_END_S103",
-      "label": "10",
+      "name": "10",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S103",
       "target": "SU_RECYCLE_BIN",
-      "label": "11",
+      "name": "11",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S104",
       "target": "SU_DELAY_END_S104",
-      "label": "12",
+      "name": "12",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S104",
       "target": "SU_RECYCLE_BIN",
-      "label": "13",
+      "name": "13",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S105",
       "target": "SU_DELAY_END_S105",
-      "label": "14",
+      "name": "14",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S105",
       "target": "SU_RECYCLE_BIN",
-      "label": "15",
+      "name": "15",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S106",
       "target": "SU_DELAY_END_S106",
-      "label": "16",
+      "name": "16",
       "color": "black"
   }, {
       "source": "SU_DELAY_BEGIN_S106",
       "target": "SU_RECYCLE_BIN",
-      "label": "17",
+      "name": "17",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S100",
       "target": "SU_MSG_SEND_CHECK_S100",
-      "label": "18",
+      "name": "18",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S101",
       "target": "SU_MSG_SEND_CHECK_S101",
-      "label": "19",
+      "name": "19",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S102",
       "target": "SU_MSG_SEND_CHECK_S102",
-      "label": "20",
+      "name": "20",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S103",
       "target": "SU_MSG_SEND_CHECK_S103",
-      "label": "21",
+      "name": "21",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S104",
       "target": "SU_MSG_SEND_CHECK_S104",
-      "label": "22",
+      "name": "22",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S105",
       "target": "SU_MSG_SEND_CHECK_S105",
-      "label": "23",
+      "name": "23",
       "color": "black"
   }, {
       "source": "SU_DELAY_END_S106",
       "target": "SU_MSG_SEND_CHECK_S106",
-      "label": "24",
+      "name": "24",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S100",
       "target": "SU_DELAY_BEGIN_S100",
-      "label": "25",
+      "name": "25",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S101",
       "target": "SU_DELAY_BEGIN_S101",
-      "label": "26",
+      "name": "26",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S102",
       "target": "SU_DELAY_BEGIN_S102",
-      "label": "27",
+      "name": "27",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S103",
       "target": "SU_DELAY_BEGIN_S103",
-      "label": "28",
+      "name": "28",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S104",
       "target": "SU_DELAY_BEGIN_S104",
-      "label": "29",
+      "name": "29",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S105",
       "target": "SU_DELAY_BEGIN_S105",
-      "label": "30",
+      "name": "30",
       "color": "black"
   }, {
       "source": "SU_MATCHED_S106",
       "target": "SU_DELAY_BEGIN_S106",
-      "label": "31",
+      "name": "31",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S100",
       "target": "SU_RECYCLE_BIN",
-      "label": "32",
+      "name": "32",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S101",
       "target": "SU_RECYCLE_BIN",
-      "label": "33",
+      "name": "33",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S102",
       "target": "SU_RECYCLE_BIN",
-      "label": "34",
+      "name": "34",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S103",
       "target": "SU_RECYCLE_BIN",
-      "label": "35",
+      "name": "35",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S104",
       "target": "SU_RECYCLE_BIN",
-      "label": "36",
+      "name": "36",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S105",
       "target": "SU_RECYCLE_BIN",
-      "label": "37",
+      "name": "37",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_FAILED_S106",
       "target": "SU_RECYCLE_BIN",
-      "label": "38",
+      "name": "38",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S100",
       "target": "SU_MSG_SEND_S100",
-      "label": "39",
+      "name": "39",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S101",
       "target": "SU_MSG_SEND_S101",
-      "label": "40",
+      "name": "40",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S102",
       "target": "SU_MSG_SEND_S102",
-      "label": "41",
+      "name": "41",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S103",
       "target": "SU_MSG_SEND_S103",
-      "label": "42",
+      "name": "42",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S104",
       "target": "SU_MSG_SEND_S104",
-      "label": "43",
+      "name": "43",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S105",
       "target": "SU_MSG_SEND_S105",
-      "label": "44",
+      "name": "44",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_PASSED_S106",
       "target": "SU_MSG_SEND_S106",
-      "label": "45",
+      "name": "45",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S100",
       "target": "SU_MSG_SEND_CHECK_FAILED_S100",
-      "label": "46",
+      "name": "46",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S100",
       "target": "SU_MSG_SEND_CHECK_PASSED_S100",
-      "label": "47",
+      "name": "47",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S100",
       "target": "SU_RECYCLE_BIN",
-      "label": "48",
+      "name": "48",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S101",
       "target": "SU_MSG_SEND_CHECK_FAILED_S101",
-      "label": "49",
+      "name": "49",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S101",
       "target": "SU_MSG_SEND_CHECK_PASSED_S101",
-      "label": "50",
+      "name": "50",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S101",
       "target": "SU_RECYCLE_BIN",
-      "label": "51",
+      "name": "51",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S102",
       "target": "SU_MSG_SEND_CHECK_FAILED_S102",
-      "label": "52",
+      "name": "52",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S102",
       "target": "SU_MSG_SEND_CHECK_PASSED_S102",
-      "label": "53",
+      "name": "53",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S102",
       "target": "SU_RECYCLE_BIN",
-      "label": "54",
+      "name": "54",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S103",
       "target": "SU_MSG_SEND_CHECK_FAILED_S103",
-      "label": "55",
+      "name": "55",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S103",
       "target": "SU_MSG_SEND_CHECK_PASSED_S103",
-      "label": "56",
+      "name": "56",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S103",
       "target": "SU_RECYCLE_BIN",
-      "label": "57",
+      "name": "57",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S104",
       "target": "SU_MSG_SEND_CHECK_FAILED_S104",
-      "label": "58",
+      "name": "58",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S104",
       "target": "SU_MSG_SEND_CHECK_PASSED_S104",
-      "label": "59",
+      "name": "59",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S104",
       "target": "SU_RECYCLE_BIN",
-      "label": "60",
+      "name": "60",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S105",
       "target": "SU_MSG_SEND_CHECK_FAILED_S105",
-      "label": "61",
+      "name": "61",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S105",
       "target": "SU_MSG_SEND_CHECK_PASSED_S105",
-      "label": "62",
+      "name": "62",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S105",
       "target": "SU_RECYCLE_BIN",
-      "label": "63",
+      "name": "63",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S106",
       "target": "SU_MSG_SEND_CHECK_FAILED_S106",
-      "label": "64",
+      "name": "64",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S106",
       "target": "SU_MSG_SEND_CHECK_PASSED_S106",
-      "label": "65",
+      "name": "65",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_CHECK_S106",
       "target": "SU_RECYCLE_BIN",
-      "label": "66",
+      "name": "66",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S100",
       "target": "SU_RECYCLE_BIN",
-      "label": "67",
+      "name": "67",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S101",
       "target": "SU_RECYCLE_BIN",
-      "label": "68",
+      "name": "68",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S102",
       "target": "SU_RECYCLE_BIN",
-      "label": "69",
+      "name": "69",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S103",
       "target": "SU_RECYCLE_BIN",
-      "label": "70",
+      "name": "70",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S104",
       "target": "SU_RECYCLE_BIN",
-      "label": "71",
+      "name": "71",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S105",
       "target": "SU_RECYCLE_BIN",
-      "label": "72",
+      "name": "72",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_FAILED_S106",
       "target": "SU_RECYCLE_BIN",
-      "label": "73",
+      "name": "73",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_PASSED_S100",
       "target": "SU_MATCHED_S102",
-      "label": "74",
+      "name": "74",
       "color": "LightGrey"
   }, {
       "source": "SU_MSG_SEND_PASSED_S100",
       "target": "SU_MATCHED_S103",
-      "label": "75",
+      "name": "75",
       "color": "LightGrey"
   }, {
       "source": "SU_MSG_SEND_PASSED_S101",
       "target": "SU_MATCHED_S106",
-      "label": "76",
+      "name": "76",
       "color": "LightGrey"
   }, {
       "source": "SU_MSG_SEND_PASSED_S102",
       "target": "SU_MATCHED_S105",
-      "label": "77",
+      "name": "77",
       "color": "LightGrey"
   }, {
       "source": "SU_MSG_SEND_PASSED_S103",
       "target": "SU_MATCHED_S104",
-      "label": "78",
+      "name": "78",
       "color": "LightGrey"
   }, {
       "source": "SU_MSG_SEND_PASSED_S104",
       "target": "SU_RECYCLE_BIN",
-      "label": "79",
+      "name": "79",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_PASSED_S105",
       "target": "SU_RECYCLE_BIN",
-      "label": "80",
+      "name": "80",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_PASSED_S106",
       "target": "SU_RECYCLE_BIN",
-      "label": "81",
+      "name": "81",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S100",
       "target": "SU_MSG_SEND_FAILED_S100",
-      "label": "82",
+      "name": "82",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S100",
       "target": "SU_MSG_SEND_PASSED_S100",
-      "label": "83",
+      "name": "83",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S100",
       "target": "SU_RECYCLE_BIN",
-      "label": "84",
+      "name": "84",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S101",
       "target": "SU_MSG_SEND_FAILED_S101",
-      "label": "85",
+      "name": "85",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S101",
       "target": "SU_MSG_SEND_PASSED_S101",
-      "label": "86",
+      "name": "86",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S101",
       "target": "SU_RECYCLE_BIN",
-      "label": "87",
+      "name": "87",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S102",
       "target": "SU_MSG_SEND_FAILED_S102",
-      "label": "88",
+      "name": "88",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S102",
       "target": "SU_MSG_SEND_PASSED_S102",
-      "label": "89",
+      "name": "89",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S102",
       "target": "SU_RECYCLE_BIN",
-      "label": "90",
+      "name": "90",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S103",
       "target": "SU_MSG_SEND_FAILED_S103",
-      "label": "91",
+      "name": "91",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S103",
       "target": "SU_MSG_SEND_PASSED_S103",
-      "label": "92",
+      "name": "92",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S103",
       "target": "SU_RECYCLE_BIN",
-      "label": "93",
+      "name": "93",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S104",
       "target": "SU_MSG_SEND_FAILED_S104",
-      "label": "94",
+      "name": "94",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S104",
       "target": "SU_MSG_SEND_PASSED_S104",
-      "label": "95",
+      "name": "95",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S104",
       "target": "SU_RECYCLE_BIN",
-      "label": "96",
+      "name": "96",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S105",
       "target": "SU_MSG_SEND_FAILED_S105",
-      "label": "97",
+      "name": "97",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S105",
       "target": "SU_MSG_SEND_PASSED_S105",
-      "label": "98",
+      "name": "98",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S105",
       "target": "SU_RECYCLE_BIN",
-      "label": "99",
+      "name": "99",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S106",
       "target": "SU_MSG_SEND_FAILED_S106",
-      "label": "100",
+      "name": "100",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S106",
       "target": "SU_MSG_SEND_PASSED_S106",
-      "label": "101",
+      "name": "101",
       "color": "black"
   }, {
       "source": "SU_MSG_SEND_S106",
       "target": "SU_RECYCLE_BIN",
-      "label": "102",
+      "name": "102",
       "color": "black"
   }, {
       "source": "SU_RECYCLE_BIN",
       "target": "RECYCLE_BIN",
-      "label": "103",
+      "name": "103",
       "color": "black"
   }]
 }

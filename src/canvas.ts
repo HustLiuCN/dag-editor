@@ -121,24 +121,6 @@ export class Canvas {
 			ctx.lineWidth = 2
 			ctx.stroke(path)
 			// paint anchors
-			const { anchors } = node
-			// TODO
-			// if (this.hasStore) {
-			this.paths.anchors[node.id] = []
-			this.paths.activeAnchors[node.id] = []
-			// }
-			Object.keys(anchors).forEach(k => {
-				if (anchors[k]) {
-					for (let i = 0; i < anchors[k]; i ++) {
-						let pos = getAnchorPos(node, k, i, anchors[k])
-						let [anchorPath, activeAnchorPath] = this._paintAnchor(pos)
-						ctx.fill(anchorPath)
-						ctx.stroke(anchorPath)
-						this.paths.anchors[node.id].push({ type: k, index: i, path: anchorPath })
-						this.paths.activeAnchors[node.id].push({ type: k, index: i, path: activeAnchorPath })
-					}
-				}
-			})
 			ctx.restore()
 		}
 		// paint text
@@ -217,36 +199,55 @@ export class Canvas {
 	paintEdge(
 		{ x: sx, y: sy }: Editor.IPos,	// start
 		{ x: ex, y: ey }: Editor.IPos,	// end
-		opts?: { id?: string, selected?: boolean, needTranslate?: boolean }		// options
+		{
+			id,
+			selected,
+			gap = 1,
+			maxWidth,
+			isLeaf,
+		}: { id?: string, selected?: boolean, gap?: number, maxWidth?: number, isLeaf?: boolean }		// options
 	) {
 		const { ctx, ratio: r } = this
 		sx *= r
 		sy *= r
 		ex *= r
 		ey *= r
-		if (opts.needTranslate) {
-			ex -= this.translateInfo.x
-			ey -= this.translateInfo.y
-		}
+		maxWidth *= r
 		const path = new Path2D()
+		// 连线起点
 		ctx.beginPath()
 		path.moveTo(sx, sy)
-		let diffY = Math.abs(ey - sy)
-		const cp1 = [sx, sy + diffY / 4]
-		const cp2 = [ex, ey - diffY / 2]
-		path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
-		if (opts && opts.selected) {
+		// 计算控制点
+		const diffY = 40 * r
+		if (gap === 1) {
+			// let diffY = Math.abs(ey - sy)
+			const cp1 = [sx, sy + diffY / 4]
+			const cp2 = [ex, sy + diffY / 4]
+			path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
+		} else {
+			const lx = sx - maxWidth / 2
+			const cp1 = [sx, sy + diffY / 4]
+			const cp2 = [lx, sy + diffY / 4]
+			const cp3 = [lx, ey - diffY / 4]
+			const cp4 = [ex, ey - diffY / 4]
+			path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY / 2)
+			path.lineTo(lx, ey - diffY / 2)
+			path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey)
+		}
+
+		// 连线
+		if (selected) {
 			ctx.save()
 			ctx.lineWidth = 2 * r
+			ctx.strokeStyle = COLOR.blue
 			ctx.stroke(path)
 			ctx.restore()
 		} else {
 			ctx.stroke(path)
 		}
-		if (opts && opts.id && this.hasStore) {
-			this.paths.edges[opts.id] = path
-		}
 		ctx.closePath()
+		// 缓存路径
+		this.paths.edges[id] = path
 		this._paintArrow({ x: ex, y: ey })
 	}
 	checkOnEdge(eid: string, pos: Editor.IPos) {

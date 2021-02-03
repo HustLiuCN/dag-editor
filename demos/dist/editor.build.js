@@ -98,9 +98,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src_dom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../src/dom */ "./src/dom.ts");
 /* harmony import */ var _src_dom__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_src_dom__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _mock_data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../mock-data/dag-shapes */ "./mock-data/dag-shapes.js");
-/* harmony import */ var _src_index__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../src/index */ "./src/index.ts");
-/* harmony import */ var _src_index__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_src_index__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _src__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../src */ "./src/index.ts");
+/* harmony import */ var _src__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_src__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ "./demos/js/store.js");
+/* harmony import */ var _mock_data_sd_mock__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../mock-data/sd-mock */ "./mock-data/sd-mock.js");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -115,88 +116,33 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+
 /**
  * 应用实例
  */
 // example
 
-var editor = new _src_index__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
+var editor = new _src__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
   container: '#container',
   page: '#editor',
-  itempanel: '#itempanel',
-  config: {
-    grid: true
-  }
+  itempanel: '#itempanel' // config: {
+  //   grid: true,
+  // },
+
 });
 /**
  * 数据
  * { nodes, edges }
  */
 
-var mockNodes = [{
-  // 固定填充
-  "shape": "shape-001",
-  "w": 160,
-  "h": 36,
-  "anchors": {
-    "input": 1,
-    "output": 1
-  },
-  // 源数据字段
-  "name": "Node-ABC",
-  "id": "node1",
-  "color": "#b3e5fc",
-  // 计算后添加
-  "x": 216,
-  "y": 113
-}, {
-  "shape": "shape-001",
-  "w": 160,
-  "h": 36,
-  "anchors": {
-    "input": 1,
-    "output": 1
-  },
-  "x": 416,
-  "y": 313,
-  "name": "测试节点2",
-  "id": "node2",
-  "color": "#b3e5fc"
-}];
-var mockEdges = [{
-  // 源数据
-  source: 'node1',
-  target: 'node2',
-  // 固定填充
-  id: 'edge1',
-  sourceAnchorIndex: 0,
-  targetAnchorIndex: 0
-}];
-editor.setData({
-  nodes: mockNodes,
-  edges: mockEdges
-}); // example data store
-
-var store = new _store__WEBPACK_IMPORTED_MODULE_3__["Store"]({
-  editor: editor
-});
+editor.setData(Object(_src__WEBPACK_IMPORTED_MODULE_2__["figure"])(_mock_data_sd_mock__WEBPACK_IMPORTED_MODULE_4__["mock_data_6"]));
 /**
  * 预留接口
  */
 
 editor.on('selectedNodeChange', function (node) {
-  console.log('selected node changed', node);
-  var oNodePanel = Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#node-panel');
-  var oCanvasPanel = Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#canvas-panel');
-
-  if (node) {
-    oNodePanel.classList.add('show');
-    oCanvasPanel.classList.remove('show');
-    store.currentNode = node;
-  } else {
-    oNodePanel.classList.remove('show');
-    oCanvasPanel.classList.add('show');
-  }
+  // console.log('selected node changed', node)
+  console.log(node);
 });
 
 var _iterator = _createForOfIteratorHelper(_mock_data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__["default"]),
@@ -206,29 +152,12 @@ try {
   for (_iterator.s(); !(_step = _iterator.n()).done;) {
     var shape = _step.value;
     editor.registerShape(shape.shape, shape);
-  } // check source data
-
+  }
 } catch (err) {
   _iterator.e(err);
 } finally {
   _iterator.f();
 }
-
-Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#source-btn').addEventListener('click', function () {
-  editor.resize();
-  var data = editor.getData();
-  console.log(data);
-  Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#code').innerHTML = JSON.stringify(data);
-  editor.setConfig({
-    grid: true
-  });
-});
-Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#export-btn').addEventListener('click', function () {
-  console.log('===save===');
-  editor.saveFile().then(function (imgURL) {
-    Object(_src_dom__WEBPACK_IMPORTED_MODULE_0__["getDom"])('#preview').src = imgURL;
-  });
-});
 
 /***/ }),
 
@@ -333,6 +262,1280 @@ var shapes = [{
 // },
 ];
 /* harmony default export */ __webpack_exports__["default"] = (shapes);
+
+/***/ }),
+
+/***/ "./mock-data/sd-mock.js":
+/*!******************************!*\
+  !*** ./mock-data/sd-mock.js ***!
+  \******************************/
+/*! exports provided: mock_data_1, mock_data_2, mock_data_3, mock_data_4, mock_data_5, mock_data_6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mock_data_1", function() { return mock_data_1; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mock_data_2", function() { return mock_data_2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mock_data_3", function() { return mock_data_3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mock_data_4", function() { return mock_data_4; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mock_data_5", function() { return mock_data_5; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "mock_data_6", function() { return mock_data_6; });
+var mock_data_1 = {
+  "nodes": [{
+    "id": "AUD_MATCHED",
+    "name": "AUD_MATCHED",
+    "color": "blue"
+  }, {
+    "id": "BEGIN_CONVERT_CALC",
+    "name": "BEGIN_CONVERT_CALC",
+    "color": "blue"
+  }, {
+    "id": "CONVERT_END",
+    "name": "CONVERT_END"
+  }, {
+    "id": "MSG_SEND",
+    "name": "MSG_SEND",
+    "color": "blue"
+  }, {
+    "id": "MSG_SEND_CHECK",
+    "name": "MSG_SEND_CHECK",
+    "color": "blue"
+  }, {
+    "id": "MSG_SEND_CHECK_FAILED",
+    "name": "MSG_SEND_CHECK_FAILED"
+  }, {
+    "id": "MSG_SEND_CHECK_PASSED",
+    "name": "MSG_SEND_CHECK_PASSED"
+  }, {
+    "id": "MSG_SEND_FAILED",
+    "name": "MSG_SEND_FAILED"
+  }, {
+    "id": "MSG_SEND_PASSED",
+    "name": "MSG_SEND_PASSED"
+  }, {
+    "id": "ROOT",
+    "name": "ROOT",
+    "color": "red"
+  }],
+  "edges": [{
+    "source": "AUD_MATCHED",
+    "target": "MSG_SEND_CHECK",
+    "name": "0",
+    "color": "black"
+  }, {
+    "source": "BEGIN_CONVERT_CALC",
+    "target": "CONVERT_END",
+    "name": "1",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND",
+    "target": "MSG_SEND_FAILED",
+    "name": "2",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND",
+    "target": "MSG_SEND_PASSED",
+    "name": "3",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK",
+    "target": "MSG_SEND_CHECK_FAILED",
+    "name": "4",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK",
+    "target": "MSG_SEND_CHECK_PASSED",
+    "name": "5",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK_PASSED",
+    "target": "MSG_SEND",
+    "name": "6",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_PASSED",
+    "target": "BEGIN_CONVERT_CALC",
+    "name": "7",
+    "color": "black"
+  }, {
+    "source": "ROOT",
+    "target": "AUD_MATCHED",
+    "name": "8",
+    "color": "black"
+  }]
+};
+var mock_data_2 = {
+  "nodes": [{
+    "id": "CV_CONVERTED_C1",
+    "name": "CV_CONVERTED_C1",
+    "color": "blue"
+  }, {
+    "id": "CV_CONVERTING_C1",
+    "name": "CV_CONVERTING_C1"
+  }, {
+    "id": "CV_CONVERT_END_C1",
+    "name": "CV_CONVERT_END_C1",
+    "color": "blue"
+  }, {
+    "id": "CV_CONVERT_TIMEOUT_C1",
+    "name": "CV_CONVERT_TIMEOUT_C1"
+  }, {
+    "id": "CV_ROOT_C1",
+    "name": "CV_ROOT_C1",
+    "color": "red"
+  }],
+  "edges": [{
+    "source": "CV_CONVERTED_C1",
+    "target": "CV_CONVERT_END_C1",
+    "name": "0",
+    "color": "black"
+  }, {
+    "source": "CV_CONVERTING_C1",
+    "target": "CV_CONVERTED_C1",
+    "name": "1",
+    "color": "black"
+  }, {
+    "source": "CV_CONVERTING_C1",
+    "target": "CV_CONVERT_TIMEOUT_C1",
+    "name": "2",
+    "color": "black"
+  }, {
+    "source": "CV_CONVERT_END_C1",
+    "target": "CV_ROOT_C1",
+    "name": "3",
+    "color": "black"
+  }, {
+    "source": "CV_CONVERT_TIMEOUT_C1",
+    "target": "CV_CONVERT_END_C1",
+    "name": "4",
+    "color": "black"
+  }, {
+    "source": "CV_ROOT_C1",
+    "target": "CV_CONVERTING_C1",
+    "name": "5",
+    "color": "black"
+  }]
+};
+var mock_data_3 = {
+  "nodes": [{
+    "id": "CC_ALL_CONVERT_END",
+    "name": "CC_ALL_CONVERT_END",
+    "color": "blue"
+  }, {
+    "id": "CC_CONVERTING",
+    "name": "CC_CONVERTING",
+    "color": "blue"
+  }, {
+    "id": "CC_ROOT",
+    "name": "CC_ROOT",
+    "color": "red"
+  }],
+  "edges": [{
+    "source": "CC_ALL_CONVERT_END",
+    "target": "CC_ROOT",
+    "name": "0",
+    "color": "black"
+  }, {
+    "source": "CC_CONVERTING",
+    "target": "CC_ALL_CONVERT_END",
+    "name": "1",
+    "color": "black"
+  }, {
+    "source": "CC_ROOT",
+    "target": "CC_CONVERTING",
+    "name": "2",
+    "color": "black"
+  }]
+};
+var mock_data_4 = {
+  "nodes": [{
+    "id": "AUD_MATCHED",
+    "name": "AUD_MATCHED",
+    "color": "blue"
+  }, {
+    "id": "BEGIN_CONVERT_CALC",
+    "name": "BEGIN_CONVERT_CALC",
+    "color": "blue"
+  }, {
+    "id": "CONVERT_END",
+    "name": "CONVERT_END"
+  }, {
+    "id": "MSG_SEND",
+    "name": "MSG_SEND",
+    "color": "blue"
+  }, {
+    "id": "MSG_SEND_CHECK",
+    "name": "MSG_SEND_CHECK",
+    "color": "blue"
+  }, {
+    "id": "MSG_SEND_CHECK_FAILED",
+    "name": "MSG_SEND_CHECK_FAILED"
+  }, {
+    "id": "MSG_SEND_CHECK_PASSED",
+    "name": "MSG_SEND_CHECK_PASSED"
+  }, {
+    "id": "MSG_SEND_FAILED",
+    "name": "MSG_SEND_FAILED"
+  }, {
+    "id": "MSG_SEND_PASSED",
+    "name": "MSG_SEND_PASSED"
+  }, {
+    "id": "RECYCLE_BIN",
+    "name": "RECYCLE_BIN"
+  }, {
+    "id": "RE_ENTER_CHECK",
+    "name": "RE_ENTER_CHECK",
+    "color": "blue"
+  }, {
+    "id": "RE_ENTER_FAILED",
+    "name": "RE_ENTER_FAILED"
+  }, {
+    "id": "RE_ENTER_PASSED",
+    "name": "RE_ENTER_PASSED"
+  }, {
+    "id": "ROOT",
+    "name": "ROOT",
+    "color": "red"
+  }],
+  "edges": [{
+    "source": "AUD_MATCHED",
+    "target": "RE_ENTER_CHECK",
+    "name": "0",
+    "color": "black"
+  }, {
+    "source": "BEGIN_CONVERT_CALC",
+    "target": "CONVERT_END",
+    "name": "1",
+    "color": "black"
+  }, {
+    "source": "BEGIN_CONVERT_CALC",
+    "target": "RECYCLE_BIN",
+    "name": "2",
+    "color": "black"
+  }, {
+    "source": "CONVERT_END",
+    "target": "RECYCLE_BIN",
+    "name": "3",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND",
+    "target": "MSG_SEND_FAILED",
+    "name": "4",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND",
+    "target": "MSG_SEND_PASSED",
+    "name": "5",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK",
+    "target": "MSG_SEND_CHECK_FAILED",
+    "name": "6",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK",
+    "target": "MSG_SEND_CHECK_PASSED",
+    "name": "7",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK_FAILED",
+    "target": "RECYCLE_BIN",
+    "name": "8",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK_PASSED",
+    "target": "MSG_SEND",
+    "name": "9",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_FAILED",
+    "target": "RECYCLE_BIN",
+    "name": "10",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_PASSED",
+    "target": "BEGIN_CONVERT_CALC",
+    "name": "11",
+    "color": "black"
+  }, {
+    "source": "RECYCLE_BIN",
+    "target": "ROOT",
+    "name": "12",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_CHECK",
+    "target": "RE_ENTER_FAILED",
+    "name": "13",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_CHECK",
+    "target": "RE_ENTER_PASSED",
+    "name": "14",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_FAILED",
+    "target": "RECYCLE_BIN",
+    "name": "15",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_PASSED",
+    "target": "MSG_SEND_CHECK",
+    "name": "16",
+    "color": "black"
+  }, {
+    "source": "ROOT",
+    "target": "AUD_MATCHED",
+    "name": "17",
+    "color": "LightGrey"
+  }]
+};
+var mock_data_5 = {
+  "nodes": [{
+    "id": "AUD_MATCHED",
+    "name": "AUD_MATCHED",
+    "color": "blue"
+  }, {
+    "id": "BEGIN_CONVERT_CALC",
+    "name": "BEGIN_CONVERT_CALC",
+    "color": "blue"
+  }, {
+    "id": "CONVERT_END",
+    "name": "CONVERT_END"
+  }, {
+    "id": "DELAY_BEGIN",
+    "name": "DELAY_BEGIN"
+  }, {
+    "id": "DELAY_END",
+    "name": "DELAY_END"
+  }, {
+    "id": "MSG_SEND",
+    "name": "MSG_SEND",
+    "color": "blue"
+  }, {
+    "id": "MSG_SEND_CHECK",
+    "name": "MSG_SEND_CHECK",
+    "color": "blue"
+  }, {
+    "id": "MSG_SEND_CHECK_FAILED",
+    "name": "MSG_SEND_CHECK_FAILED"
+  }, {
+    "id": "MSG_SEND_CHECK_PASSED",
+    "name": "MSG_SEND_CHECK_PASSED"
+  }, {
+    "id": "MSG_SEND_FAILED",
+    "name": "MSG_SEND_FAILED"
+  }, {
+    "id": "MSG_SEND_PASSED",
+    "name": "MSG_SEND_PASSED"
+  }, {
+    "id": "RECYCLE_BIN",
+    "name": "RECYCLE_BIN"
+  }, {
+    "id": "RE_ENTER_CHECK",
+    "name": "RE_ENTER_CHECK",
+    "color": "blue"
+  }, {
+    "id": "RE_ENTER_FAILED",
+    "name": "RE_ENTER_FAILED"
+  }, {
+    "id": "RE_ENTER_PASSED",
+    "name": "RE_ENTER_PASSED"
+  }, {
+    "id": "ROOT",
+    "name": "ROOT",
+    "color": "red"
+  }, {
+    "id": "TRIGGER_A_MATCHED",
+    "name": "TRIGGER_A_MATCHED"
+  }, {
+    "id": "TRIGGER_B_MATCHED",
+    "name": "TRIGGER_B_MATCHED",
+    "color": "blue"
+  }],
+  "edges": [{
+    "source": "AUD_MATCHED",
+    "target": "RECYCLE_BIN",
+    "name": "0",
+    "color": "black"
+  }, {
+    "source": "AUD_MATCHED",
+    "target": "TRIGGER_A_MATCHED",
+    "name": "1",
+    "color": "LightGrey"
+  }, {
+    "source": "BEGIN_CONVERT_CALC",
+    "target": "CONVERT_END",
+    "name": "2",
+    "color": "black"
+  }, {
+    "source": "BEGIN_CONVERT_CALC",
+    "target": "RECYCLE_BIN",
+    "name": "3",
+    "color": "black"
+  }, {
+    "source": "CONVERT_END",
+    "target": "RECYCLE_BIN",
+    "name": "4",
+    "color": "black"
+  }, {
+    "source": "DELAY_BEGIN",
+    "target": "DELAY_END",
+    "name": "5",
+    "color": "black"
+  }, {
+    "source": "DELAY_END",
+    "target": "MSG_SEND_CHECK",
+    "name": "6",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND",
+    "target": "MSG_SEND_FAILED",
+    "name": "7",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND",
+    "target": "MSG_SEND_PASSED",
+    "name": "8",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK",
+    "target": "MSG_SEND_CHECK_FAILED",
+    "name": "9",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK",
+    "target": "MSG_SEND_CHECK_PASSED",
+    "name": "10",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK_FAILED",
+    "target": "RECYCLE_BIN",
+    "name": "11",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_CHECK_PASSED",
+    "target": "MSG_SEND",
+    "name": "12",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_FAILED",
+    "target": "RECYCLE_BIN",
+    "name": "13",
+    "color": "black"
+  }, {
+    "source": "MSG_SEND_PASSED",
+    "target": "BEGIN_CONVERT_CALC",
+    "name": "14",
+    "color": "black"
+  }, {
+    "source": "RECYCLE_BIN",
+    "target": "ROOT",
+    "name": "15",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_CHECK",
+    "target": "RE_ENTER_FAILED",
+    "name": "16",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_CHECK",
+    "target": "RE_ENTER_PASSED",
+    "name": "17",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_FAILED",
+    "target": "RECYCLE_BIN",
+    "name": "18",
+    "color": "black"
+  }, {
+    "source": "RE_ENTER_PASSED",
+    "target": "DELAY_BEGIN",
+    "name": "19",
+    "color": "black"
+  }, {
+    "source": "ROOT",
+    "target": "AUD_MATCHED",
+    "name": "20",
+    "color": "black"
+  }, {
+    "source": "TRIGGER_A_MATCHED",
+    "target": "TRIGGER_B_MATCHED",
+    "name": "21",
+    "color": "LightGrey"
+  }, {
+    "source": "TRIGGER_B_MATCHED",
+    "target": "MSG_SEND",
+    "name": "22",
+    "color": "black"
+  }, {
+    "source": "TRIGGER_B_MATCHED",
+    "target": "RE_ENTER_CHECK",
+    "name": "23",
+    "color": "black"
+  }]
+};
+var mock_data_6 = {
+  "nodes": [{
+    "id": "AUD_MATCHED",
+    "name": "AUD_MATCHED",
+    "color": "blue"
+  }, {
+    "id": "RECYCLE_BIN",
+    "name": "RECYCLE_BIN"
+  }, {
+    "id": "ROOT",
+    "name": "ROOT",
+    "color": "red"
+  }, {
+    "id": "SU_DELAY_BEGIN_S100",
+    "name": "SU_DELAY_BEGIN_S100",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_BEGIN_S101",
+    "name": "SU_DELAY_BEGIN_S101",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_BEGIN_S102",
+    "name": "SU_DELAY_BEGIN_S102",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_BEGIN_S103",
+    "name": "SU_DELAY_BEGIN_S103",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_BEGIN_S104",
+    "name": "SU_DELAY_BEGIN_S104",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_BEGIN_S105",
+    "name": "SU_DELAY_BEGIN_S105",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_BEGIN_S106",
+    "name": "SU_DELAY_BEGIN_S106",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S100",
+    "name": "SU_DELAY_END_S100",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S101",
+    "name": "SU_DELAY_END_S101",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S102",
+    "name": "SU_DELAY_END_S102",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S103",
+    "name": "SU_DELAY_END_S103",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S104",
+    "name": "SU_DELAY_END_S104",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S105",
+    "name": "SU_DELAY_END_S105",
+    "color": "blue"
+  }, {
+    "id": "SU_DELAY_END_S106",
+    "name": "SU_DELAY_END_S106",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S100",
+    "name": "SU_MATCHED_S100",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S101",
+    "name": "SU_MATCHED_S101",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S102",
+    "name": "SU_MATCHED_S102",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S103",
+    "name": "SU_MATCHED_S103",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S104",
+    "name": "SU_MATCHED_S104",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S105",
+    "name": "SU_MATCHED_S105",
+    "color": "blue"
+  }, {
+    "id": "SU_MATCHED_S106",
+    "name": "SU_MATCHED_S106",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S100",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S100"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S101",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S101"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S102",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S102"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S103",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S103"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S104",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S104"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S105",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S105"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_FAILED_S106",
+    "name": "SU_MSG_SEND_CHECK_FAILED_S106"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S100",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S100"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S101",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S101"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S102",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S102"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S103",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S103"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S104",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S104"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S105",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S105"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_PASSED_S106",
+    "name": "SU_MSG_SEND_CHECK_PASSED_S106"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S100",
+    "name": "SU_MSG_SEND_CHECK_S100",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S101",
+    "name": "SU_MSG_SEND_CHECK_S101",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S102",
+    "name": "SU_MSG_SEND_CHECK_S102",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S103",
+    "name": "SU_MSG_SEND_CHECK_S103",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S104",
+    "name": "SU_MSG_SEND_CHECK_S104",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S105",
+    "name": "SU_MSG_SEND_CHECK_S105",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_CHECK_S106",
+    "name": "SU_MSG_SEND_CHECK_S106",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S100",
+    "name": "SU_MSG_SEND_FAILED_S100"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S101",
+    "name": "SU_MSG_SEND_FAILED_S101"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S102",
+    "name": "SU_MSG_SEND_FAILED_S102"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S103",
+    "name": "SU_MSG_SEND_FAILED_S103"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S104",
+    "name": "SU_MSG_SEND_FAILED_S104"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S105",
+    "name": "SU_MSG_SEND_FAILED_S105"
+  }, {
+    "id": "SU_MSG_SEND_FAILED_S106",
+    "name": "SU_MSG_SEND_FAILED_S106"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S100",
+    "name": "SU_MSG_SEND_PASSED_S100"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S101",
+    "name": "SU_MSG_SEND_PASSED_S101"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S102",
+    "name": "SU_MSG_SEND_PASSED_S102"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S103",
+    "name": "SU_MSG_SEND_PASSED_S103"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S104",
+    "name": "SU_MSG_SEND_PASSED_S104"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S105",
+    "name": "SU_MSG_SEND_PASSED_S105"
+  }, {
+    "id": "SU_MSG_SEND_PASSED_S106",
+    "name": "SU_MSG_SEND_PASSED_S106"
+  }, {
+    "id": "SU_MSG_SEND_S100",
+    "name": "SU_MSG_SEND_S100",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_S101",
+    "name": "SU_MSG_SEND_S101",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_S102",
+    "name": "SU_MSG_SEND_S102",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_S103",
+    "name": "SU_MSG_SEND_S103",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_S104",
+    "name": "SU_MSG_SEND_S104",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_S105",
+    "name": "SU_MSG_SEND_S105",
+    "color": "blue"
+  }, {
+    "id": "SU_MSG_SEND_S106",
+    "name": "SU_MSG_SEND_S106",
+    "color": "blue"
+  }, {
+    "id": "SU_RECYCLE_BIN",
+    "name": "SU_RECYCLE_BIN"
+  }],
+  "edges": [{
+    "source": "AUD_MATCHED",
+    "target": "SU_MATCHED_S100",
+    "name": "0",
+    "color": "LightGrey"
+  }, {
+    "source": "AUD_MATCHED",
+    "target": "SU_MATCHED_S101",
+    "name": "1",
+    "color": "LightGrey"
+  }, {
+    "source": "RECYCLE_BIN",
+    "target": "ROOT",
+    "name": "2",
+    "color": "black"
+  }, {
+    "source": "ROOT",
+    "target": "AUD_MATCHED",
+    "name": "3",
+    "color": "LightGrey"
+  }, {
+    "source": "SU_DELAY_BEGIN_S100",
+    "target": "SU_DELAY_END_S100",
+    "name": "4",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S100",
+    "target": "SU_RECYCLE_BIN",
+    "name": "5",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S101",
+    "target": "SU_DELAY_END_S101",
+    "name": "6",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S101",
+    "target": "SU_RECYCLE_BIN",
+    "name": "7",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S102",
+    "target": "SU_DELAY_END_S102",
+    "name": "8",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S102",
+    "target": "SU_RECYCLE_BIN",
+    "name": "9",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S103",
+    "target": "SU_DELAY_END_S103",
+    "name": "10",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S103",
+    "target": "SU_RECYCLE_BIN",
+    "name": "11",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S104",
+    "target": "SU_DELAY_END_S104",
+    "name": "12",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S104",
+    "target": "SU_RECYCLE_BIN",
+    "name": "13",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S105",
+    "target": "SU_DELAY_END_S105",
+    "name": "14",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S105",
+    "target": "SU_RECYCLE_BIN",
+    "name": "15",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S106",
+    "target": "SU_DELAY_END_S106",
+    "name": "16",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_BEGIN_S106",
+    "target": "SU_RECYCLE_BIN",
+    "name": "17",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S100",
+    "target": "SU_MSG_SEND_CHECK_S100",
+    "name": "18",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S101",
+    "target": "SU_MSG_SEND_CHECK_S101",
+    "name": "19",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S102",
+    "target": "SU_MSG_SEND_CHECK_S102",
+    "name": "20",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S103",
+    "target": "SU_MSG_SEND_CHECK_S103",
+    "name": "21",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S104",
+    "target": "SU_MSG_SEND_CHECK_S104",
+    "name": "22",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S105",
+    "target": "SU_MSG_SEND_CHECK_S105",
+    "name": "23",
+    "color": "black"
+  }, {
+    "source": "SU_DELAY_END_S106",
+    "target": "SU_MSG_SEND_CHECK_S106",
+    "name": "24",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S100",
+    "target": "SU_DELAY_BEGIN_S100",
+    "name": "25",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S101",
+    "target": "SU_DELAY_BEGIN_S101",
+    "name": "26",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S102",
+    "target": "SU_DELAY_BEGIN_S102",
+    "name": "27",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S103",
+    "target": "SU_DELAY_BEGIN_S103",
+    "name": "28",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S104",
+    "target": "SU_DELAY_BEGIN_S104",
+    "name": "29",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S105",
+    "target": "SU_DELAY_BEGIN_S105",
+    "name": "30",
+    "color": "black"
+  }, {
+    "source": "SU_MATCHED_S106",
+    "target": "SU_DELAY_BEGIN_S106",
+    "name": "31",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S100",
+    "target": "SU_RECYCLE_BIN",
+    "name": "32",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S101",
+    "target": "SU_RECYCLE_BIN",
+    "name": "33",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S102",
+    "target": "SU_RECYCLE_BIN",
+    "name": "34",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S103",
+    "target": "SU_RECYCLE_BIN",
+    "name": "35",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S104",
+    "target": "SU_RECYCLE_BIN",
+    "name": "36",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S105",
+    "target": "SU_RECYCLE_BIN",
+    "name": "37",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_FAILED_S106",
+    "target": "SU_RECYCLE_BIN",
+    "name": "38",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S100",
+    "target": "SU_MSG_SEND_S100",
+    "name": "39",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S101",
+    "target": "SU_MSG_SEND_S101",
+    "name": "40",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S102",
+    "target": "SU_MSG_SEND_S102",
+    "name": "41",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S103",
+    "target": "SU_MSG_SEND_S103",
+    "name": "42",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S104",
+    "target": "SU_MSG_SEND_S104",
+    "name": "43",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S105",
+    "target": "SU_MSG_SEND_S105",
+    "name": "44",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_PASSED_S106",
+    "target": "SU_MSG_SEND_S106",
+    "name": "45",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S100",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S100",
+    "name": "46",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S100",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S100",
+    "name": "47",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S100",
+    "target": "SU_RECYCLE_BIN",
+    "name": "48",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S101",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S101",
+    "name": "49",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S101",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S101",
+    "name": "50",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S101",
+    "target": "SU_RECYCLE_BIN",
+    "name": "51",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S102",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S102",
+    "name": "52",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S102",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S102",
+    "name": "53",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S102",
+    "target": "SU_RECYCLE_BIN",
+    "name": "54",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S103",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S103",
+    "name": "55",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S103",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S103",
+    "name": "56",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S103",
+    "target": "SU_RECYCLE_BIN",
+    "name": "57",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S104",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S104",
+    "name": "58",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S104",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S104",
+    "name": "59",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S104",
+    "target": "SU_RECYCLE_BIN",
+    "name": "60",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S105",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S105",
+    "name": "61",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S105",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S105",
+    "name": "62",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S105",
+    "target": "SU_RECYCLE_BIN",
+    "name": "63",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S106",
+    "target": "SU_MSG_SEND_CHECK_FAILED_S106",
+    "name": "64",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S106",
+    "target": "SU_MSG_SEND_CHECK_PASSED_S106",
+    "name": "65",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_CHECK_S106",
+    "target": "SU_RECYCLE_BIN",
+    "name": "66",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S100",
+    "target": "SU_RECYCLE_BIN",
+    "name": "67",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S101",
+    "target": "SU_RECYCLE_BIN",
+    "name": "68",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S102",
+    "target": "SU_RECYCLE_BIN",
+    "name": "69",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S103",
+    "target": "SU_RECYCLE_BIN",
+    "name": "70",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S104",
+    "target": "SU_RECYCLE_BIN",
+    "name": "71",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S105",
+    "target": "SU_RECYCLE_BIN",
+    "name": "72",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_FAILED_S106",
+    "target": "SU_RECYCLE_BIN",
+    "name": "73",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S100",
+    "target": "SU_MATCHED_S102",
+    "name": "74",
+    "color": "LightGrey"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S100",
+    "target": "SU_MATCHED_S103",
+    "name": "75",
+    "color": "LightGrey"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S101",
+    "target": "SU_MATCHED_S106",
+    "name": "76",
+    "color": "LightGrey"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S102",
+    "target": "SU_MATCHED_S105",
+    "name": "77",
+    "color": "LightGrey"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S103",
+    "target": "SU_MATCHED_S104",
+    "name": "78",
+    "color": "LightGrey"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S104",
+    "target": "SU_RECYCLE_BIN",
+    "name": "79",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S105",
+    "target": "SU_RECYCLE_BIN",
+    "name": "80",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_PASSED_S106",
+    "target": "SU_RECYCLE_BIN",
+    "name": "81",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S100",
+    "target": "SU_MSG_SEND_FAILED_S100",
+    "name": "82",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S100",
+    "target": "SU_MSG_SEND_PASSED_S100",
+    "name": "83",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S100",
+    "target": "SU_RECYCLE_BIN",
+    "name": "84",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S101",
+    "target": "SU_MSG_SEND_FAILED_S101",
+    "name": "85",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S101",
+    "target": "SU_MSG_SEND_PASSED_S101",
+    "name": "86",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S101",
+    "target": "SU_RECYCLE_BIN",
+    "name": "87",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S102",
+    "target": "SU_MSG_SEND_FAILED_S102",
+    "name": "88",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S102",
+    "target": "SU_MSG_SEND_PASSED_S102",
+    "name": "89",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S102",
+    "target": "SU_RECYCLE_BIN",
+    "name": "90",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S103",
+    "target": "SU_MSG_SEND_FAILED_S103",
+    "name": "91",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S103",
+    "target": "SU_MSG_SEND_PASSED_S103",
+    "name": "92",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S103",
+    "target": "SU_RECYCLE_BIN",
+    "name": "93",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S104",
+    "target": "SU_MSG_SEND_FAILED_S104",
+    "name": "94",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S104",
+    "target": "SU_MSG_SEND_PASSED_S104",
+    "name": "95",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S104",
+    "target": "SU_RECYCLE_BIN",
+    "name": "96",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S105",
+    "target": "SU_MSG_SEND_FAILED_S105",
+    "name": "97",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S105",
+    "target": "SU_MSG_SEND_PASSED_S105",
+    "name": "98",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S105",
+    "target": "SU_RECYCLE_BIN",
+    "name": "99",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S106",
+    "target": "SU_MSG_SEND_FAILED_S106",
+    "name": "100",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S106",
+    "target": "SU_MSG_SEND_PASSED_S106",
+    "name": "101",
+    "color": "black"
+  }, {
+    "source": "SU_MSG_SEND_S106",
+    "target": "SU_RECYCLE_BIN",
+    "name": "102",
+    "color": "black"
+  }, {
+    "source": "SU_RECYCLE_BIN",
+    "target": "RECYCLE_BIN",
+    "name": "103",
+    "color": "black"
+  }]
+};
 
 /***/ }),
 
@@ -859,24 +2062,6 @@ class Canvas {
             ctx.lineWidth = 2;
             ctx.stroke(path);
             // paint anchors
-            const { anchors } = node;
-            // TODO
-            // if (this.hasStore) {
-            this.paths.anchors[node.id] = [];
-            this.paths.activeAnchors[node.id] = [];
-            // }
-            Object.keys(anchors).forEach(k => {
-                if (anchors[k]) {
-                    for (let i = 0; i < anchors[k]; i++) {
-                        let pos = utils_1.getAnchorPos(node, k, i, anchors[k]);
-                        let [anchorPath, activeAnchorPath] = this._paintAnchor(pos);
-                        ctx.fill(anchorPath);
-                        ctx.stroke(anchorPath);
-                        this.paths.anchors[node.id].push({ type: k, index: i, path: anchorPath });
-                        this.paths.activeAnchors[node.id].push({ type: k, index: i, path: activeAnchorPath });
-                    }
-                }
-            });
             ctx.restore();
         }
         // paint text
@@ -955,37 +2140,50 @@ class Canvas {
     // paint edge
     paintEdge({ x: sx, y: sy }, // start
     { x: ex, y: ey }, // end
-    opts // options
+    { id, selected, gap = 1, maxWidth, isLeaf, } // options
     ) {
         const { ctx, ratio: r } = this;
         sx *= r;
         sy *= r;
         ex *= r;
         ey *= r;
-        if (opts.needTranslate) {
-            ex -= this.translateInfo.x;
-            ey -= this.translateInfo.y;
-        }
+        maxWidth *= r;
         const path = new Path2D();
+        // 连线起点
         ctx.beginPath();
         path.moveTo(sx, sy);
-        let diffY = Math.abs(ey - sy);
-        const cp1 = [sx, sy + diffY / 4];
-        const cp2 = [ex, ey - diffY / 2];
-        path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey);
-        if (opts && opts.selected) {
+        // 计算控制点
+        const diffY = 40 * r;
+        if (gap === 1) {
+            // let diffY = Math.abs(ey - sy)
+            const cp1 = [sx, sy + diffY / 4];
+            const cp2 = [ex, sy + diffY / 4];
+            path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey);
+        }
+        else {
+            const lx = sx - maxWidth / 2;
+            const cp1 = [sx, sy + diffY / 4];
+            const cp2 = [lx, sy + diffY / 4];
+            const cp3 = [lx, ey - diffY / 4];
+            const cp4 = [ex, ey - diffY / 4];
+            path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY / 2);
+            path.lineTo(lx, ey - diffY / 2);
+            path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey);
+        }
+        // 连线
+        if (selected) {
             ctx.save();
             ctx.lineWidth = 2 * r;
+            ctx.strokeStyle = color_1.default.blue;
             ctx.stroke(path);
             ctx.restore();
         }
         else {
             ctx.stroke(path);
         }
-        if (opts && opts.id && this.hasStore) {
-            this.paths.edges[opts.id] = path;
-        }
         ctx.closePath();
+        // 缓存路径
+        this.paths.edges[id] = path;
         this._paintArrow({ x: ex, y: ey });
     }
     checkOnEdge(eid, pos) {
@@ -1285,8 +2483,6 @@ class Editor {
          */
         this.isMouseDown = false;
         this.eventList = [
-            ['oItemPanel', 'mousedown', '_beginAddNode'],
-            ['oItemPanel', 'mouseup', '_mouseUp'],
             ['oPage', 'mousedown', '_mouseDownOnPage'],
             ['oPage', 'mousemove', '_mouseMove'],
             ['oPage', 'mouseleave', '_mouseLeavePage'],
@@ -1478,11 +2674,35 @@ class Editor {
             let status = this.selectedNode === node ? 'selected' : (this.hoverNode === node ? 'hover' : null);
             this.mainCvs.paintNode(node, { status });
         });
-        this.edges.forEach(({ source, sourceAnchorIndex, target, targetAnchorIndex, id }) => {
-            const start = this.nodes.find(n => n.id === source);
-            const end = this.nodes.find(n => n.id === target);
-            this.mainCvs.paintEdge(utils_1.getAnchorPos(start, 'output', sourceAnchorIndex, start.anchors.output), utils_1.getAnchorPos(end, 'input', targetAnchorIndex, end.anchors.input), { id, selected: this.selectedEdge && this.selectedEdge.id === id });
-        });
+        this._paintEdgeTask();
+    }
+    _paintEdgeTask() {
+        const { levels } = this.layout;
+        const edges = this.edges.slice();
+        let gap = 1;
+        let count = 0;
+        while (count < edges.length) {
+            edges.forEach(({ source, target, id }, i) => {
+                const start = this.nodes.find(n => n.id === source);
+                const end = this.nodes.find(n => n.id === target);
+                let startPos = utils_1.getAnchorPos(start, 'output', 0, start.anchors.output);
+                let endPos = utils_1.getAnchorPos(end, 'input', 0, end.anchors.input);
+                if (end.depth - start.depth === gap) {
+                    this.mainCvs.paintEdge(startPos, endPos, {
+                        id,
+                        selected: this.selectedEdge && this.selectedEdge.id === id,
+                        gap,
+                        // TODO
+                        maxWidth: start.treeWidth * 100,
+                        isLeaf: start.hasNoSon,
+                    });
+                    count++;
+                    // edges.splice(i, 1)
+                }
+            });
+            gap++;
+        }
+        // console.log(gap, count, edges.length);
     }
     on(ev, cb) {
         if (this.callback.hasOwnProperty(ev)) {
@@ -1501,9 +2721,10 @@ class Editor {
             edges: this.edges,
         };
     }
-    setData({ nodes = [], edges = [] }) {
+    setData({ nodes = [], edges = [], layout }) {
         this.nodes = nodes;
         this.edges = edges;
+        this.layout = layout;
         this._renderTask('set data');
     }
     setConfig(config) {
@@ -1594,19 +2815,8 @@ class Editor {
         const { tx, ty } = this.dynamicCvs.translateInfo;
         if (this.isMouseDown) { // move
             switch (this.mouseDownType) {
-                case 'add-node':
-                    this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedShape), { x: x - tx, y: y - ty }));
-                    break;
                 case 'move-node':
                     this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
-                    break;
-                case 'add-edge':
-                    this.nodes.forEach(node => {
-                        if (node.id !== this.selectedNode.id && node.anchors) {
-                            this.dynamicCvs.paintActiveAnchors(node);
-                        }
-                    });
-                    this.dynamicCvs.paintEdge(this.anchorStartPos, { x, y }, { needTranslate: true });
                     break;
                 case 'drag-canvas':
                     this.mainCvs.clear();
@@ -1863,6 +3073,214 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(__webpack_require__(/*! ./core */ "./src/core.ts"), exports);
 __exportStar(__webpack_require__(/*! ./mind */ "./src/mind.js"), exports);
+__exportStar(__webpack_require__(/*! ./layout/calculate */ "./src/layout/calculate.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./src/layout/calculate.ts":
+/*!*********************************!*\
+  !*** ./src/layout/calculate.ts ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.findMaxLevel = exports.format = exports.figure = void 0;
+function figure(data) {
+    let { nodes, edges } = data;
+    edges = cutToDag(edges);
+    const layout = getDepth(nodes, edges);
+    return format({ nodes, edges, layout });
+}
+exports.figure = figure;
+// 去环, 转换为标准 DAG
+function cutToDag(edges) {
+    const i = edges.findIndex(e => e.target.toUpperCase().match(/ROOT/));
+    if (i > -1) {
+        edges.splice(i, 1);
+    }
+    return edges;
+}
+// 计算深度
+function getDepth(nodes, allEdges) {
+    const edges = allEdges.slice();
+    // 入度表 { node_id: input_count }
+    const inMap = {};
+    // 父节点字典 { node_id: [ parent_id ] }
+    const parentsMap = {};
+    // 子节点字典 { node_id: [ child_id ] }
+    const childrenMap = {};
+    // 层级字典
+    const levels = {};
+    // 初始化几个关键字典
+    for (let n of nodes) {
+        const { id } = n;
+        inMap[id] = 0;
+        parentsMap[id] = [];
+        childrenMap[id] = [];
+    }
+    for (let e of edges) {
+        let s = e.source;
+        let t = e.target;
+        // 入度
+        inMap[t]++;
+        // 父节点
+        parentsMap[t].push(s);
+        // 子节点
+        childrenMap[s].push(t);
+    }
+    // 几个方法
+    // node_id => node
+    const findNode = id => {
+        return nodes.find(n => n.id === id);
+    };
+    // parent_id => [ child ]
+    const findChildren = id => {
+        return childrenMap[id];
+    };
+    const findChildrenByLevel = (id, lv) => {
+        return findChildren(id).filter(c => levels[lv] && levels[lv].indexOf(c) > -1);
+    };
+    // child_id => [ parent ]
+    const findParents = id => {
+        return parentsMap[id];
+    };
+    const findParentsByLevel = (id, lv) => {
+        return findParents(id).filter(c => levels[lv] && levels[lv].indexOf(c) > -1);
+    };
+    // 根节点
+    const root = getRoot(inMap);
+    const rootNode = findNode(root);
+    // 计算每个节点的最大深度
+    const getNodeDepth = id => {
+        const parents = findParents(id);
+        return parents.length ? Math.max.apply(null, parents.map(pid => findNode(pid)['depth'])) + 1 : 0;
+    };
+    const queue = [];
+    queue.push(root);
+    while (queue.length) {
+        // 从队列中取出当前入度为 0 的节点
+        let curId = queue.pop();
+        // 记录, 得出 cur 的深度, 入度为 0 意味着其父节点均已遍历过
+        let cur = findNode(curId);
+        cur.depth = getNodeDepth(curId);
+        // 查找 cur 的子节点
+        const children = findChildren(curId);
+        children.forEach(c => {
+            inMap[c]--;
+            if (inMap[c] === 0) {
+                queue.push(c);
+            }
+        });
+    }
+    // 层级
+    for (let node of nodes) {
+        let { depth, id } = node;
+        if (!levels.hasOwnProperty(depth)) {
+            levels[depth] = [];
+        }
+        levels[depth].push(id);
+    }
+    // 层内排序
+    const getParentsOrders = (ids, lv) => {
+        const list = levels[lv];
+        return ids.reduce((total, cur) => total + list.indexOf(cur), 0);
+    };
+    for (let l in levels) {
+        const lv = Number(l);
+        const list = levels[l];
+        if (lv > 0) {
+            list.sort((a, b) => {
+                let pa = findParentsByLevel(a, lv - 1);
+                let pb = findParentsByLevel(b, lv - 1);
+                return getParentsOrders(pa, lv - 1) - getParentsOrders(pb, lv - 1);
+            });
+        }
+    }
+    // 以 node 为根的类树的宽度
+    const getWidth = (nid, l) => {
+        const lv = Number(l);
+        const children = findChildrenByLevel(nid, lv + 1);
+        if (!children.length) {
+            const node = findNode(nid);
+            node.hasNoSon = true;
+            return 1;
+        }
+        return children.reduce((total, cur) => {
+            return total + getWidth(cur, lv + 1);
+        }, 0);
+    };
+    for (let l in levels) {
+        const lv = Number(l);
+        const list = levels[l];
+        list.forEach(id => {
+            const node = findNode(id);
+            node.treeWidth = getWidth(id, lv);
+        });
+    }
+    const ox = 400;
+    const oy = 40;
+    const ow = 100;
+    const oh = 80;
+    rootNode.x = ox;
+    rootNode.y = oy;
+    // 按层级定位
+    for (let l in levels) {
+        const lv = Number(l);
+        const list = levels[l];
+        list.forEach(pid => {
+            const par = findNode(pid);
+            const mx = par.x;
+            const count = par.treeWidth;
+            let sx = par.x - count * ow / 2;
+            const children = findChildrenByLevel(pid, lv + 1);
+            children.forEach((c, i) => {
+                const child = findNode(c);
+                if (!child.hasOwnProperty('x') || !child.hasOwnProperty('y')) {
+                    if (i === 0) {
+                        child.x = sx + child.treeWidth * ow / 2;
+                    }
+                    else {
+                        const prev = findNode(children[i - 1]);
+                        child.x = prev.x + prev.treeWidth * ow / 2 + child.treeWidth * ow / 2;
+                    }
+                    child.y = par.y + oh;
+                }
+            });
+        });
+    }
+    console.log(levels, nodes);
+    return { levels, childrenMap, parentsMap };
+}
+// 寻找入度为0的节点
+function getRoot(nodesMap) {
+    return Object.keys(nodesMap).filter(n => nodesMap[n] === 0)[0];
+}
+// 格式化填充 editor 要求数据字段
+function format({ nodes, edges, layout }) {
+    return {
+        nodes: nodes.map(n => {
+            return Object.assign(Object.assign({}, n), { shape: 'shape-001', w: 80, h: 40, anchors: { input: 1, output: 1 } });
+        }),
+        edges: edges.map(e => {
+            return Object.assign(Object.assign({}, e), { id: `edge-${e.name}`, sourceAnchorIndex: 0, targetAnchorIndex: 0 });
+        }),
+        layout,
+    };
+}
+exports.format = format;
+// 查找最宽层级
+function findMaxLevel(levels, start, end) {
+    let max = start;
+    for (let i = start; i < end; i++) {
+        max = levels[max].length > levels[i].length ? max : i;
+    }
+    return max;
+}
+exports.findMaxLevel = findMaxLevel;
 
 
 /***/ }),
@@ -2537,7 +3955,7 @@ function compareEdge(a, b) {
 exports.compareEdge = compareEdge;
 function logger(msg) {
     if (true) {
-        console.log(msg);
+        // console.log(msg)
     }
 }
 exports.logger = logger;
