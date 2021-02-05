@@ -58,12 +58,14 @@ export declare class Canvas {
     paintActiveAnchors(node: Editor.INode): void;
     paintEdge({ x: sx, y: sy }: Editor.IPos, // start
     { x: ex, y: ey }: Editor.IPos, // end
-    { id, selected, gap, maxWidth, isLeaf, }: {
+    { id, selected, gap, maxWidth, isLeaf, gapCount, edgeCount, }: {
         id?: string;
         selected?: boolean;
         gap?: number;
         maxWidth?: number;
         isLeaf?: boolean;
+        gapCount?: number;
+        edgeCount?: number;
     }): void;
     checkOnEdge(eid: string, pos: Editor.IPos): boolean;
     private _paintArrow;

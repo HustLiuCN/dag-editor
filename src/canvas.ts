@@ -2,6 +2,8 @@ import COLOR, { lighter } from './color'
 import { Editor } from './core'
 import { getAnchorPos, logger } from './utils'
 
+const gw = 10
+
 export class Canvas {
 	constructor(cvs: HTMLCanvasElement, {
 		ratio = 1,
@@ -205,7 +207,13 @@ export class Canvas {
 			gap = 1,
 			maxWidth,
 			isLeaf,
-		}: { id?: string, selected?: boolean, gap?: number, maxWidth?: number, isLeaf?: boolean }		// options
+			gapCount = 0,
+			edgeCount = 0,
+		}: {
+			id?: string, selected?: boolean, gap?: number, maxWidth?: number, isLeaf?: boolean,
+			gapCount?: number,
+			edgeCount?: number,
+		}		// options
 	) {
 		const { ctx, ratio: r } = this
 		sx *= r
@@ -220,19 +228,24 @@ export class Canvas {
 		// 计算控制点
 		const diffY = 40 * r
 		if (gap === 1) {
-			// let diffY = Math.abs(ey - sy)
 			const cp1 = [sx, sy + diffY / 4]
 			const cp2 = [ex, sy + diffY / 4]
 			path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
 		} else {
-			const lx = sx - maxWidth / 2
-			const cp1 = [sx, sy + diffY / 4]
-			const cp2 = [lx, sy + diffY / 4]
-			const cp3 = [lx, ey - diffY / 4]
-			const cp4 = [ex, ey - diffY / 4]
-			path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY / 2)
-			path.lineTo(lx, ey - diffY / 2)
-			path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey)
+			if (isLeaf) {
+				path.lineTo(sx, ey - diffY / 2)
+				path.bezierCurveTo(sx, ey - diffY / 4, ex, ey - diffY / 4, ex, ey)
+			} else {
+				let lx = sx - maxWidth / 2 - gapCount * gw * r
+				const cp1 = [sx, sy + diffY / 4]
+				const cp2 = [lx, sy + diffY / 4]
+				const cp3 = [lx, ey - diffY / 4]
+				const cp4 = [ex, ey - diffY / 4]
+				path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY / 2)
+				path.lineTo(lx, ey - diffY / 2)
+				path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey)
+			}
+
 		}
 
 		// 连线

@@ -1,6 +1,10 @@
+import { buildData } from './format'
+
 export function figure(data) {
   let { nodes, edges } = data
   edges = cutToDag(edges)
+  const tmp = buildData({ nodes, edges })
+  nodes = tmp.nodes
   const layout = getDepth(nodes, edges)
 
   return format({ nodes, edges, layout })
@@ -141,18 +145,48 @@ function getDepth(nodes, allEdges) {
   const oy = 40
   const ow = 100
   const oh = 80
+  const gw = 10
   rootNode.x = ox
   rootNode.y = oy
   // 按层级定位
+  const getGapCount = id => {
+    const node = findNode(id)
+    return childrenMap[id].length - findChildrenByLevel(id, node.depth + 1).length
+  }
+  // 寻找树里有多少条跨级边
+  const getTreeGapCount = id => {
+    let n = 0
+    const node = findNode(id)
+    if (node.hasNoSon) {
+      return n
+    }
+    n = getGapCount(id)
+    const children = findChildrenByLevel(id, node.depth + 1)
+    return n + children.reduce((total, cur) => {
+      return total + getTreeGapCount(cur)
+    }, 0)
+  }
+  // 判断父节点是否有跨级边且不是连向自己
+  const checkParentGap = (cid, pid) => {
+    const gapCount = getGapCount(pid)
+  }
+  for (let l in levels) {
+    const lv = Number(l)
+    const list = levels[l]
+    list.forEach(id => {
+      const node = findNode(id)
+      node.gapCount = getTreeGapCount(id)
+    })
+  }
   for (let l in levels) {
     const lv = Number(l)
     const list = levels[l]
 
     list.forEach(pid => {
       const par = findNode(pid)
-      const mx = par.x
-      const count = par.treeWidth
-      let sx = par.x - count * ow / 2
+
+      let sx = par.x - par.treeWidth * ow / 2 - par.gapCount * gw
+
       const children = findChildrenByLevel(pid, lv + 1)
 
       children.forEach((c, i) => {
@@ -160,10 +194,15 @@ function getDepth(nodes, allEdges) {
         if (!child.hasOwnProperty('x') || !child.hasOwnProperty('y')) {
           if (i === 0) {
             child.x = sx + child.treeWidth * ow / 2
+            if (getGapCount(pid)) {
+              child.x += gw
+            }
           } else {
             const prev = findNode(children[i - 1])
             child.x = prev.x + prev.treeWidth * ow / 2 + child.treeWidth * ow / 2
           }
+
+          child.x += child.gapCount * gw
 
           child.y = par.y + oh
         }

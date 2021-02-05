@@ -111,6 +111,8 @@ export declare namespace Editor {
         depth?: number;
         treeWidth?: number;
         hasNoSon?: boolean;
+        gapCount?: number;
+        _edgesCount?: number;
     }
     interface IAnchor {
         input?: number;

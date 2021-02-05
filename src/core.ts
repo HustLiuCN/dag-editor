@@ -14,6 +14,9 @@ import { ContextMenu } from './contextmenu'
 import { findMaxLevel } from './layout/calculate'
 import { count } from 'console'
 
+const ow = 100
+const gw = 10
+
 // Editor core
 export class Editor {
 	constructor({
@@ -244,8 +247,10 @@ export class Editor {
 							selected: this.selectedEdge && this.selectedEdge.id === id,
 							gap,
 							// TODO
-							maxWidth: start.treeWidth * 100,
+							maxWidth: start.treeWidth * ow,
 							isLeaf: start.hasNoSon,
+							gapCount: start.gapCount,
+							edgeCount: start._edgesCount,
 						},
 					)
 					count ++
@@ -607,6 +612,8 @@ export namespace Editor {
 		depth?: number,
 		treeWidth?: number,
 		hasNoSon?: boolean,
+		gapCount?: number,
+		_edgesCount?: number,
 	}
 	// anchor: [x, y, type]
 	export interface IAnchor {
