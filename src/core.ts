@@ -11,25 +11,18 @@ import { Event } from './event'
 import { Command } from './command'
 import { ContextMenu } from './contextmenu'
 
-import { findMaxLevel } from './layout/calculate'
-import { count } from 'console'
-
 const ow = 100
-const gw = 10
 
 // Editor core
 export class Editor {
 	constructor({
 		container,
-		// toolbar,
-		itempanel,
 		page,
 		config,
 	}: Editor.IOption) {
 		console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;')
 		// dom container
 		this.oContainer = getDom(container)
-		this.oItemPanel = getDom(itempanel)
 		this.oPage = getDom(page)
 		// init property
 		this.shapes = {}
@@ -42,7 +35,6 @@ export class Editor {
 		this._renderTask('init')
 	}
 	readonly oContainer: HTMLElement
-	private oItemPanel: HTMLElement
 	readonly oPage: HTMLElement
 	extraConfig: any
 	// init canvas
@@ -75,29 +67,18 @@ export class Editor {
 		const oc = createDom('canvas', 'editor-canvas') as HTMLCanvasElement
 		oc.width = width * ratio
 		oc.height = height * ratio
-		const odc = oc.cloneNode() as HTMLCanvasElement
-		odc.style.pointerEvents = 'none'
-		odc.style.backgroundColor = 'transparent'
 
 		// define canvas object
 		// main canvas paint all nodes & edges that exist in this.nodes & this.edges
 		this.mainCvs = new Canvas(oc, { ratio, hasStore: true, hasBg: true, config: this.extraConfig })
-		// dynamic canvas paint nodes & edges which is being added or moved
-		this.dynamicCvs = new Canvas(odc, { ratio })
 
 		// append to page container
 		this.oPage.appendChild(oc)
-		this.oPage.appendChild(odc)
 	}
 	pageConfig: Editor.IPageConfig
 	private mainCvs: Canvas
-	private dynamicCvs: Canvas
 	// register shape
 	private shapes: Editor.IShapes
-	private selectedShape: Editor.IShape
-	registerShape(name: string, shape: Editor.IShape) {
-		this.shapes[name] = shape
-	}
 	/*
 	 *	node
 	 */
@@ -131,12 +112,6 @@ export class Editor {
 		this.__hoverNode = node
 		this._renderTask('hover node change')
 	}
-	private _addNode(node: Editor.INode) {
-		this.nodes.push({ ...node, id: randomID() })
-		let cur = this.nodes[this.nodes.length - 1]
-		this.callback.nodeAdded && this.callback.nodeAdded(cur)
-		this.selectedNode = cur
-	}
 	private _updateNode(node: Editor.INode) {
 		let i = this.nodes.findIndex(n => n.id === node.id)
 		if (i < 0) {
@@ -146,19 +121,6 @@ export class Editor {
 		cur = { ...node }
 		this.nodes.push(cur)
 		this.selectedNode = cur
-	}
-	private _delNode(nid: string) {
-		let i = this.nodes.findIndex(n => n.id === nid)
-		if (i > -1) {
-			this.nodes.splice(i, 1)
-			let edges = this._getRelatedEdge(nid)
-			if (edges.length) {
-				edges.forEach(e => { this._delEdge(e.id) })
-			}
-			this.selectedNode = null
-
-			this.callback.nodeDeleted && this.callback.nodeDeleted(nid)
-		}
 	}
 	/*
 	 * anchor & edge
@@ -176,29 +138,7 @@ export class Editor {
 		this._renderTask('selected edge change')
 	}
 	private hoverAnchor: [Editor.INode, string, number]		// [node, type, index]
-	// private selectedAnchor: [Editor.INode, number]
-	private anchorStartPos = { x: 0, y: 0 }
 
-	private _addEdge([source, sourceAnchorIndex]: [Editor.INode, number], [target, targetAnchorIndex]: [Editor.INode, number]) {
-		let edge = {
-			source: source.id,
-			sourceAnchorIndex,
-			target: target.id,
-			targetAnchorIndex,
-		}
-		let exist = this.edges.find(e => compareEdge(edge, e))
-		if (!exist) {
-			this.edges.push({ ...edge, id: randomID() })
-			this.callback.edgeAdded && this.callback.edgeAdded(edge)
-		}
-	}
-	private _delEdge(eid: string) {
-		let i = this.edges.findIndex(e => e.id === eid)
-		if (i > -1) {
-			let [ edge ] = this.edges.splice(i, 1)
-			this.callback.edgeDeleted && this.callback.edgeDeleted(edge)
-		}
-	}
 	// clear
 	private _clear() {
 		this.nodes = []
@@ -367,18 +307,6 @@ export class Editor {
 		x: 0,
 		y: 0,
 	}
-	// mousedown on itempanel
-	private _beginAddNode(e: MouseEvent) {
-		const o = e.target as HTMLElement
-		const shape = getAttr(o, 'data-shape')
-		if (!shape) {
-			return
-		}
-
-		this.isMouseDown = true
-		this.mouseDownType = 'add-node'
-		this.selectedShape = this.shapes[shape]
-	}
 	// mousedown on page
 	private _mouseDownOnPage(e: MouseEvent) {
 		this.isMouseDown = true
@@ -389,14 +317,7 @@ export class Editor {
 			this.selectedNode = this.hoverNode
 			this.selectedEdge = null
 			// this.selectedNode = this.selectedNode
-			if (this.hoverAnchor) {
-				// u can't drag an edge from input anchor
-				const [node, type, index] = this.hoverAnchor
-				this.mouseDownType = type === 'output' ? 'add-edge' : null
-				this.anchorStartPos = getAnchorPos(node, type, index, node.anchors[type])
-			} else {
-				this.mouseDownType = 'move-node'
-			}
+			this.mouseDownType = 'move-node'
 		} else {
 			this.selectedNode = null
 			this.selectedEdge = this._getSelectedEdge({ x, y })
@@ -407,31 +328,19 @@ export class Editor {
 	}
 	// mousemove
 	private _mouseMove(e: MouseEvent) {
-		this.dynamicCvs.clear()
 		const { offsetX: x, offsetY: y } = e
 		// diff (x, y) from mouse down start point
 		const dx = x - this.mouseEventStartPos.x
 		const dy = y - this.mouseEventStartPos.y
-		// canvas translate info
-		const { tx, ty } = this.dynamicCvs.translateInfo
 
 		if (this.isMouseDown) {		// move
 			switch(this.mouseDownType) {
-				case 'move-node':
-					this.dynamicCvs.paintNode({
-						...this.selectedNode,
-						x: this.selectedNode.x + dx,
-						y: this.selectedNode.y + dy,
-					})
-					break
 				case 'drag-canvas':
 					this.mainCvs.clear()
 					this.mainCvs.transform(dx, dy)
-					this.dynamicCvs.transform(dx, dy)
 					this.mainCvs.preFill()
 					this._render()
 					this.mainCvs.restore()
-					this.dynamicCvs.restore()
 					break
 			}
 		} else {		// hover
@@ -460,35 +369,9 @@ export class Editor {
 		const { offsetX: x, offsetY: y } = e
 		const dx = x - this.mouseEventStartPos.x
 		const dy = y - this.mouseEventStartPos.y
-		const { tx, ty } = this.dynamicCvs.translateInfo
 		switch(this.mouseDownType) {
-			case 'add-node':
-				this._addNode({ ...this.selectedShape, x: x - tx, y: y - ty })
-				break
-			case 'move-node':
-				if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
-					break
-				}
-				logger('move')
-				this._updateNode({
-					...this.selectedNode,
-					x: this.selectedNode.x + dx,
-					y: this.selectedNode.y + dy,
-				})
-				break
-			case 'add-edge':
-				this.nodes.forEach(node => {
-					if (node.id !== this.selectedNode.id) {		// not link to self && link to an input-anchor
-						const target = this.mainCvs.checkInNodeAnchor(node, { x, y }, { active: true })
-						if (target && target[1] === 'input') {
-							this._addEdge([ this.hoverAnchor[0], this.hoverAnchor[2] ], [ node, target[2] ])
-						}
-					}
-				})
-				break
 			case 'drag-canvas':
 				this.mainCvs.translate(dx, dy)
-				this.dynamicCvs.translate(dx, dy)
 				break
 		}
 
@@ -497,7 +380,6 @@ export class Editor {
 	private _mouseUp() {
 		this.isMouseDown = false
 		this.mouseDownType = null
-		this.dynamicCvs.clear()
 	}
 	/*
 	 *	contextmenu
@@ -541,13 +423,6 @@ export class Editor {
 	private _preventDefaultMenu(e: MouseEvent) {
 		e.preventDefault()
 	}
-	private _delNodeCommand() {
-		this._delNode(this.selectedNode.id)
-	}
-	private _delEdgeCommand() {
-		this._delEdge(this.selectedEdge.id)
-		this.selectedEdge = null
-	}
 	/*
 	 * methods
 	 */
@@ -569,15 +444,6 @@ export class Editor {
 			}
 		}
 		return null
-	}
-	private _getRelatedEdge(nid: string): Editor.IEdge[] {
-		let tmps = []
-		this.edges.forEach(e => {
-			if (e.source === nid || e.target === nid) {
-				tmps.push(e)
-			}
-		})
-		return tmps
 	}
 }
 

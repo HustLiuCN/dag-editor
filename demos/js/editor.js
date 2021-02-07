@@ -4,9 +4,10 @@
 */
 import { getDom } from '../../src/dom'
 import shapes from '../../mock-data/dag-shapes'
-import { Editor, figure, format } from '../../src'
+import { Editor } from '../../src'
 import { Store } from './store'
 import * as MockData from '../../mock-data/sd-mock'
+import layout from '../../src/layout'
 
 /**
  * 应用实例
@@ -25,17 +26,13 @@ const editor = new Editor({
  * 数据
  * { nodes, edges }
  */
-editor.setData(figure(MockData.mock_data_6))
+// layout(MockData.mock_data_6)
+editor.setData(layout(MockData.mock_data_6))
 
 /**
  * 预留接口
  */
-editor.on('selectedNodeChange', (node) => {
-  // console.log('selected node changed', node)
-  console.log(node);
-})
-
-for (let shape of shapes) {
-  editor.registerShape(shape.shape, shape)
-}
-
+// editor.on('selectedNodeChange', (node) => {
+//   // console.log('selected node changed', node)
+//   console.log(node);
+// })

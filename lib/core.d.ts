@@ -1,8 +1,7 @@
 import '../style/editor.css';
 export declare class Editor {
-    constructor({ container, itempanel, page, config, }: Editor.IOption);
+    constructor({ container, page, config, }: Editor.IOption);
     readonly oContainer: HTMLElement;
-    private oItemPanel;
     readonly oPage: HTMLElement;
     extraConfig: any;
     private _init;
@@ -10,10 +9,7 @@ export declare class Editor {
     private _initCanvas;
     pageConfig: Editor.IPageConfig;
     private mainCvs;
-    private dynamicCvs;
     private shapes;
-    private selectedShape;
-    registerShape(name: string, shape: Editor.IShape): void;
     protected nodes: Editor.INode[];
     private __selectedNode;
     private get selectedNode();
@@ -21,17 +17,12 @@ export declare class Editor {
     private __hoverNode;
     private get hoverNode();
     private set hoverNode(value);
-    private _addNode;
     private _updateNode;
-    private _delNode;
     private edges;
     private __selectedEdge;
     private get selectedEdge();
     private set selectedEdge(value);
     private hoverAnchor;
-    private anchorStartPos;
-    private _addEdge;
-    private _delEdge;
     private _clear;
     private renderTask;
     private _renderTask;
@@ -61,7 +52,6 @@ export declare class Editor {
     private eventList;
     private _bindEvents;
     private mouseEventStartPos;
-    private _beginAddNode;
     private _mouseDownOnPage;
     private _mouseMove;
     private _mouseLeavePage;
@@ -77,11 +67,8 @@ export declare class Editor {
     private _initCommand;
     private _triggerMenu;
     private _preventDefaultMenu;
-    private _delNodeCommand;
-    private _delEdgeCommand;
     private _getSelectedNode;
     private _getSelectedEdge;
-    private _getRelatedEdge;
 }
 export declare namespace Editor {
     interface IOption {

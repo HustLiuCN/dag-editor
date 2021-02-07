@@ -102,16 +102,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _src__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_src__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _store__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./store */ "./demos/js/store.js");
 /* harmony import */ var _mock_data_sd_mock__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../../mock-data/sd-mock */ "./mock-data/sd-mock.js");
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
+/* harmony import */ var _src_layout__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../src/layout */ "./src/layout.ts");
+/* harmony import */ var _src_layout__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(_src_layout__WEBPACK_IMPORTED_MODULE_5__);
 /*
 *  dag-editor
 *  author: liupeidong@gmail.com
 */
+
 
 
 
@@ -134,30 +131,16 @@ var editor = new _src__WEBPACK_IMPORTED_MODULE_2__["Editor"]({
  * 数据
  * { nodes, edges }
  */
+// layout(MockData.mock_data_6)
 
-editor.setData(Object(_src__WEBPACK_IMPORTED_MODULE_2__["figure"])(_mock_data_sd_mock__WEBPACK_IMPORTED_MODULE_4__["mock_data_6"]));
+editor.setData(_src_layout__WEBPACK_IMPORTED_MODULE_5___default()(_mock_data_sd_mock__WEBPACK_IMPORTED_MODULE_4__["mock_data_6"]));
 /**
  * 预留接口
  */
-
-editor.on('selectedNodeChange', function (node) {
-  // console.log('selected node changed', node)
-  console.log(node);
-});
-
-var _iterator = _createForOfIteratorHelper(_mock_data_dag_shapes__WEBPACK_IMPORTED_MODULE_1__["default"]),
-    _step;
-
-try {
-  for (_iterator.s(); !(_step = _iterator.n()).done;) {
-    var shape = _step.value;
-    editor.registerShape(shape.shape, shape);
-  }
-} catch (err) {
-  _iterator.e(err);
-} finally {
-  _iterator.f();
-}
+// editor.on('selectedNodeChange', (node) => {
+//   // console.log('selected node changed', node)
+//   console.log(node);
+// })
 
 /***/ }),
 
@@ -2468,14 +2451,9 @@ const event_1 = __webpack_require__(/*! ./event */ "./src/event.ts");
 const command_1 = __webpack_require__(/*! ./command */ "./src/command.ts");
 const contextmenu_1 = __webpack_require__(/*! ./contextmenu */ "./src/contextmenu.ts");
 const ow = 100;
-const gw = 10;
 // Editor core
 class Editor {
-    constructor({ container, 
-    // toolbar,
-    itempanel, page, config, }) {
-        // private selectedAnchor: [Editor.INode, number]
-        this.anchorStartPos = { x: 0, y: 0 };
+    constructor({ container, page, config, }) {
         /*
          *	public
          */
@@ -2523,7 +2501,6 @@ class Editor {
         console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;');
         // dom container
         this.oContainer = dom_1.getDom(container);
-        this.oItemPanel = dom_1.getDom(itempanel);
         this.oPage = dom_1.getDom(page);
         // init property
         this.shapes = {};
@@ -2561,20 +2538,11 @@ class Editor {
         const oc = dom_1.createDom('canvas', 'editor-canvas');
         oc.width = width * ratio;
         oc.height = height * ratio;
-        const odc = oc.cloneNode();
-        odc.style.pointerEvents = 'none';
-        odc.style.backgroundColor = 'transparent';
         // define canvas object
         // main canvas paint all nodes & edges that exist in this.nodes & this.edges
         this.mainCvs = new canvas_1.Canvas(oc, { ratio, hasStore: true, hasBg: true, config: this.extraConfig });
-        // dynamic canvas paint nodes & edges which is being added or moved
-        this.dynamicCvs = new canvas_1.Canvas(odc, { ratio });
         // append to page container
         this.oPage.appendChild(oc);
-        this.oPage.appendChild(odc);
-    }
-    registerShape(name, shape) {
-        this.shapes[name] = shape;
     }
     get selectedNode() {
         return this.__selectedNode;
@@ -2601,12 +2569,6 @@ class Editor {
         this.__hoverNode = node;
         this._renderTask('hover node change');
     }
-    _addNode(node) {
-        this.nodes.push(Object.assign(Object.assign({}, node), { id: utils_1.randomID() }));
-        let cur = this.nodes[this.nodes.length - 1];
-        this.callback.nodeAdded && this.callback.nodeAdded(cur);
-        this.selectedNode = cur;
-    }
     _updateNode(node) {
         let i = this.nodes.findIndex(n => n.id === node.id);
         if (i < 0) {
@@ -2617,18 +2579,6 @@ class Editor {
         this.nodes.push(cur);
         this.selectedNode = cur;
     }
-    _delNode(nid) {
-        let i = this.nodes.findIndex(n => n.id === nid);
-        if (i > -1) {
-            this.nodes.splice(i, 1);
-            let edges = this._getRelatedEdge(nid);
-            if (edges.length) {
-                edges.forEach(e => { this._delEdge(e.id); });
-            }
-            this.selectedNode = null;
-            this.callback.nodeDeleted && this.callback.nodeDeleted(nid);
-        }
-    }
     get selectedEdge() {
         return this.__selectedEdge;
     }
@@ -2638,26 +2588,6 @@ class Editor {
         }
         this.__selectedEdge = edge;
         this._renderTask('selected edge change');
-    }
-    _addEdge([source, sourceAnchorIndex], [target, targetAnchorIndex]) {
-        let edge = {
-            source: source.id,
-            sourceAnchorIndex,
-            target: target.id,
-            targetAnchorIndex,
-        };
-        let exist = this.edges.find(e => utils_1.compareEdge(edge, e));
-        if (!exist) {
-            this.edges.push(Object.assign(Object.assign({}, edge), { id: utils_1.randomID() }));
-            this.callback.edgeAdded && this.callback.edgeAdded(edge);
-        }
-    }
-    _delEdge(eid) {
-        let i = this.edges.findIndex(e => e.id === eid);
-        if (i > -1) {
-            let [edge] = this.edges.splice(i, 1);
-            this.callback.edgeDeleted && this.callback.edgeDeleted(edge);
-        }
     }
     // clear
     _clear() {
@@ -2776,17 +2706,6 @@ class Editor {
             event.add(this[ev[0]], ev[1], this[ev[2]].bind(this));
         }
     }
-    // mousedown on itempanel
-    _beginAddNode(e) {
-        const o = e.target;
-        const shape = dom_1.getAttr(o, 'data-shape');
-        if (!shape) {
-            return;
-        }
-        this.isMouseDown = true;
-        this.mouseDownType = 'add-node';
-        this.selectedShape = this.shapes[shape];
-    }
     // mousedown on page
     _mouseDownOnPage(e) {
         this.isMouseDown = true;
@@ -2796,15 +2715,7 @@ class Editor {
             this.selectedNode = this.hoverNode;
             this.selectedEdge = null;
             // this.selectedNode = this.selectedNode
-            if (this.hoverAnchor) {
-                // u can't drag an edge from input anchor
-                const [node, type, index] = this.hoverAnchor;
-                this.mouseDownType = type === 'output' ? 'add-edge' : null;
-                this.anchorStartPos = utils_1.getAnchorPos(node, type, index, node.anchors[type]);
-            }
-            else {
-                this.mouseDownType = 'move-node';
-            }
+            this.mouseDownType = 'move-node';
         }
         else {
             this.selectedNode = null;
@@ -2816,26 +2727,18 @@ class Editor {
     }
     // mousemove
     _mouseMove(e) {
-        this.dynamicCvs.clear();
         const { offsetX: x, offsetY: y } = e;
         // diff (x, y) from mouse down start point
         const dx = x - this.mouseEventStartPos.x;
         const dy = y - this.mouseEventStartPos.y;
-        // canvas translate info
-        const { tx, ty } = this.dynamicCvs.translateInfo;
         if (this.isMouseDown) { // move
             switch (this.mouseDownType) {
-                case 'move-node':
-                    this.dynamicCvs.paintNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
-                    break;
                 case 'drag-canvas':
                     this.mainCvs.clear();
                     this.mainCvs.transform(dx, dy);
-                    this.dynamicCvs.transform(dx, dy);
                     this.mainCvs.preFill();
                     this._render();
                     this.mainCvs.restore();
-                    this.dynamicCvs.restore();
                     break;
             }
         }
@@ -2866,31 +2769,9 @@ class Editor {
         const { offsetX: x, offsetY: y } = e;
         const dx = x - this.mouseEventStartPos.x;
         const dy = y - this.mouseEventStartPos.y;
-        const { tx, ty } = this.dynamicCvs.translateInfo;
         switch (this.mouseDownType) {
-            case 'add-node':
-                this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x: x - tx, y: y - ty }));
-                break;
-            case 'move-node':
-                if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
-                    break;
-                }
-                utils_1.logger('move');
-                this._updateNode(Object.assign(Object.assign({}, this.selectedNode), { x: this.selectedNode.x + dx, y: this.selectedNode.y + dy }));
-                break;
-            case 'add-edge':
-                this.nodes.forEach(node => {
-                    if (node.id !== this.selectedNode.id) { // not link to self && link to an input-anchor
-                        const target = this.mainCvs.checkInNodeAnchor(node, { x, y }, { active: true });
-                        if (target && target[1] === 'input') {
-                            this._addEdge([this.hoverAnchor[0], this.hoverAnchor[2]], [node, target[2]]);
-                        }
-                    }
-                });
-                break;
             case 'drag-canvas':
                 this.mainCvs.translate(dx, dy);
-                this.dynamicCvs.translate(dx, dy);
                 break;
         }
         this._mouseUp();
@@ -2898,7 +2779,6 @@ class Editor {
     _mouseUp() {
         this.isMouseDown = false;
         this.mouseDownType = null;
-        this.dynamicCvs.clear();
     }
     _initCommand() {
         const command = new command_1.Command({ app: this });
@@ -2933,13 +2813,6 @@ class Editor {
     _preventDefaultMenu(e) {
         e.preventDefault();
     }
-    _delNodeCommand() {
-        this._delNode(this.selectedNode.id);
-    }
-    _delEdgeCommand() {
-        this._delEdge(this.selectedEdge.id);
-        this.selectedEdge = null;
-    }
     /*
      * methods
      */
@@ -2961,15 +2834,6 @@ class Editor {
             }
         }
         return null;
-    }
-    _getRelatedEdge(nid) {
-        let tmps = [];
-        this.edges.forEach(e => {
-            if (e.source === nid || e.target === nid) {
-                tmps.push(e);
-            }
-        });
-        return tmps;
     }
 }
 exports.Editor = Editor;
@@ -3083,232 +2947,209 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(__webpack_require__(/*! ./core */ "./src/core.ts"), exports);
 __exportStar(__webpack_require__(/*! ./mind */ "./src/mind.js"), exports);
-__exportStar(__webpack_require__(/*! ./layout/calculate */ "./src/layout/calculate.ts"), exports);
 
 
 /***/ }),
 
-/***/ "./src/layout/calculate.ts":
-/*!*********************************!*\
-  !*** ./src/layout/calculate.ts ***!
-  \*********************************/
+/***/ "./src/layout.ts":
+/*!***********************!*\
+  !*** ./src/layout.ts ***!
+  \***********************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findMaxLevel = exports.format = exports.figure = void 0;
-const format_1 = __webpack_require__(/*! ./format */ "./src/layout/format.ts");
-function figure(data) {
-    let { nodes, edges } = data;
-    edges = cutToDag(edges);
-    const tmp = format_1.buildData({ nodes, edges });
-    nodes = tmp.nodes;
-    const layout = getDepth(nodes, edges);
-    return format({ nodes, edges, layout });
-}
-exports.figure = figure;
-// 去环, 转换为标准 DAG
-function cutToDag(edges) {
-    const i = edges.findIndex(e => e.target.toUpperCase().match(/ROOT/));
-    if (i > -1) {
-        edges.splice(i, 1);
-    }
-    return edges;
-}
-// 计算深度
-function getDepth(nodes, allEdges) {
-    const edges = allEdges.slice();
+const layout = ({ nodes, edges }) => {
+    // TODO 成环的一条特殊标记
+    const [brims, circle] = cutToDag(edges);
+    // 初始化
     // 入度表 { node_id: input_count }
     const inMap = {};
-    // 父节点字典 { node_id: [ parent_id ] }
+    // 父节点表 { node_id: [ parent_id ] }
     const parentsMap = {};
-    // 子节点字典 { node_id: [ child_id ] }
+    // 子节点表 { node_id: [ child_id ] }
     const childrenMap = {};
-    // 层级字典
+    // 层级表
     const levels = {};
-    // 初始化几个关键字典
-    for (let n of nodes) {
-        const { id } = n;
+    // 初始化构建
+    for (let node of nodes) {
+        const { id } = node;
         inMap[id] = 0;
         parentsMap[id] = [];
         childrenMap[id] = [];
     }
-    for (let e of edges) {
-        let s = e.source;
-        let t = e.target;
-        // 入度
+    for (let br of brims) {
+        const s = br.source;
+        const t = br.target;
         inMap[t]++;
-        // 父节点
         parentsMap[t].push(s);
-        // 子节点
         childrenMap[s].push(t);
     }
-    // 几个方法
-    // node_id => node
-    const findNode = id => {
-        return nodes.find(n => n.id === id);
-    };
-    // parent_id => [ child ]
-    const findChildren = id => {
-        return childrenMap[id];
-    };
-    const findChildrenByLevel = (id, lv) => {
-        return findChildren(id).filter(c => levels[lv] && levels[lv].indexOf(c) > -1);
-    };
-    // child_id => [ parent ]
-    const findParents = id => {
-        return parentsMap[id];
-    };
-    const findParentsByLevel = (id, lv) => {
-        return findParents(id).filter(c => levels[lv] && levels[lv].indexOf(c) > -1);
-    };
-    // 根节点
-    const root = getRoot(inMap);
-    const rootNode = findNode(root);
-    // 计算每个节点的最大深度
-    const getNodeDepth = id => {
-        const parents = findParents(id);
-        return parents.length ? Math.max.apply(null, parents.map(pid => findNode(pid)['depth'])) + 1 : 0;
-    };
-    const queue = [];
-    queue.push(root);
-    while (queue.length) {
-        // 从队列中取出当前入度为 0 的节点
-        let curId = queue.pop();
-        // 记录, 得出 cur 的深度, 入度为 0 意味着其父节点均已遍历过
-        let cur = findNode(curId);
-        cur.depth = getNodeDepth(curId);
-        // 查找 cur 的子节点
-        const children = findChildren(curId);
-        children.forEach(c => {
-            inMap[c]--;
-            if (inMap[c] === 0) {
-                queue.push(c);
-            }
-        });
-    }
-    // 层级
-    for (let node of nodes) {
-        let { depth, id } = node;
-        if (!levels.hasOwnProperty(depth)) {
-            levels[depth] = [];
-        }
-        levels[depth].push(id);
-    }
-    // 层内排序
-    const getParentsOrders = (ids, lv) => {
-        const list = levels[lv];
-        return ids.reduce((total, cur) => total + list.indexOf(cur), 0);
-    };
-    for (let l in levels) {
-        const lv = Number(l);
-        const list = levels[l];
-        if (lv > 0) {
-            list.sort((a, b) => {
-                let pa = findParentsByLevel(a, lv - 1);
-                let pb = findParentsByLevel(b, lv - 1);
-                return getParentsOrders(pa, lv - 1) - getParentsOrders(pb, lv - 1);
-            });
-        }
-    }
-    // 以 node 为根的类树的宽度
-    const getWidth = (nid, l) => {
-        const lv = Number(l);
-        const children = findChildrenByLevel(nid, lv + 1);
-        if (!children.length) {
-            const node = findNode(nid);
-            node.hasNoSon = true;
-            return 1;
-        }
-        return children.reduce((total, cur) => {
-            return total + getWidth(cur, lv + 1);
-        }, 0);
-    };
-    for (let l in levels) {
-        const lv = Number(l);
-        const list = levels[l];
-        list.forEach(id => {
-            const node = findNode(id);
-            node.treeWidth = getWidth(id, lv);
-        });
-    }
+    // root
     const ox = 400;
     const oy = 40;
     const ow = 100;
     const oh = 80;
     const gw = 10;
+    const root = Object.keys(inMap).find(k => inMap[k] === 0);
+    const rootNode = findNode(root);
     rootNode.x = ox;
     rootNode.y = oy;
-    // 按层级定位
-    const getGapCount = id => {
-        const node = findNode(id);
-        return childrenMap[id].length - findChildrenByLevel(id, node.depth + 1).length;
-    };
-    // 寻找树里有多少条跨级边
-    const getTreeGapCount = id => {
-        let n = 0;
-        const node = findNode(id);
-        if (node.hasNoSon) {
-            return n;
-        }
-        n = getGapCount(id);
-        const children = findChildrenByLevel(id, node.depth + 1);
-        return n + children.reduce((total, cur) => {
-            return total + getTreeGapCount(cur);
-        }, 0);
-    };
-    // 判断父节点是否有跨级边且不是连向自己
-    const checkParentGap = (cid, pid) => {
-        const gapCount = getGapCount(pid);
-    };
-    for (let l in levels) {
-        const lv = Number(l);
-        const list = levels[l];
-        list.forEach(id => {
-            const node = findNode(id);
-            node.gapCount = getTreeGapCount(id);
-        });
-    }
-    for (let l in levels) {
-        const lv = Number(l);
-        const list = levels[l];
-        list.forEach(pid => {
-            const par = findNode(pid);
-            let sx = par.x - par.treeWidth * ow / 2 - par.gapCount * gw;
-            const children = findChildrenByLevel(pid, lv + 1);
-            children.forEach((c, i) => {
-                const child = findNode(c);
-                if (!child.hasOwnProperty('x') || !child.hasOwnProperty('y')) {
-                    if (i === 0) {
-                        child.x = sx + child.treeWidth * ow / 2;
-                        if (getGapCount(pid)) {
-                            child.x += gw;
-                        }
-                    }
-                    else {
-                        const prev = findNode(children[i - 1]);
-                        child.x = prev.x + prev.treeWidth * ow / 2 + child.treeWidth * ow / 2;
-                    }
-                    child.x += child.gapCount * gw;
-                    child.y = par.y + oh;
+    // 计算节点深度, 由上自下
+    const figureDepth = () => {
+        const queue = [root];
+        const getNodeDepth = id => {
+            const parents = findParents(id);
+            return parents.length ? Math.max.apply(null, parents.map(p => findNode(p)['depth'])) + 1 : 0;
+        };
+        while (queue.length) {
+            const cur = queue.pop();
+            const curNode = findNode(cur);
+            const depth = getNodeDepth(cur);
+            curNode.depth = depth;
+            if (!levels.hasOwnProperty(depth)) {
+                levels[depth] = [];
+            }
+            levels[depth].push(cur);
+            const children = findChildren(cur);
+            children.forEach(child => {
+                inMap[child]--;
+                if (inMap[child] === 0) {
+                    queue.push(child);
                 }
             });
+        }
+    };
+    figureDepth();
+    // 层内梳理
+    const figureLevelInside = () => {
+        // 排序
+        const getFathersTotalOrder = (id, lv) => {
+            if (lv < 2) {
+                return 0;
+            }
+            const ids = findFathers(id);
+            const list = levels[lv - 1];
+            return ids.reduce((total, cur) => total + list.indexOf(cur), 0);
+        };
+        // 宽度
+        const getWidth = id => {
+            const node = findNode(id);
+            if (node.hasOwnProperty('treeWidth')) {
+                return node.treeWidth;
+            }
+            const sons = findSons(id);
+            if (!sons.length) {
+                node.hasNoSon = true;
+                node.treeWidth = 1;
+            }
+            else {
+                node.treeWidth = sons.reduce((total, cur) => total + getWidth(cur), 0);
+            }
+            return node.treeWidth;
+        };
+        // 跨级线, 没有子节点的节点连出的跨级线不占用横向空间, 不计算入内
+        const getTreeGapCount = id => {
+            const node = findNode(id);
+            if (node.hasOwnProperty('gapCount')) {
+                return node.gapCount;
+            }
+            if (node.hasNoSon) {
+                node.gapCount = 0;
+            }
+            else {
+                const sons = findSons(id);
+                node.gapCount = getGapCount(id) + sons.reduce((total, cur) => total + getTreeGapCount(cur), 0);
+            }
+            return node.gapCount;
+        };
+        console.time('figure_level');
+        Object.keys(levels).sort((a, b) => Number(a) - Number(b)).forEach(l => {
+            const lv = Number(l);
+            levels[l].sort((a, b) => {
+                const ca = findChildren(a);
+                const cb = findChildren(b);
+                const pa = getFathersTotalOrder(a, lv);
+                const pb = getFathersTotalOrder(b, lv);
+                if (pa !== pb) {
+                    return pa - pb;
+                }
+                return cb.length - ca.length;
+            });
+            levels[l].forEach(id => {
+                getWidth(id);
+                getTreeGapCount(id);
+                // 计算坐标
+                const node = findNode(id);
+                const sx = node.x - node.treeWidth * ow / 2 - node.gapCount * gw;
+                const sons = findSons(id);
+                sons.forEach((c, i) => {
+                    const child = findNode(c);
+                    if (!child.hasOwnProperty('x') || !child.hasOwnProperty('y')) {
+                        if (i === 0) {
+                            child.x = sx + child.treeWidth * ow / 2;
+                            if (getGapCount(id)) {
+                                child.x += gw;
+                            }
+                        }
+                        else {
+                            const prev = findNode(sons[i - 1]);
+                            child.x = prev.x + prev.treeWidth * ow / 2 + child.treeWidth * ow / 2;
+                        }
+                        child.x += child.gapCount * gw;
+                        child.y = node.y + oh;
+                    }
+                });
+            });
         });
+        console.timeEnd('figure_level');
+    };
+    figureLevelInside();
+    console.log(nodes);
+    // utils
+    // node_id => node
+    function findNode(id) {
+        return nodes.find(n => n.id === id);
     }
-    console.log(levels, nodes);
-    return { levels, childrenMap, parentsMap };
-}
-// 寻找入度为0的节点
-function getRoot(nodesMap) {
-    return Object.keys(nodesMap).filter(n => nodesMap[n] === 0)[0];
-}
+    // node_id => [ child ]
+    function findChildren(id) {
+        return childrenMap[id];
+    }
+    // node_id => [ son ]
+    function findSons(id) {
+        const node = findNode(id);
+        return findChildren(id).filter(c => levels[node.depth + 1] && levels[node.depth + 1].indexOf(c) > -1);
+    }
+    // node_id => [ parent ]
+    function findParents(id) {
+        return parentsMap[id];
+    }
+    // node_id => [ father ]
+    function findFathers(id) {
+        const node = findNode(id);
+        return findParents(id).filter(p => levels[node.depth - 1] && levels[node.depth - 1].indexOf(p) > -1);
+    }
+    // node_id => gap edge
+    function getGapCount(id) {
+        return childrenMap[id].length - findSons(id).length;
+    }
+    function cutToDag(edges) {
+        const i = edges.findIndex(e => e.target.toUpperCase().match(/ROOT/));
+        let circle = [];
+        if (i > -1) {
+            circle = edges.splice(i, 1);
+        }
+        return [edges, circle];
+    }
+    return format({ nodes, edges, layout: { levels, childrenMap, parentsMap } });
+};
 // 格式化填充 editor 要求数据字段
 function format({ nodes, edges, layout }) {
     return {
         nodes: nodes.map(n => {
-            return Object.assign(Object.assign({}, n), { shape: 'shape-001', w: 80, h: 40, anchors: { input: 1, output: 1 } });
+            return Object.assign(Object.assign({}, n), { w: 80, h: 40, anchors: { input: 1, output: 1 } });
         }),
         edges: edges.map(e => {
             return Object.assign(Object.assign({}, e), { id: `edge-${e.name}`, sourceAnchorIndex: 0, targetAnchorIndex: 0 });
@@ -3316,189 +3157,7 @@ function format({ nodes, edges, layout }) {
         layout,
     };
 }
-exports.format = format;
-// 查找最宽层级
-function findMaxLevel(levels, start, end) {
-    let max = start;
-    for (let i = start; i < end; i++) {
-        max = levels[max].length > levels[i].length ? max : i;
-    }
-    return max;
-}
-exports.findMaxLevel = findMaxLevel;
-
-
-/***/ }),
-
-/***/ "./src/layout/format.ts":
-/*!******************************!*\
-  !*** ./src/layout/format.ts ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.buildData = void 0;
-function buildData(params) {
-    const { edges, nodes } = params;
-    const rootName = nodes.find(item => item.id.indexOf('ROOT') > -1).id;
-    const treeData = buildTreeData(edges);
-    const treeArr = [1];
-    treeData[rootName].path = [rootName];
-    changeLevel(treeData[rootName]);
-    const levelData = getLevelData(treeData);
-    countEdges();
-    getLocation();
-    return { edges, nodes };
-    // 计算每个节点左侧有多少条线
-    function countEdges() {
-        levelData.forEach((levelArr, levelIndex) => {
-            if (levelIndex === 0) {
-                levelArr[levelIndex].edgesCount = 0;
-                treeData[rootName].edgesCount = 0;
-                return;
-            }
-            levelArr = levelArr.reduce((allumulatorArr, current, index) => {
-                treeData[current.text].edgesCount = getEdgesCount(current); // 自己的分边
-                const prevItem = allumulatorArr[index - 1];
-                if (index === 0) {
-                    const edgesArrCount = getTotalCount(current.path);
-                    current.edgesCount = edgesArrCount;
-                }
-                else {
-                    // 兄弟节点，不用处理
-                    if (prevItem.father !== current.father) {
-                        // 历史路径对比
-                        const sameAncestorIndex = findSameAncestor(prevItem.path, current.path);
-                        const edgesArr = current.path.slice(sameAncestorIndex + 1);
-                        const edgesArrCount = getTotalCount(edgesArr);
-                        current.edgesCount = edgesArrCount;
-                    }
-                }
-                treeData[current.text].edgesCount = current.edgesCount;
-                // 有前一个节点
-                allumulatorArr.push(current);
-                return allumulatorArr;
-            }, []);
-        });
-    }
-    function buildTreeData(originData) {
-        // 0级节点有1个
-        const data = {};
-        originData.forEach((item) => {
-            const { source, target } = item;
-            if (target === rootName)
-                return false;
-            if (data.hasOwnProperty(target)) {
-                if (!data.hasOwnProperty(source)) {
-                    // 有target，没source
-                    data[source] = {
-                        text: source,
-                        level: 0,
-                        children: []
-                    };
-                }
-                data[source].children.push(data[target]);
-            }
-            else {
-                const hasSource = data.hasOwnProperty(source);
-                const targetData = {
-                    text: target,
-                    level: hasSource ? data[source].level + 1 : 0,
-                    children: []
-                };
-                data[target] = targetData;
-                // 没有 target，有source
-                if (hasSource) {
-                    data[source].children.push(targetData);
-                }
-                else {
-                    data[source] = {
-                        text: source,
-                        level: 0,
-                        children: [targetData]
-                    };
-                }
-            }
-        });
-        return data;
-    }
-    // 修改层级，从root开始，递归修改children的层级，同时更新treeData
-    function changeLevel(data) {
-        const { children, level, text, path } = data;
-        if (children && children.length > 0) {
-            children.forEach((item) => {
-                //   item.father = text;
-                const preLevel = treeData[item.text].level;
-                treeArr.push(item.text);
-                treeData[item.text].count = treeArr.length;
-                treeData[item.text].father = text;
-                treeData[item.text].path = [...path, item.text];
-                // 增加子节点的level
-                if (preLevel < level + 1) {
-                    treeData[item.text].level = level + 1;
-                    item.level = level + 1;
-                }
-                changeLevel(item);
-            });
-        }
-        return treeData;
-    }
-    function getLevelData(data) {
-        const levelData = [];
-        Object.values(data).sort((prev, next) => {
-            return prev.count - next.count;
-        }).forEach(item => {
-            const { level } = item;
-            if (levelData[level]) {
-                levelData[level].push(item);
-            }
-            else {
-                levelData[level] = [item];
-            }
-        });
-        return levelData;
-    }
-    function findSameAncestor(path1, path2) {
-        const newPath1 = [...path1].reverse();
-        const newPath2 = [...path2].reverse();
-        for (let i = 1; i < newPath1.length; i++) {
-            if (newPath1[i] === newPath2[i]) {
-                return path1.length - i;
-            }
-        }
-    }
-    function getEdgesCount(data) {
-        var _a;
-        const match = data.children.find(item => {
-            return item.level > data.level + 1;
-        });
-        return match && ((_a = data.children) === null || _a === void 0 ? void 0 : _a.length) > 1 ? 1 : 0;
-    }
-    function getTotalCount(path) {
-        const newPath = path.slice(0, path.length - 1); // 不算自己
-        return newPath.reduce((acc, current) => {
-            const edgesCount = getEdgesCount(treeData[current]);
-            // const edgesCount = treeData[current].edgesCount; // 缓存
-            return acc + edgesCount;
-        }, 0);
-    }
-    function getLocation() {
-        levelData.forEach((item, level) => {
-            item.forEach((innerItem) => {
-                const node = nodes.find(item => item.id === innerItem.text);
-                node._level = level;
-                node._edgesCount = innerItem.edgesCount;
-                node._father = innerItem.father;
-                node._children = innerItem.children;
-                node._path = innerItem.path;
-            });
-        });
-    }
-}
-exports.buildData = buildData;
+exports.default = layout;
 
 
 /***/ }),
