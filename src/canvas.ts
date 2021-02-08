@@ -208,11 +208,9 @@ export class Canvas {
 			maxWidth,
 			isLeaf,
 			gapCount = 0,
-			edgeCount = 0,
 		}: {
 			id?: string, selected?: boolean, gap?: number, maxWidth?: number, isLeaf?: boolean,
 			gapCount?: number,
-			edgeCount?: number,
 		}		// options
 	) {
 		const { ctx, ratio: r } = this
@@ -231,6 +229,13 @@ export class Canvas {
 			const cp1 = [sx, sy + diffY / 4]
 			const cp2 = [ex, sy + diffY / 4]
 			path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey)
+		} else if (gap === -1) {
+			const lx = ex - (gapCount + 1) * gw * r - maxWidth / 2
+			path.lineTo(sx, sy + 40)
+			path.lineTo(lx, sy + 40)
+			path.lineTo(lx, ey - 40)
+			path.lineTo(ex, ey - 40)
+			path.lineTo(ex, ey)
 		} else {
 			if (isLeaf) {
 				path.lineTo(sx, ey - diffY / 2)
@@ -245,7 +250,6 @@ export class Canvas {
 				path.lineTo(lx, ey - diffY / 2)
 				path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey)
 			}
-
 		}
 
 		// 连线

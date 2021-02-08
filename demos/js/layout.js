@@ -9,6 +9,7 @@ function createLayout({
   page,
   data,
   nodeSelected,
+  edgeSelected,
 }) {
   const editor = new Editor({
     page,
@@ -16,6 +17,7 @@ function createLayout({
   editor.setData(layout(data))
 
   nodeSelected && editor.on('selectedNodeChange', nodeSelected)
+  edgeSelected && editor.on('selectedEdgeChange', edgeSelected)
 }
 
 export default createLayout

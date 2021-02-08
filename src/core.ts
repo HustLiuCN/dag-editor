@@ -131,6 +131,7 @@ export class Editor {
 		}
 		this.__selectedEdge = edge
 		this._renderTask('selected edge change')
+		this.callback.selectedEdgeChange && this.callback.selectedEdgeChange(edge)
 	}
 	private hoverAnchor: [Editor.INode, string, number]		// [node, type, index]
 
@@ -162,7 +163,7 @@ export class Editor {
 		this._paintEdgeTask()
 	}
 	private _paintEdgeTask() {
-		const { levels } = this.layout
+		const { circle } = this.layout
 		const edges = this.edges.slice()
 
 		let gap = 1
@@ -185,7 +186,6 @@ export class Editor {
 							maxWidth: start.treeWidth * ow,
 							isLeaf: start.hasNoSon,
 							gapCount: start.gapCount,
-							edgeCount: start._edgesCount,
 						},
 					)
 					count ++
@@ -194,7 +194,28 @@ export class Editor {
 			})
 			gap ++
 		}
+		this._paintTail(circle[0])
 		// console.log(gap, count, edges.length);
+	}
+	private _paintTail(circle: Editor.IEdge) {
+		const { source, target, id } = circle
+		const start = this.nodes.find(n => n.id === source)
+		const end = this.nodes.find(n => n.id === target)
+		let startPos = getAnchorPos(start, 'output', 0, start.anchors.output)
+		let endPos = getAnchorPos(end, 'input', 0, end.anchors.input)
+
+		this.mainCvs.paintEdge(
+			startPos,
+			endPos,
+			{
+				id,
+				selected: this.selectedEdge && this.selectedEdge.id === id,
+				gap: -1,
+				// TODO
+				maxWidth: end.treeWidth * ow,
+				gapCount: end.gapCount,
+			},
+		)
 	}
 	/*
 	 *	public
@@ -205,6 +226,7 @@ export class Editor {
 		nodeDeleted: null,
 		edgeAdded: null,
 		edgeDeleted: null,
+		selectedEdgeChange: null,
 	}
 	on(ev: Editor.ICallback, cb: Function) {
 		if (this.callback.hasOwnProperty(ev)) {

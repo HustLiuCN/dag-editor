@@ -9,4 +9,5 @@ createLayout({
   page: '#editor',
   data: mock.mock_data_6,
   nodeSelected: node => console.log(node),
+  edgeSelected: edge => console.log(edge),
 })

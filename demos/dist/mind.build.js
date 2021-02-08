@@ -922,7 +922,7 @@ class Canvas {
     // paint edge
     paintEdge({ x: sx, y: sy }, // start
     { x: ex, y: ey }, // end
-    { id, selected, gap = 1, maxWidth, isLeaf, gapCount = 0, edgeCount = 0, } // options
+    { id, selected, gap = 1, maxWidth, isLeaf, gapCount = 0, } // options
     ) {
         const { ctx, ratio: r } = this;
         sx *= r;
@@ -940,6 +940,14 @@ class Canvas {
             const cp1 = [sx, sy + diffY / 4];
             const cp2 = [ex, sy + diffY / 4];
             path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], ex, ey);
+        }
+        else if (gap === -1) {
+            const lx = ex - (gapCount + 1) * gw * r - maxWidth / 2;
+            path.lineTo(sx, sy + 40);
+            path.lineTo(lx, sy + 40);
+            path.lineTo(lx, ey - 40);
+            path.lineTo(ex, ey - 40);
+            path.lineTo(ex, ey);
         }
         else {
             if (isLeaf) {
@@ -1171,6 +1179,7 @@ class Editor {
             nodeDeleted: null,
             edgeAdded: null,
             edgeDeleted: null,
+            selectedEdgeChange: null,
         };
         /*
          *	events
@@ -1293,6 +1302,7 @@ class Editor {
         }
         this.__selectedEdge = edge;
         this._renderTask('selected edge change');
+        this.callback.selectedEdgeChange && this.callback.selectedEdgeChange(edge);
     }
     // clear
     _clear() {
@@ -1320,7 +1330,7 @@ class Editor {
         this._paintEdgeTask();
     }
     _paintEdgeTask() {
-        const { levels } = this.layout;
+        const { circle } = this.layout;
         const edges = this.edges.slice();
         let gap = 1;
         let count = 0;
@@ -1339,7 +1349,6 @@ class Editor {
                         maxWidth: start.treeWidth * ow,
                         isLeaf: start.hasNoSon,
                         gapCount: start.gapCount,
-                        edgeCount: start._edgesCount,
                     });
                     count++;
                     // edges.splice(i, 1)
@@ -1347,7 +1356,23 @@ class Editor {
             });
             gap++;
         }
+        this._paintTail(circle[0]);
         // console.log(gap, count, edges.length);
+    }
+    _paintTail(circle) {
+        const { source, target, id } = circle;
+        const start = this.nodes.find(n => n.id === source);
+        const end = this.nodes.find(n => n.id === target);
+        let startPos = utils_1.getAnchorPos(start, 'output', 0, start.anchors.output);
+        let endPos = utils_1.getAnchorPos(end, 'input', 0, end.anchors.input);
+        this.mainCvs.paintEdge(startPos, endPos, {
+            id,
+            selected: this.selectedEdge && this.selectedEdge.id === id,
+            gap: -1,
+            // TODO
+            maxWidth: end.treeWidth * ow,
+            gapCount: end.gapCount,
+        });
     }
     on(ev, cb) {
         if (this.callback.hasOwnProperty(ev)) {

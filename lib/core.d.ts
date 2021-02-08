@@ -26,6 +26,7 @@ export declare class Editor {
     private _renderTask;
     private _render;
     private _paintEdgeTask;
+    private _paintTail;
     private callback;
     on(ev: Editor.ICallback, cb: Function): void;
     update(node: Editor.INode): void;

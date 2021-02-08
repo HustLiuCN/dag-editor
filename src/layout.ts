@@ -187,7 +187,7 @@ const layout = ({ nodes, edges }) => {
     return [edges, circle]
   }
 
-  return format({ nodes, edges, layout: { levels, childrenMap, parentsMap }})
+  return format({ nodes, edges, layout: { levels, childrenMap, parentsMap, circle }})
 }
 
 // 格式化填充 editor 要求数据字段
