@@ -7,6 +7,7 @@ const webpackConfig = {
 	entry: {
 		mind: './demos/js/mind',
 		editor: './demos/js/editor',
+		layout: './demos/js/layout',
 	},
 	output: {
 		filename: '[name].build.js',

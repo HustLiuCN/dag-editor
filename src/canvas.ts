@@ -241,7 +241,7 @@ export class Canvas {
 				const cp2 = [lx, sy + diffY / 4]
 				const cp3 = [lx, ey - diffY / 4]
 				const cp4 = [ex, ey - diffY / 4]
-				path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY / 2)
+				path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY)
 				path.lineTo(lx, ey - diffY / 2)
 				path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey)
 			}

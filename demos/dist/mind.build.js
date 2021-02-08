@@ -952,7 +952,7 @@ class Canvas {
                 const cp2 = [lx, sy + diffY / 4];
                 const cp3 = [lx, ey - diffY / 4];
                 const cp4 = [ex, ey - diffY / 4];
-                path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY / 2);
+                path.bezierCurveTo(cp1[0], cp1[1], cp2[0], cp2[1], lx, sy + diffY);
                 path.lineTo(lx, ey - diffY / 2);
                 path.bezierCurveTo(cp3[0], cp3[1], cp4[0], cp4[1], ex, ey);
             }
@@ -1136,95 +1136,6 @@ exports.Command = Command;
 
 /***/ }),
 
-/***/ "./src/contextmenu.ts":
-/*!****************************!*\
-  !*** ./src/contextmenu.ts ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ContextMenu = void 0;
-const dom_1 = __webpack_require__(/*! ./dom */ "./src/dom.ts");
-class ContextMenu {
-    constructor({ app, command, container, }) {
-        this.app = app;
-        this.command = command;
-        this.container = container;
-        this._init();
-        this._bind();
-    }
-    // init
-    _init() {
-        const oBody = this._createBody();
-        this.body = oBody;
-        this.container.appendChild(oBody);
-    }
-    _bind() {
-        this.body.addEventListener('click', e => {
-            const o = e.target;
-            if (o.classList.contains('editor-contextmenu-item')) {
-                let command = dom_1.getAttr(o, 'data-command');
-                this.command.execute(command);
-                this.detach();
-            }
-        });
-    }
-    // attach
-    attach(e, { type }) {
-        this.detach();
-        this.body.classList.add('show');
-        this.body.style.left = `${e.clientX}px`;
-        this.body.style.top = `${e.clientY}px`;
-        switch (type) {
-            case 'node':
-                this.body.appendChild(this._createDelItem());
-                break;
-            case 'edge':
-                this.body.appendChild(this._createDelEdge());
-                break;
-            default:
-                this.body.appendChild(this._createClearItem());
-                break;
-        }
-    }
-    // detach
-    detach() {
-        this.body.innerHTML = '';
-        this.body.classList.remove('show');
-    }
-    // create dom
-    _createBody() {
-        const body = dom_1.createDom('div', 'editor-contextmenu bxs', 'editor-contextmenu');
-        // body.classList
-        return body;
-    }
-    _createDelItem() {
-        const item = dom_1.createDom('div', 'editor-contextmenu-item');
-        item.setAttribute('data-command', 'del:node');
-        item.innerText = '删除节点';
-        return item;
-    }
-    _createDelEdge() {
-        const item = dom_1.createDom('div', 'editor-contextmenu-item');
-        item.setAttribute('data-command', 'del:edge');
-        item.innerText = '删除边';
-        return item;
-    }
-    _createClearItem() {
-        const item = dom_1.createDom('div', 'editor-contextmenu-item');
-        item.setAttribute('data-command', 'clear');
-        item.innerText = '清空';
-        return item;
-    }
-}
-exports.ContextMenu = ContextMenu;
-
-
-/***/ }),
-
 /***/ "./src/core.ts":
 /*!*********************!*\
   !*** ./src/core.ts ***!
@@ -1247,11 +1158,10 @@ const utils_1 = __webpack_require__(/*! ./utils */ "./src/utils.ts");
 const canvas_1 = __webpack_require__(/*! ./canvas */ "./src/canvas.ts");
 const event_1 = __webpack_require__(/*! ./event */ "./src/event.ts");
 const command_1 = __webpack_require__(/*! ./command */ "./src/command.ts");
-const contextmenu_1 = __webpack_require__(/*! ./contextmenu */ "./src/contextmenu.ts");
 const ow = 100;
 // Editor core
 class Editor {
-    constructor({ container, page, config, }) {
+    constructor({ page, config, }) {
         /*
          *	public
          */
@@ -1271,7 +1181,6 @@ class Editor {
             ['oPage', 'mousemove', '_mouseMove'],
             ['oPage', 'mouseleave', '_mouseLeavePage'],
             ['oPage', 'mouseup', '_mouseUpPage'],
-            ['oContainer', 'contextmenu', '_preventDefaultMenu'],
         ];
         /*
          *	add-node
@@ -1298,10 +1207,9 @@ class Editor {
         };
         console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;');
         // dom container
-        this.oContainer = dom_1.getDom(container);
+        // this.oContainer = getDom(container)
         this.oPage = dom_1.getDom(page);
         // init property
-        this.shapes = {};
         this.nodes = [];
         this.edges = [];
         // extra config
@@ -1316,12 +1224,11 @@ class Editor {
         this._initCommand();
     }
     _initPageConfig() {
-        if (!this.oPage || !this.oContainer) {
+        if (!this.oPage) {
             throw Error('cannot find Editor editor container');
         }
         else {
             this.oPage.classList.add('editor-page');
-            this.oContainer.classList.add('editor-container');
         }
         let rect = this.oPage.getBoundingClientRect();
         const ratio = window.devicePixelRatio || 1;
@@ -1520,8 +1427,6 @@ class Editor {
             this.selectedEdge = this._getSelectedEdge({ x, y });
             this.mouseDownType = 'drag-canvas';
         }
-        // trigger contextmenu
-        this._triggerMenu(e.button === 2, e);
     }
     // mousemove
     _mouseMove(e) {
@@ -1585,28 +1490,6 @@ class Editor {
             command.register(cmd, this[commands[cmd]]);
         }
         this.command = command;
-        this.contextmenu = new contextmenu_1.ContextMenu({
-            app: this,
-            command,
-            container: this.oContainer
-        });
-    }
-    _triggerMenu(show, e) {
-        if (show) {
-            let options = {
-                type: null,
-            };
-            if (this.selectedNode) {
-                options.type = 'node';
-            }
-            else if (this.selectedEdge) {
-                options.type = 'edge';
-            }
-            this.contextmenu.attach(e, options);
-        }
-        else {
-            this.contextmenu.detach();
-        }
     }
     _preventDefaultMenu(e) {
         e.preventDefault();

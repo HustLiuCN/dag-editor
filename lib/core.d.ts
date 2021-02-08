@@ -1,7 +1,6 @@
 import '../style/editor.css';
 export declare class Editor {
-    constructor({ container, page, config, }: Editor.IOption);
-    readonly oContainer: HTMLElement;
+    constructor({ page, config, }: Editor.IOption);
     readonly oPage: HTMLElement;
     extraConfig: any;
     private _init;
@@ -9,7 +8,6 @@ export declare class Editor {
     private _initCanvas;
     pageConfig: Editor.IPageConfig;
     private mainCvs;
-    private shapes;
     protected nodes: Editor.INode[];
     private __selectedNode;
     private get selectedNode();
@@ -65,7 +63,6 @@ export declare class Editor {
         clear: string;
     };
     private _initCommand;
-    private _triggerMenu;
     private _preventDefaultMenu;
     private _getSelectedNode;
     private _getSelectedEdge;

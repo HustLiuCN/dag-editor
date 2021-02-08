@@ -1,5 +1,3 @@
-import { buildData } from './format'
-
 const layout = ({ nodes, edges }) => {
   // TODO 成环的一条特殊标记
   const [brims, circle] = cutToDag(edges)

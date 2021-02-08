@@ -16,16 +16,14 @@ const ow = 100
 // Editor core
 export class Editor {
 	constructor({
-		container,
 		page,
 		config,
 	}: Editor.IOption) {
 		console.info('%csimple-dag-editor: created', 'color: #c5e1a5;font-weight: bold;')
 		// dom container
-		this.oContainer = getDom(container)
+		// this.oContainer = getDom(container)
 		this.oPage = getDom(page)
 		// init property
-		this.shapes = {}
 		this.nodes = []
 		this.edges = []
 		// extra config
@@ -34,7 +32,7 @@ export class Editor {
 		this._init()
 		this._renderTask('init')
 	}
-	readonly oContainer: HTMLElement
+	// readonly oContainer: HTMLElement
 	readonly oPage: HTMLElement
 	extraConfig: any
 	// init canvas
@@ -44,11 +42,10 @@ export class Editor {
 		this._initCommand()
 	}
 	private _initPageConfig() {
-		if (!this.oPage || !this.oContainer) {
+		if (!this.oPage) {
 			throw Error('cannot find Editor editor container')
 		} else {
 			this.oPage.classList.add('editor-page')
-			this.oContainer.classList.add('editor-container')
 		}
 		let rect = this.oPage.getBoundingClientRect()
 		const ratio = window.devicePixelRatio || 1
@@ -77,8 +74,6 @@ export class Editor {
 	}
 	pageConfig: Editor.IPageConfig
 	private mainCvs: Canvas
-	// register shape
-	private shapes: Editor.IShapes
 	/*
 	 *	node
 	 */
@@ -278,7 +273,7 @@ export class Editor {
 		['oPage', 'mousemove', '_mouseMove'],
 		['oPage', 'mouseleave', '_mouseLeavePage'],
 		['oPage', 'mouseup', '_mouseUpPage'],
-		['oContainer', 'contextmenu', '_preventDefaultMenu'],
+		// ['oContainer', 'contextmenu', '_preventDefaultMenu'],
 	]
 	private _bindEvents() {
 		const event = new Event({
@@ -323,8 +318,6 @@ export class Editor {
 			this.selectedEdge = this._getSelectedEdge({ x, y })
 			this.mouseDownType = 'drag-canvas'
 		}
-		// trigger contextmenu
-		this._triggerMenu(e.button === 2, e)
 	}
 	// mousemove
 	private _mouseMove(e: MouseEvent) {
@@ -399,26 +392,6 @@ export class Editor {
 		}
 
 		this.command = command
-		this.contextmenu = new ContextMenu({
-			app: this,
-			command,
-			container: this.oContainer
-		})
-	}
-	private _triggerMenu(show: boolean, e?: MouseEvent) {
-		if (show) {
-			let options = {
-				type: null,
-			}
-			if (this.selectedNode) {
-				options.type = 'node'
-			} else if (this.selectedEdge) {
-				options.type = 'edge'
-			}
-			this.contextmenu.attach(e, options)
-		} else {
-			this.contextmenu.detach()
-		}
 	}
 	private _preventDefaultMenu(e: MouseEvent) {
 		e.preventDefault()
