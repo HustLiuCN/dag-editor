@@ -2965,7 +2965,7 @@ function format({ nodes, edges, layout }) {
             return Object.assign(Object.assign({}, n), { name: n.label, w: 80, h: 40, anchors: { input: 1, output: 1 } });
         }),
         edges: edges.map(e => {
-            return Object.assign(Object.assign({}, e), { id: `edge-${e.name}`, sourceAnchorIndex: 0, targetAnchorIndex: 0 });
+            return Object.assign(Object.assign({}, e), { id: `edge-${e.name}`, sourceAnchorIndex: 0, targetAnchorIndex: 0, name: e.label });
         }),
         layout,
     };

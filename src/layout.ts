@@ -208,6 +208,7 @@ function format({ nodes, edges, layout }) {
         id: `edge-${e.name}`,
         sourceAnchorIndex: 0,
         targetAnchorIndex: 0,
+        name: e.label,
       }
     }),
     layout,
