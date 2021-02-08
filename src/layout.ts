@@ -196,6 +196,7 @@ function format({ nodes, edges, layout }) {
     nodes: nodes.map(n => {
       return {
         ...n,
+        name: n.label,
         w:80,
         h:40,
         anchors: { input:1, output:1 },

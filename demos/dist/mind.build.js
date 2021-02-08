@@ -1351,13 +1351,13 @@ class Editor {
                         gapCount: start.gapCount,
                     });
                     count++;
-                    // edges.splice(i, 1)
                 }
             });
             gap++;
         }
-        this._paintTail(circle[0]);
-        // console.log(gap, count, edges.length);
+        if (circle.length) {
+            this._paintTail(circle[0]);
+        }
     }
     _paintTail(circle) {
         const { source, target, id } = circle;

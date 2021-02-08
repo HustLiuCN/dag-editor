@@ -2458,13 +2458,13 @@ class Editor {
                         gapCount: start.gapCount,
                     });
                     count++;
-                    // edges.splice(i, 1)
                 }
             });
             gap++;
         }
-        this._paintTail(circle[0]);
-        // console.log(gap, count, edges.length);
+        if (circle.length) {
+            this._paintTail(circle[0]);
+        }
     }
     _paintTail(circle) {
         const { source, target, id } = circle;
@@ -2962,7 +2962,7 @@ const layout = ({ nodes, edges }) => {
 function format({ nodes, edges, layout }) {
     return {
         nodes: nodes.map(n => {
-            return Object.assign(Object.assign({}, n), { w: 80, h: 40, anchors: { input: 1, output: 1 } });
+            return Object.assign(Object.assign({}, n), { name: n.label, w: 80, h: 40, anchors: { input: 1, output: 1 } });
         }),
         edges: edges.map(e => {
             return Object.assign(Object.assign({}, e), { id: `edge-${e.name}`, sourceAnchorIndex: 0, targetAnchorIndex: 0 });
