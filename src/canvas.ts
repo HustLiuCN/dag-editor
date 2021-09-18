@@ -37,6 +37,7 @@ export class Canvas {
 			edges: {},
 			anchors: {},
 			activeAnchors: {},
+			placeholder: null,
 		}
 		// translate
 		this.translateInfo = {
@@ -61,6 +62,8 @@ export class Canvas {
 		activeAnchors: {
 			[id: string]: Array<{ type: string, index: number, path: Path2D }>
 		},
+		// placeholder node path
+		placeholder: Path2D | null,
 	}
 	translateInfo: { x: number, y: number, tx: number, ty: number }
 	translate(dx: number, dy: number) {
@@ -103,6 +106,11 @@ export class Canvas {
 		ctx.restore()
 		// create & save rectangle path
 		const path = this._paintRoundRect(ox, oy, w, h, 4*r)
+		// paint node if placeholder
+		if (node.isPlaceholder) {
+			this._paintPlaceholderNode(path);
+			return;
+		}
 		if (node.id && this.hasStore) {
 			this.paths.nodes[node.id] = path
 		}
@@ -161,6 +169,16 @@ export class Canvas {
 		path.closePath()
 		return path
 	}
+	private _paintPlaceholderNode(path: Path2D) {
+		const { ctx } = this
+		this.paths.placeholder = path
+		ctx.save()
+		ctx.setLineDash([5, 10])
+		ctx.stroke(path)
+		ctx.fillStyle = COLOR.lingthBlue
+		ctx.fill(path)
+		ctx.restore()
+	}
 	checkInNode(nid: string, pos: Editor.IPos) {
 		const r = this.ratio
 		const path = this.paths.nodes[nid]
@@ -168,6 +186,13 @@ export class Canvas {
 		x *= r
 		y *= r
 		return path && this.ctx.isPointInPath(path, x, y)
+	}
+	checkInPlaceholder({x, y}: Editor.IPos) {
+		const { placeholder: path } = this.paths;
+		const r = this.ratio;
+		x *= r;
+		y *= r;
+		return path && this.ctx.isPointInPath(path, x, y);
 	}
 	// paint anchor
 	private _paintAnchor({ x, y }: { x: number, y: number }): [Path2D, Path2D] {

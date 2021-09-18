@@ -129,6 +129,9 @@ export class Editor {
 		this.nodes.push({ ...node, id: randomID() })
 		let cur = this.nodes[this.nodes.length - 1]
 		this.callback.nodeAdded && this.callback.nodeAdded(cur)
+		if (node.isPlaceholder) {
+			return
+		}
 		this.selectedNode = cur
 	}
 	private _updateNode(node: Editor.INode) {
@@ -340,6 +343,14 @@ export class Editor {
 		this.isMouseDown = true
 		this.mouseDownType = 'add-node'
 		this.selectedShape = this.shapes[shape]
+
+		// add placeholder node
+		const n = this.nodes.find(n => n.isPlaceholder)?.id
+		if (n) {
+			this._delNode(n)
+		}
+		this._addNode({ ...this.selectedShape, x: 200, y: 200, isPlaceholder: true })
+		this.repaint()
 	}
 	// mousedown on page
 	private _mouseDownOnPage(e: MouseEvent) {
@@ -436,7 +447,20 @@ export class Editor {
 		const { tx, ty } = this.dynamicCvs.translateInfo
 		switch(this.mouseDownType) {
 			case 'add-node':
-				this._addNode({ ...this.selectedShape, x: x - tx, y: y - ty })
+				const placeholder = this.nodes.find(n => n.isPlaceholder);
+				// console.log(x - tx, y - ty, placeholder);
+				const isIn = this.mainCvs.checkInPlaceholder({ x, y })
+				console.log(isIn)
+				if (isIn && placeholder) {
+					this._delNode(placeholder.id)
+					this._addNode({
+						...this.selectedShape,
+						x: placeholder.x,
+						y: placeholder.y,
+					})
+				}
+
+				// this._addNode({ ...this.selectedShape, x: x - tx, y: y - ty })
 				break
 			case 'move-node':
 				if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {
@@ -599,6 +623,7 @@ export namespace Editor {
 		name: string,
 		color?: string,
 		anchors: IAnchor,
+		isPlaceholder?: boolean;
 	}
 	export interface IEdge {
 		id?: string,

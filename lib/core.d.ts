@@ -120,6 +120,7 @@ export declare namespace Editor {
         name: string;
         color?: string;
         anchors: IAnchor;
+        isPlaceholder?: boolean;
     }
     interface IEdge {
         id?: string;

@@ -777,6 +777,7 @@ class Canvas {
             edges: {},
             anchors: {},
             activeAnchors: {},
+            placeholder: null,
         };
         // translate
         this.translateInfo = {
@@ -826,6 +827,11 @@ class Canvas {
         ctx.restore();
         // create & save rectangle path
         const path = this._paintRoundRect(ox, oy, w, h, 4 * r);
+        // paint node if placeholder
+        if (node.isPlaceholder) {
+            this._paintPlaceholderNode(path);
+            return;
+        }
         if (node.id && this.hasStore) {
             this.paths.nodes[node.id] = path;
         }
@@ -884,10 +890,27 @@ class Canvas {
         path.closePath();
         return path;
     }
+    _paintPlaceholderNode(path) {
+        const { ctx } = this;
+        this.paths.placeholder = path;
+        ctx.save();
+        ctx.setLineDash([5, 10]);
+        ctx.stroke(path);
+        ctx.fillStyle = color_1.default.lingthBlue;
+        ctx.fill(path);
+        ctx.restore();
+    }
     checkInNode(nid, pos) {
         const r = this.ratio;
         const path = this.paths.nodes[nid];
         let { x, y } = pos;
+        x *= r;
+        y *= r;
+        return path && this.ctx.isPointInPath(path, x, y);
+    }
+    checkInPlaceholder({ x, y }) {
+        const { placeholder: path } = this.paths;
+        const r = this.ratio;
         x *= r;
         y *= r;
         return path && this.ctx.isPointInPath(path, x, y);
@@ -1385,6 +1408,9 @@ class Editor {
         this.nodes.push(Object.assign(Object.assign({}, node), { id: utils_1.randomID() }));
         let cur = this.nodes[this.nodes.length - 1];
         this.callback.nodeAdded && this.callback.nodeAdded(cur);
+        if (node.isPlaceholder) {
+            return;
+        }
         this.selectedNode = cur;
     }
     _updateNode(node) {
@@ -1526,6 +1552,7 @@ class Editor {
     }
     // mousedown on itempanel
     _beginAddNode(e) {
+        var _a;
         const o = e.target;
         const shape = dom_1.getAttr(o, 'data-shape');
         if (!shape) {
@@ -1534,6 +1561,13 @@ class Editor {
         this.isMouseDown = true;
         this.mouseDownType = 'add-node';
         this.selectedShape = this.shapes[shape];
+        // add placeholder node
+        const n = (_a = this.nodes.find(n => n.isPlaceholder)) === null || _a === void 0 ? void 0 : _a.id;
+        if (n) {
+            this._delNode(n);
+        }
+        this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x: 200, y: 200, isPlaceholder: true }));
+        this.repaint();
     }
     // mousedown on page
     _mouseDownOnPage(e) {
@@ -1628,7 +1662,15 @@ class Editor {
         const { tx, ty } = this.dynamicCvs.translateInfo;
         switch (this.mouseDownType) {
             case 'add-node':
-                this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x: x - tx, y: y - ty }));
+                const placeholder = this.nodes.find(n => n.isPlaceholder);
+                // console.log(x - tx, y - ty, placeholder);
+                const isIn = this.mainCvs.checkInPlaceholder({ x, y });
+                console.log(isIn);
+                if (isIn && placeholder) {
+                    this._delNode(placeholder.id);
+                    this._addNode(Object.assign(Object.assign({}, this.selectedShape), { x: placeholder.x, y: placeholder.y }));
+                }
+                // this._addNode({ ...this.selectedShape, x: x - tx, y: y - ty })
                 break;
             case 'move-node':
                 if (Math.abs(dx) < 5 && Math.abs(dy) < 5) {

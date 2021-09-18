@@ -35,6 +35,7 @@ export declare class Canvas {
                 path: Path2D;
             }>;
         };
+        placeholder: Path2D | null;
     };
     translateInfo: {
         x: number;
@@ -50,7 +51,9 @@ export declare class Canvas {
         isNew?: boolean;
     }): void;
     private _paintRoundRect;
+    private _paintPlaceholderNode;
     checkInNode(nid: string, pos: Editor.IPos): boolean;
+    checkInPlaceholder({ x, y }: Editor.IPos): boolean;
     private _paintAnchor;
     checkInNodeAnchor(node: Editor.INode, pos: Editor.IPos, opts?: {
         active?: boolean;
